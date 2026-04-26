@@ -368,9 +368,15 @@ export default function Stats() {
         {years.length > 0 && (
           <div className="card" style={{ marginBottom:'1.5rem' }}>
             <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Skoki per rok</h3>
-            {Object.entries(perYear).sort().map(([year, count]) => (
-              <Bar key={year} label={year} value={count} max={maxPerYear} color="var(--accent)" />
-            ))}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(130px, 1fr))', gap:'0.5rem' }}>
+              {Object.entries(perYear).sort().map(([year, count]) => (
+                <div key={year} style={{ background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:8, padding:'0.65rem 0.85rem', borderTop:'2px solid var(--accent)' }}>
+                  <div style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', marginBottom:3 }}>{year}</div>
+                  <div style={{ fontFamily:'var(--head)', fontSize:'1.4rem', fontWeight:900, color:'var(--text)' }}>{count}</div>
+                  <div style={{ fontSize:'0.68rem', color:'var(--muted)', marginTop:2 }}>skoków</div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
