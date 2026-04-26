@@ -540,7 +540,7 @@ export default function Stats() {
 
                       const lines = []
                       Object.entries(byMonth).sort((a,b) => a[0]-b[0]).forEach(([mi, mJumps]) => {
-                        lines.push(`--- ${months[parseInt(mi)]} ${yr} (${mJumps.length} skoków) ---`)
+                        lines.push(`--- ${months[parseInt(mi)]} ${yr} ---`)
                         mJumps.forEach(j => {
                           const parts = [
                             `#${j.number}`,
@@ -553,6 +553,12 @@ export default function Stats() {
                           ].filter(Boolean)
                           lines.push(parts.join(' | '))
                         })
+                        // Podsumowanie miesiąca
+                        const withRes = mJumps.filter(j => j.result && parseFloat(j.result) >= 0)
+                        const avgRes = withRes.length
+                          ? (withRes.reduce((s,j) => s + parseFloat(j.result), 0) / withRes.length).toFixed(2)
+                          : null
+                        lines.push(`Podsumowanie: ${mJumps.length} skoków${avgRes ? ` | Śr. wynik: ${avgRes} cm` : ''}`)
                         lines.push('')
                       })
 
