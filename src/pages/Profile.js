@@ -81,7 +81,15 @@ export default function Profile() {
 
   const downloadDoc = async (name) => {
     const { data } = await supabase.storage.from('documents').createSignedUrl(`${profileBase.uid}/${name}`, 60)
-    if (data?.signedUrl) window.open(data.signedUrl, '_blank')
+    if (data?.signedUrl) {
+      const a = document.createElement('a')
+      a.href = data.signedUrl
+      a.download = cleanName(name)
+      a.target = '_blank'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
   }
 
   const deleteDoc = async (name) => {
