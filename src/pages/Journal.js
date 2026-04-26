@@ -63,7 +63,7 @@ export default function Journal() {
               <div style={{ fontSize:32, flexShrink:0 }}>{expired ? '🚨' : days <= 14 ? '⚠️' : '📅'}</div>
               <div style={{ flex:1 }}>
                 <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color: expired ? 'var(--danger)' : '#FBBF24', marginBottom:2 }}>
-                  {expired ? 'PRZETERMINOWANE UŁOŻENIE ZAPASOWEGO!' : 'Zbliża się koniec ważności ułożenia zapasowego'}
+                  {expired ? 'NIEAKTUALNE UŁOŻENIE SPADOCHRONU ZAPASOWEGO!' : 'Zbliża się koniec ważności ułożenia zapasowego'}
                 </div>
                 <div style={{ fontSize:'0.82rem', color: expired ? 'var(--danger)' : '#FBBF24', opacity:0.9 }}>
                   {profile.reserve_name && <span style={{ fontWeight:600 }}>{profile.reserve_name} — </span>}
