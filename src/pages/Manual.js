@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 
 const Section = ({ title, children }) => (
@@ -57,7 +56,6 @@ const FieldTable = ({ rows }) => (
 )
 
 export default function Manual() {
-  const navigate = useNavigate()
 
   return (
     <div>
