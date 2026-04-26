@@ -44,18 +44,18 @@ export default function Login() {
             by SkyQba ver 1.0
           </div>
           <div style={{ fontFamily:'var(--mono)', fontSize:'0.7rem', letterSpacing:'2px', color:'var(--muted)', textTransform:'uppercase' }}>
-            Parachute Jump Logbook
+            Dziennik skoków spadochronowych
           </div>
         </div>
 
         <div className="card">
           <h2 style={{ fontFamily:'var(--head)', fontSize:'1.2rem', fontWeight:800, marginBottom:'1.5rem' }}>
-            {resetMode ? 'Reset Password' : 'Sign In'}
+            {resetMode ? 'Resetowanie hasła' : 'Logowanie'}
           </h2>
 
           {resetSent && (
             <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.85rem 1rem', marginBottom:'1rem', fontSize:'0.88rem', color:'var(--success)' }}>
-              Reset link sent! Check your email.
+              Link do resetowania hasła został wysłany! Sprawdź skrzynkę e-mail.
             </div>
           )}
 
@@ -77,17 +77,17 @@ export default function Login() {
               </div>
             )}
             <button className="btn" type="submit" disabled={loading}>
-              {loading ? 'Please wait...' : resetMode ? 'Send Reset Link' : 'Sign In'}
+              {loading ? 'Proszę czekać...' : resetMode ? 'Wyślij link resetujący' : 'Zaloguj się'}
             </button>
           </form>
 
           <div style={{ marginTop:'1rem', display:'flex', flexDirection:'column', gap:'0.5rem', alignItems:'center' }}>
             <button onClick={() => { setResetMode(!resetMode); setError(''); setResetSent(false) }}
               style={{ background:'none', border:'none', color:'var(--muted)', fontSize:'0.82rem', cursor:'pointer', fontFamily:'var(--font)' }}>
-              {resetMode ? '← Back to Sign In' : 'Forgot password?'}
+              {resetMode ? '← Wróć do logowania' : 'Zapomniałeś hasła?'}
             </button>
             <Link to="/register" style={{ color:'var(--accent2)', fontSize:'0.82rem', textDecoration:'none' }}>
-              No account yet? Register →
+              Nie masz konta? Zarejestruj się →
             </Link>
           </div>
         </div>
