@@ -29,7 +29,6 @@ export default function Navbar() {
 
       <div style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
         <NavLink to="/"        label="Dziennik"   active={pathname === '/'} />
-        <NavLink to="/stats"   label="Statystyki" active={pathname === '/stats'} />
         <NavLink to="/profile" label="Profil"     active={pathname === '/profile'} />
         <button onClick={logout} style={{
           padding:'0.4rem 0.9rem',

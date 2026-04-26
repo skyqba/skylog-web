@@ -242,6 +242,9 @@ export default function Profile() {
         </div>
 
         {/* Eksport / Import */}
+        <Link to="/stats" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
+          <button className="btn ghost" style={{ width:'100%' }}>📊 Statystyki skoków</button>
+        </Link>
         <Link to="/edit-jumps" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
           <button className="btn ghost" style={{ width:'100%' }}>✏ Edytuj skoki</button>
         </Link>
