@@ -523,15 +523,42 @@ export default function Stats() {
                     {yr} — łącznie {perYearMonth[yr].reduce((a,b) => a+b, 0)} skoków
                   </div>
                   <button
-                    onClick={() => {
-                      const monthRows = perYearMonth[yr]
-                        .map((cnt, mi) => cnt > 0 ? `${months[mi]}: ${cnt} skoków` : null)
-                        .filter(Boolean)
-                        .join('\n')
+                  onClick={() => {
                       const total = perYearMonth[yr].reduce((a,b) => a+b, 0)
+                      // Pobierz szczegółowe skoki z danego roku
+                      const yearJumps = withDate
+                        .filter(j => j.jump_date.startsWith(yr))
+                        .sort((a,b) => a.number - b.number)
+
+                      // Grupuj po miesiącach
+                      const byMonth = {}
+                      yearJumps.forEach(j => {
+                        const mi = parseInt(j.jump_date.slice(5,7)) - 1
+                        if (!byMonth[mi]) byMonth[mi] = []
+                        byMonth[mi].push(j)
+                      })
+
+                      const lines = []
+                      Object.entries(byMonth).sort((a,b) => a[0]-b[0]).forEach(([mi, mJumps]) => {
+                        lines.push(`--- ${months[parseInt(mi)]} ${yr} (${mJumps.length} skoków) ---`)
+                        mJumps.forEach(j => {
+                          const parts = [
+                            `#${j.number}`,
+                            j.jump_date,
+                            j.city || '',
+                            j.parachute || '',
+                            j.aircraft || '',
+                            j.result ? `wynik: ${j.result} cm` : '',
+                            j.notes || '',
+                          ].filter(Boolean)
+                          lines.push(parts.join(' | '))
+                        })
+                        lines.push('')
+                      })
+
                       const subject = encodeURIComponent(`JumpLog — skoki ${yr}`)
                       const body = encodeURIComponent(
-                        `Cześć Gośka,\n\nPrzesyłam statystyki skoków za ${yr}:\n\n${monthRows}\n\nŁącznie: ${total} skoków\n\nPozdrawiam,\nKamil`
+                        `Cześć Gośka,\n\nPrzesyłam szczegółowe skoki za ${yr} (łącznie ${total}):\n\n${lines.join('\n')}\nPozdrawiam,\nKamil`
                       )
                       window.location.href = `mailto:skyqba@gmail.com?subject=${subject}&body=${body}`
                     }}
