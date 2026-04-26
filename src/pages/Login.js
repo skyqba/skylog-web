@@ -41,11 +41,13 @@ export default function Login() {
 
         {/* Logo */}
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:'0.6rem', marginBottom:'0.5rem' }}>
-            <span style={{ width:40, height:40, borderRadius:10, background:'var(--accent)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}></span>
+          <div style={{ marginBottom:'0.25rem' }}>
             <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:900, color:'var(--text)' }}>
               Sky<span style={{ color:'var(--accent2)' }}>Log</span>
             </span>
+          </div>
+          <div style={{ fontFamily:'var(--font)', fontSize:'0.65rem', color:'var(--muted)', marginBottom:'0.4rem' }}>
+            by SkyQba ver 1.0
           </div>
           <div style={{ fontFamily:'var(--mono)', fontSize:'0.7rem', letterSpacing:'2px', color:'var(--muted)', textTransform:'uppercase' }}>
             Dziennik skoków spadochronowych

@@ -72,10 +72,10 @@ export default function Register() {
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', padding:'2rem 1rem' }}>
       <div style={{ width:'100%', maxWidth:460 }}>
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:'0.6rem', marginBottom:'0.5rem' }}>
-            <span style={{ width:40, height:40, borderRadius:10, background:'var(--accent)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}></span>
+          <div style={{ marginBottom:'0.25rem' }}>
             <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:800, color:'var(--text)' }}>Sky<span style={{ color:'var(--accent2)' }}>Log</span></span>
           </div>
+          <div style={{ fontFamily:'var(--font)', fontSize:'0.65rem', color:'var(--muted)' }}>by SkyQba ver 1.0</div>
         </div>
         <div className="card">
           <h2 style={{ fontFamily:'var(--head)', fontSize:'1.2rem', marginBottom:'1.5rem', fontWeight:800 }}>Rejestracja</h2>
