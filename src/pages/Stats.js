@@ -440,6 +440,28 @@ export default function Stats() {
           </div>
         )}
 
+        {/* Lista miesięcy z liczbą skoków */}
+        {yearsSorted.length > 0 && (
+          <div className="card" style={{ marginBottom:'1.5rem' }}>
+            <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Skoki per miesiąc — szczegółowo</h3>
+            {yearsSorted.map(yr => (
+              <div key={yr} style={{ marginBottom:'1rem' }}>
+                <div style={{ fontFamily:'var(--head)', fontSize:'0.85rem', fontWeight:800, color:'var(--accent2)', marginBottom:'0.4rem', paddingBottom:'0.25rem', borderBottom:'1px solid var(--border)' }}>
+                  {yr} — łącznie {perYearMonth[yr].reduce((a,b) => a+b, 0)} skoków
+                </div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:'0.35rem' }}>
+                  {perYearMonth[yr].map((cnt, mi) => cnt > 0 ? (
+                    <div key={mi} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.3rem 0.6rem', background:'var(--bg3)', borderRadius:6, border:'1px solid var(--border)' }}>
+                      <span style={{ fontSize:'0.8rem', color:'var(--muted)' }}>{months[mi]}</span>
+                      <span style={{ fontFamily:'var(--mono)', fontSize:'0.82rem', fontWeight:700, color:'var(--text)' }}>{cnt}</span>
+                    </div>
+                  ) : null)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Top strefy */}
         {topCities.length > 0 && (
           <div className="card" style={{ marginBottom:'1.5rem' }}>
