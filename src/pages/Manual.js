@@ -76,7 +76,7 @@ export default function Manual() {
 
         {/* Spis treści */}
         <div className="card" style={{ marginBottom: '2rem' }}>
-          <div style={{ fontFamily: 'var(--head)', fontSize: '0.9rem', fontWeight: 800, marginBottom: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.7rem' }}>Spis treści</div>
+          <div style={{ fontFamily: 'var(--head)', fontWeight: 800, marginBottom: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.7rem' }}>Spis treści</div>
           {[
             '1. Czym jest JumpLog?',
             '2. Pierwsze kroki — rejestracja i logowanie',
