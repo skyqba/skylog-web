@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 
-const StatCard = ({ label, value, sub, color = 'var(--accent2)' }) => (
-  <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.25rem 1.5rem', borderTop:`2px solid ${color}` }}>
-    <div style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:6 }}>{label}</div>
-    <div style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:900, letterSpacing:'-1px', color:'var(--text)', lineHeight:1 }}>{value}</div>
-    {sub && <div style={{ fontSize:'0.75rem', color:'var(--muted)', marginTop:4 }}>{sub}</div>}
+const StatCard = ({ label, value, sub, color = 'var(--accent2)', small = false }) => (
+  <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'0.85rem 1rem', borderTop:`2px solid ${color}` }}>
+    <div style={{ fontFamily:'var(--mono)', fontSize:'0.55rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:4 }}>{label}</div>
+    <div style={{ fontFamily:'var(--head)', fontSize: small ? '0.95rem' : '1.35rem', fontWeight:900, letterSpacing:'-0.5px', color:'var(--text)', lineHeight:1.2 }}>{value}</div>
+    {sub && <div style={{ fontSize:'0.68rem', color:'var(--muted)', marginTop:3, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</div>}
   </div>
 )
 
@@ -166,16 +166,16 @@ export default function Stats() {
         </div>
 
         {/* Główne liczby */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))', gap:'0.75rem', marginBottom:'1.5rem' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(130px, 1fr))', gap:'0.75rem', marginBottom:'1.5rem' }}>
           <StatCard label="Łączna liczba skoków" value={totalJumps} />
           <StatCard label="Lata aktywności" value={years.length} sub={years.length > 0 ? `${years[0]} – ${years[years.length-1]}` : ''} color="var(--success)" />
           <StatCard label="Śr. wysokość" value={avgAlt ? `${avgAlt}m` : '—'} sub={maxAlt ? `max ${maxAlt}m` : ''} color="#FBBF24" />
           <StatCard label="Śr. opóźnienie" value={avgDelay ? `${avgDelay}s` : '—'} sub={maxDelay ? `max ${maxDelay}s` : ''} color="#F472B6" />
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))', gap:'0.75rem', marginBottom:'2rem' }}>
-          <StatCard label="Pierwszy skok" value={fmt(firstJump?.jump_date)} sub={firstJump?.city || ''} color="var(--muted)" />
-          <StatCard label="Ostatni skok" value={fmt(lastJump?.jump_date)} sub={lastJump?.city || ''} color="var(--muted)" />
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(130px, 1fr))', gap:'0.75rem', marginBottom:'2rem' }}>
+          <StatCard label="Pierwszy skok" value={fmt(firstJump?.jump_date)} sub={firstJump?.city ? firstJump.city.slice(0,16) : ''} color="var(--muted)" small />
+          <StatCard label="Ostatni skok" value={fmt(lastJump?.jump_date)} sub={lastJump?.city ? lastJump.city.slice(0,16) : ''} color="var(--muted)" small />
           <StatCard label="Rekord dzienny" value={bestDayJumps ? `${bestDayJumps[1]} skoków` : '—'} sub={bestDayJumps ? fmt(bestDayJumps[0]) : ''} color="var(--accent)" />
           <StatCard label="Liczba stref" value={Object.keys(perCity).length} sub="różnych lokalizacji" color="var(--accent2)" />
         </div>
