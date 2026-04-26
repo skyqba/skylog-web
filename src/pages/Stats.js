@@ -225,9 +225,9 @@ export default function Stats() {
         startY: y,
         head: [['Parametr', 'Wartość']],
         body: [
-          ['Ogólna średnia (ze średnich dziennych)', overallAvg || '—'],
-          ['Najlepszy dzień', bestDay ? `${bestDay.avg.toFixed(3)} · ${fmt(bestDay.day)} (${bestDay.count} skoków)` : '—'],
-          ['Najsłabszy dzień', worstDay ? `${worstDay.avg.toFixed(3)} · ${fmt(worstDay.day)} (${worstDay.count} skoków)` : '—'],
+          ['Ogólna średnia', overallAvg ? `${overallAvg} cm` : '—'],
+          ['Najlepszy dzień', bestDay ? `${bestDay.avg.toFixed(3)} cm · ${fmt(bestDay.day)} (${bestDay.count} skoków)` : '—'],
+          ['Najsłabszy dzień', worstDay ? `${worstDay.avg.toFixed(3)} cm · ${fmt(worstDay.day)} (${worstDay.count} skoków)` : '—'],
         ],
         styles: { fontSize: 9, font: 'helvetica' },
         headStyles: { fillColor: [108, 99, 255] },
@@ -242,11 +242,11 @@ export default function Stats() {
       doc.text('Wyniki per dzień skoczny', 14, y); y += 6
       autoTable(doc, {
         startY: y,
-        head: [['Data', 'Liczba skoków', 'Średnia dnia']],
+        head: [['Data', 'Liczba skoków', 'Średnia dnia (cm)']],
         body: dayAvgsWithRolling.map(d => [
           fmt(d.day),
           String(d.count),
-          d.oneDayAvg.toFixed(3),
+          `${d.oneDayAvg.toFixed(3)} cm`,
         ]),
         styles: { fontSize: 8, font: 'helvetica' },
         headStyles: { fillColor: [108, 99, 255] },
@@ -360,25 +360,25 @@ export default function Stats() {
         {dayAvgs.length > 0 && (
           <div className="card" style={{ marginBottom:'1.5rem' }}>
             <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>Wyniki — celność lądowania</h3>
-            <p style={{ color:'var(--muted)', fontSize:'0.8rem', marginBottom:'1.25rem' }}>Średnia wyników z każdego dnia treningowego (niższa wartość = lepszy wynik)</p>
+            <p style={{ color:'var(--muted)', fontSize:'0.8rem', marginBottom:'1.25rem' }}>Średnia wyników z każdego dnia treningowego w cm (niższa wartość = lepszy wynik, 0 cm = idealne trafienie)</p>
 
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))', gap:'0.75rem', marginBottom:'1.25rem' }}>
               <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.85rem 1rem' }}>
                 <div style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Ogólna średnia</div>
-                <div style={{ fontFamily:'var(--head)', fontSize:'1.6rem', fontWeight:900, color:'var(--success)' }}>{overallAvg}</div>
+                <div style={{ fontFamily:'var(--head)', fontSize:'1.6rem', fontWeight:900, color:'var(--success)' }}>{overallAvg} <span style={{ fontSize:'1rem' }}>cm</span></div>
                 <div style={{ fontSize:'0.72rem', color:'var(--muted)', marginTop:2 }}>średnia z {dayAvgs.length} dni treningowych</div>
               </div>
               {bestDay && (
                 <div style={{ background:'rgba(52,211,153,0.07)', border:'1px solid rgba(52,211,153,0.2)', borderRadius:'var(--r)', padding:'0.85rem 1rem' }}>
                   <div style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Najlepszy dzień</div>
-                  <div style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:900, color:'var(--success)' }}>{bestDay.avg.toFixed(3)}</div>
+                  <div style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:900, color:'var(--success)' }}>{bestDay.avg.toFixed(3)} <span style={{ fontSize:'0.85rem' }}>cm</span></div>
                   <div style={{ fontSize:'0.72rem', color:'var(--muted)', marginTop:2 }}>{fmt(bestDay.day)} · {bestDay.count} skoków</div>
                 </div>
               )}
               {worstDay && (
                 <div style={{ background:'rgba(248,113,113,0.07)', border:'1px solid rgba(248,113,113,0.2)', borderRadius:'var(--r)', padding:'0.85rem 1rem' }}>
                   <div style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Najsłabszy dzień</div>
-                  <div style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:900, color:'var(--danger)' }}>{worstDay.avg.toFixed(3)}</div>
+                  <div style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:900, color:'var(--danger)' }}>{worstDay.avg.toFixed(3)} <span style={{ fontSize:'0.85rem' }}>cm</span></div>
                   <div style={{ fontSize:'0.72rem', color:'var(--muted)', marginTop:2 }}>{fmt(worstDay.day)} · {worstDay.count} skoków</div>
                 </div>
               )}
@@ -390,7 +390,7 @@ export default function Stats() {
                 {(() => {
                   const maxVal = Math.max(...dayAvgs.map(d => d.avg), 1)
                   return dayAvgs.map((d, i) => (
-                    <div key={i} title={`${fmt(d.day)}\nŚrednia: ${d.avg.toFixed(3)}\nSkoków: ${d.count}`}
+                    <div key={i} title={`${fmt(d.day)}\nŚrednia: ${d.avg.toFixed(3)} cm\nSkoków: ${d.count}`}
                       style={{ flex:1, minWidth:20, display:'flex', flexDirection:'column', alignItems:'center', gap:2, cursor:'default' }}>
                       <div style={{ width:'100%', background: d.avg <= parseFloat(overallAvg) ? 'var(--success)' : 'rgba(108,99,255,0.5)', borderRadius:'3px 3px 0 0', height:`${(d.avg / maxVal) * 90}px`, minHeight:3, transition:'height 0.5s ease' }} />
                       <div style={{ fontFamily:'var(--mono)', fontSize:'0.5rem', color:'var(--muted)', transform:'rotate(-45deg)', transformOrigin:'center', whiteSpace:'nowrap', marginTop:4 }}>{d.day.slice(5)}</div>
@@ -411,7 +411,7 @@ export default function Stats() {
               <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.8rem' }}>
                 <thead>
                   <tr style={{ background:'var(--bg3)', borderBottom:'1px solid var(--border)' }}>
-                    {['Data', 'Liczba skoków', 'Średnia dnia'].map(h => (
+                    {['Data', 'Liczba skoków', 'Średnia dnia (cm)'].map(h => (
                       <th key={h} style={{ padding:'0.5rem 0.75rem', textAlign:'left', fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1, whiteSpace:'nowrap' }}>{h}</th>
                     ))}
                   </tr>
@@ -421,7 +421,7 @@ export default function Stats() {
                     <tr key={i} style={{ borderBottom:'1px solid var(--border)', background: i % 2 === 0 ? 'var(--bg3)' : 'transparent' }}>
                       <td style={{ padding:'0.45rem 0.75rem', whiteSpace:'nowrap', fontWeight:500 }}>{fmt(d.day)}</td>
                       <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', color:'var(--muted)' }}>{d.count}</td>
-                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color: d.oneDayAvg <= parseFloat(overallAvg) ? 'var(--success)' : 'var(--danger)' }}>{d.oneDayAvg.toFixed(3)}</td>
+                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color: d.oneDayAvg <= parseFloat(overallAvg) ? 'var(--success)' : 'var(--danger)' }}>{d.oneDayAvg.toFixed(3)} cm</td>
                     </tr>
                   ))}
                 </tbody>
