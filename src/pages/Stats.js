@@ -55,15 +55,9 @@ export default function Stats() {
     const y = j.jump_date.slice(0,4)
     perYear[y] = (perYear[y] || 0) + 1
   })
-  const maxPerYear = Math.max(...Object.values(perYear))
 
   // Skoki per miesiac
   const months = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru']
-  const perMonth = {}
-  withDate.forEach(j => {
-    const m = parseInt(j.jump_date.slice(5,7)) - 1
-    perMonth[m] = (perMonth[m] || 0) + 1
-  })
 
   // Strefy
   const perCity = {}
@@ -73,8 +67,6 @@ export default function Stats() {
   })
   const topCities = Object.entries(perCity).sort((a,b) => b[1]-a[1]).slice(0,8)
   const maxCity   = topCities[0]?.[1] || 1
-
-  // Samoloty
   const perAircraft = {}
   jumps.filter(j => j.aircraft).forEach(j => {
     const a = j.aircraft.trim()
