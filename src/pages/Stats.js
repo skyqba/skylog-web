@@ -136,6 +136,13 @@ export default function Stats() {
     count: results.length,
   })).sort((a,b) => a.day.localeCompare(b.day))
 
+  // Średnia krocząca: dany dzień + 3 poprzednie dni treningowe (4 dni łącznie)
+  const dayAvgsWithRolling = dayAvgs.map((d, i) => {
+    const window = dayAvgs.slice(Math.max(0, i - 3), i + 1)
+    const rollingAvg = window.reduce((s, x) => s + x.avg, 0) / window.length
+    return { ...d, rollingAvg, windowSize: window.length }
+  })
+
   const overallAvg = dayAvgs.length
     ? (dayAvgs.reduce((s,d) => s + d.avg, 0) / dayAvgs.length).toFixed(3)
     : null
@@ -232,11 +239,17 @@ export default function Stats() {
       if (y > 230) { doc.addPage(); y = 14 }
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(11)
-      doc.text('Średnie wyników per dzień', 14, y); y += 6
+      doc.text('Wyniki per dzień + średnia krocząca (4 dni)', 14, y); y += 6
       autoTable(doc, {
         startY: y,
-        head: [['Data', 'Liczba skoków', 'Średni wynik']],
-        body: dayAvgs.map(d => [fmt(d.day), String(d.count), d.avg.toFixed(3)]),
+        head: [['Data', 'Skoków', 'Średnia dnia', 'Śr. krocząca (4 dni)', 'Okno']],
+        body: dayAvgsWithRolling.map(d => [
+          fmt(d.day),
+          String(d.count),
+          d.avg.toFixed(3),
+          d.rollingAvg.toFixed(3),
+          d.windowSize < 4 ? `${d.windowSize} (brak danych)` : String(d.windowSize),
+        ]),
         styles: { fontSize: 8, font: 'helvetica' },
         headStyles: { fillColor: [108, 99, 255] },
         alternateRowStyles: { fillColor: [245, 245, 250] },
@@ -388,8 +401,35 @@ export default function Stats() {
                 })()}
               </div>
             </div>
-            <div style={{ fontSize:'0.72rem', color:'var(--muted)', marginTop:4 }}>
+            <div style={{ fontSize:'0.72rem', color:'var(--muted)', marginTop:4, marginBottom:'1.25rem' }}>
               Zielony = wynik lepszy od średniej · Fioletowy = wynik słabszy od średniej
+            </div>
+
+            {/* Tabela z średnią kroczącą */}
+            <h4 style={{ fontFamily:'var(--head)', fontSize:'0.88rem', fontWeight:700, marginBottom:'0.75rem', color:'var(--text)' }}>
+              Szczegółowe wyniki — średnia z dnia + 3 poprzednie dni treningowe
+            </h4>
+            <div style={{ overflowX:'auto' }}>
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.8rem' }}>
+                <thead>
+                  <tr style={{ background:'var(--bg3)', borderBottom:'1px solid var(--border)' }}>
+                    {['Data', 'Skoków', 'Średnia dnia', 'Średnia krocząca (4 dni)', 'Okno'].map(h => (
+                      <th key={h} style={{ padding:'0.5rem 0.75rem', textAlign:'left', fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1, whiteSpace:'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {dayAvgsWithRolling.map((d, i) => (
+                    <tr key={i} style={{ borderBottom:'1px solid var(--border)', background: i % 2 === 0 ? 'var(--bg3)' : 'transparent' }}>
+                      <td style={{ padding:'0.45rem 0.75rem', whiteSpace:'nowrap', fontWeight:500 }}>{fmt(d.day)}</td>
+                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', color:'var(--muted)' }}>{d.count}</td>
+                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color: d.avg <= parseFloat(overallAvg) ? 'var(--success)' : 'var(--danger)' }}>{d.avg.toFixed(3)}</td>
+                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color:'var(--accent2)' }}>{d.rollingAvg.toFixed(3)}</td>
+                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontSize:'0.72rem', color:'var(--muted)' }}>{d.windowSize} {d.windowSize < 4 ? '(brak danych)' : ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
