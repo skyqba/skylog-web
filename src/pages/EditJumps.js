@@ -15,7 +15,9 @@ export default function EditJumps() {
   const [editId, setEditId]       = useState(null)
   const [editForm, setEditForm]   = useState({})
   const [saving, setSaving]       = useState(false)
+  const [deleting, setDeleting]   = useState(false)
   const [search, setSearch]       = useState('')
+  const [selected, setSelected]   = useState(new Set())
   const [equipment, setEquipment] = useState([])
   const [dropzones, setDropzones] = useState([])
   const navigate = useNavigate()
@@ -35,6 +37,32 @@ export default function EditJumps() {
     }
     load()
   }, [])
+
+  const toggleSelect = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const toggleAll = () => {
+    if (selected.size === filtered.length && filtered.length > 0) setSelected(new Set())
+    else setSelected(new Set(filtered.map(j => j.id)))
+  }
+
+  const deleteSelected = async () => {
+    if (selected.size === 0) return
+    if (!window.confirm(`Czy na pewno chcesz usunąć ${selected.size} skok(ów)? Tej operacji nie można cofnąć.`)) return
+    setDeleting(true)
+    const ids = Array.from(selected)
+    const { error } = await supabase.from('jumps').delete().in('id', ids)
+    if (!error) {
+      setJumps(j => j.filter(x => !selected.has(x.id)))
+      setSelected(new Set())
+    }
+    setDeleting(false)
+  }
 
   const startEdit = (jump) => {
     setEditId(jump.id)
@@ -110,6 +138,33 @@ export default function EditJumps() {
           />
         </div>
 
+        {/* Pasek zaznaczania i usuwania */}
+        {!loading && filtered.length > 0 && (
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r)', padding:'0.65rem 1rem', marginBottom:'1rem' }}>
+            <label style={{ display:'flex', alignItems:'center', gap:'0.5rem', cursor:'pointer', fontSize:'0.88rem', fontWeight:500 }}>
+              <input
+                type="checkbox"
+                checked={selected.size === filtered.length && filtered.length > 0}
+                onChange={toggleAll}
+                style={{ width:15, height:15, accentColor:'var(--accent)', cursor:'pointer' }}
+              />
+              Zaznacz wszystkie
+              {selected.size > 0 && (
+                <span style={{ fontFamily:'var(--mono)', fontSize:'0.72rem', color:'var(--muted)' }}>({selected.size} zaznaczonych)</span>
+              )}
+            </label>
+            {selected.size > 0 && (
+              <button
+                onClick={deleteSelected}
+                disabled={deleting}
+                style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.4)', borderRadius:7, color:'var(--danger)', cursor:'pointer', fontSize:'0.82rem', fontWeight:600, padding:'0.35rem 0.85rem', fontFamily:'var(--font)' }}
+              >
+                {deleting ? 'Usuwanie...' : `Usuń (${selected.size})`}
+              </button>
+            )}
+          </div>
+        )}
+
         {loading && <p style={{ color:'var(--muted)', textAlign:'center', padding:'3rem' }}>Ładowanie...</p>}
 
         {!loading && filtered.length === 0 && (
@@ -122,8 +177,15 @@ export default function EditJumps() {
             {/* Wiersz skoku */}
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 1.1rem', cursor: editId === jump.id ? 'default' : 'pointer' }}
               onClick={() => editId !== jump.id && startEdit(jump)}>
-              <div style={{ display:'flex', alignItems:'center', gap:'1rem' }}>
-                <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color:'var(--accent2)', minWidth:60 }}>#{jump.number}</div>
+              <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
+                <input
+                  type="checkbox"
+                  checked={selected.has(jump.id)}
+                  onChange={() => toggleSelect(jump.id)}
+                  onClick={e => e.stopPropagation()}
+                  style={{ width:15, height:15, accentColor:'var(--accent)', cursor:'pointer', flexShrink:0 }}
+                />
+                <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color:'var(--accent2)', minWidth:50 }}>#{jump.number}</div>
                 <div>
                   <div style={{ fontSize:'0.85rem', fontWeight:500 }}>{fmt(jump.jump_date)}{jump.city ? ` · ${jump.city}` : ''}</div>
                   <div style={{ fontSize:'0.75rem', color:'var(--muted)', marginTop:2, fontFamily:'var(--mono)' }}>
