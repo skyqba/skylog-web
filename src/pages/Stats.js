@@ -154,15 +154,139 @@ export default function Stats() {
   })
   const bestDayJumps = Object.entries(jumpsPerDay).sort((a,b) => b[1]-a[1])[0]
 
+  const printStats = () => {
+    window.print()
+  }
+
+  const downloadPDF = async () => {
+    const { default: jsPDF } = await import('jspdf')
+    const { default: autoTable } = await import('jspdf-autotable')
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(18)
+    doc.text('JumpLog - Statystyki skoków', 14, 18)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    doc.text(`Data wydruku: ${new Date().toLocaleDateString('pl-PL')}`, 14, 26)
+
+    let y = 34
+
+    // Ogólne
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(12)
+    doc.text('Podsumowanie ogólne', 14, y); y += 6
+    autoTable(doc, {
+      startY: y,
+      head: [['Parametr', 'Wartość']],
+      body: [
+        ['Łączna liczba skoków', String(totalJumps)],
+        ['Lata aktywności', years.length > 0 ? `${years[0]} – ${years[years.length-1]}` : '—'],
+        ['Pierwszy skok', fmt(firstJump?.jump_date) + (firstJump?.city ? ` · ${firstJump.city}` : '')],
+        ['Ostatni skok', fmt(lastJump?.jump_date) + (lastJump?.city ? ` · ${lastJump.city}` : '')],
+        ['Rekord dzienny', bestDayJumps ? `${bestDayJumps[1]} skoków (${fmt(bestDayJumps[0])})` : '—'],
+        ['Średnia wysokość', avgAlt ? `${avgAlt} m (max ${maxAlt} m)` : '—'],
+        ['Średnie opóźnienie', avgDelay ? `${avgDelay} s (max ${maxDelay} s)` : '—'],
+        ['Liczba stref zrzutu', String(Object.keys(perCity).length)],
+      ],
+      styles: { fontSize: 9, font: 'helvetica' },
+      headStyles: { fillColor: [108, 99, 255] },
+      alternateRowStyles: { fillColor: [245, 245, 250] },
+    })
+    y = doc.lastAutoTable.finalY + 8
+
+    // Wyniki
+    if (dayAvgs.length > 0) {
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(12)
+      doc.text('Wyniki — celność lądowania', 14, y); y += 6
+      autoTable(doc, {
+        startY: y,
+        head: [['Parametr', 'Wartość']],
+        body: [
+          ['Ogólna średnia (ze średnich dziennych)', overallAvg || '—'],
+          ['Najlepszy dzień', bestDay ? `${bestDay.avg.toFixed(3)} · ${fmt(bestDay.day)} (${bestDay.count} skoków)` : '—'],
+          ['Najsłabszy dzień', worstDay ? `${worstDay.avg.toFixed(3)} · ${fmt(worstDay.day)} (${worstDay.count} skoków)` : '—'],
+        ],
+        styles: { fontSize: 9, font: 'helvetica' },
+        headStyles: { fillColor: [108, 99, 255] },
+        alternateRowStyles: { fillColor: [245, 245, 250] },
+      })
+      y = doc.lastAutoTable.finalY + 8
+
+      // Tabela średnich dziennych
+      if (y > 230) { doc.addPage(); y = 14 }
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(11)
+      doc.text('Średnie wyników per dzień', 14, y); y += 6
+      autoTable(doc, {
+        startY: y,
+        head: [['Data', 'Liczba skoków', 'Średni wynik']],
+        body: dayAvgs.map(d => [fmt(d.day), String(d.count), d.avg.toFixed(3)]),
+        styles: { fontSize: 8, font: 'helvetica' },
+        headStyles: { fillColor: [108, 99, 255] },
+        alternateRowStyles: { fillColor: [245, 245, 250] },
+      })
+      y = doc.lastAutoTable.finalY + 8
+    }
+
+    // Skoki per rok
+    if (Object.keys(perYear).length > 0) {
+      if (y > 230) { doc.addPage(); y = 14 }
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(11)
+      doc.text('Skoki per rok', 14, y); y += 6
+      autoTable(doc, {
+        startY: y,
+        head: [['Rok', 'Liczba skoków']],
+        body: Object.entries(perYear).sort().map(([yr, cnt]) => [yr, String(cnt)]),
+        styles: { fontSize: 9, font: 'helvetica' },
+        headStyles: { fillColor: [108, 99, 255] },
+        alternateRowStyles: { fillColor: [245, 245, 250] },
+      })
+      y = doc.lastAutoTable.finalY + 8
+    }
+
+    // Top strefy
+    if (topCities.length > 0) {
+      if (y > 230) { doc.addPage(); y = 14 }
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(11)
+      doc.text('Najczęstsze strefy zrzutu', 14, y); y += 6
+      autoTable(doc, {
+        startY: y,
+        head: [['Strefa', 'Liczba skoków']],
+        body: topCities.map(([c, n]) => [c, String(n)]),
+        styles: { fontSize: 9, font: 'helvetica' },
+        headStyles: { fillColor: [108, 99, 255] },
+        alternateRowStyles: { fillColor: [245, 245, 250] },
+      })
+    }
+
+    doc.save(`JumpLog_statystyki_${new Date().toISOString().split('T')[0]}.pdf`)
+  }
+
   return (
     <div>
       <Navbar />
       <div style={{ maxWidth:780, margin:'0 auto', padding:'1.5rem 1rem 4rem' }}>
 
         {/* Nagłówek */}
-        <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', marginBottom:'2rem' }}>
-          <button onClick={() => navigate('/')} style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 0.75rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.82rem' }}>← Wróć</button>
-          <h2 style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>Statystyki skoków</h2>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'0.75rem', marginBottom:'2rem' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
+            <button onClick={() => navigate('/profile')} style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 0.75rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.82rem' }}>← Wróć</button>
+            <h2 style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>Statystyki skoków</h2>
+          </div>
+          <div style={{ display:'flex', gap:'0.5rem' }}>
+            <button onClick={printStats} style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 0.85rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.82rem', transition:'all 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}>
+              🖨 Drukuj
+            </button>
+            <button onClick={downloadPDF} className="btn" style={{ width:'auto', padding:'0.4rem 0.85rem', fontSize:'0.82rem' }}>
+              📄 Pobierz PDF
+            </button>
+          </div>
         </div>
 
         {/* Główne liczby */}
