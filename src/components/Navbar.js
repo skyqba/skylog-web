@@ -22,7 +22,7 @@ export default function Navbar() {
         <span style={{
           width:30, height:30, borderRadius:8, background:'var(--accent)',
           display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, flexShrink:0
-        }}>🪂</span>
+        }}></span>
         <span style={{ fontFamily:'var(--head)', fontSize:'1.35rem', fontWeight:900, color:'var(--text)', letterSpacing:'-0.5px' }}>
           Sky<span style={{ color:'var(--accent2)' }}>Log</span>
         </span>

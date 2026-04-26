@@ -73,7 +73,7 @@ export default function Register() {
       <div style={{ width:'100%', maxWidth:460 }}>
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:'0.6rem', marginBottom:'0.5rem' }}>
-            <span style={{ width:40, height:40, borderRadius:10, background:'var(--accent)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>🪂</span>
+            <span style={{ width:40, height:40, borderRadius:10, background:'var(--accent)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}></span>
             <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:800, color:'var(--text)' }}>Sky<span style={{ color:'var(--accent2)' }}>Log</span></span>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function Register() {
           <form onSubmit={handleRegister}>
             <div onClick={() => fileRef.current.click()} style={{ display:'flex', alignItems:'center', gap:'1rem', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--r)', padding:'0.75rem 1rem', cursor:'pointer', marginBottom:'1rem' }}>
               <div style={{ width:56, height:56, borderRadius:'50%', flexShrink:0, overflow:'hidden', background:'rgba(108,99,255,0.15)', border:'2px solid var(--accent)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>
-                {preview ? <img src={preview} alt="avatar" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : '🪂'}
+                {preview ? <img src={preview} alt="avatar" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : ''}
               </div>
               <div>
                 <div style={{ color:'var(--accent2)', fontWeight:500, fontSize:'0.88rem' }}>Dodaj zdjęcie profilowe</div>

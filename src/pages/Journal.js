@@ -152,7 +152,7 @@ export default function Journal() {
         {loading && <p style={{ color:'var(--muted)', textAlign:'center', padding:'3rem' }}>Ładowanie...</p>}
         {!loading && jumps.length === 0 && (
           <div style={{ textAlign:'center', padding:'4rem 1rem', color:'var(--muted)' }}>
-            <div style={{ fontSize:48, marginBottom:'0.75rem', opacity:0.3 }}>🪂</div>
+            <div style={{ fontSize:48, marginBottom:'0.75rem', opacity:0.3 }}></div>
             <p>Brak skoków w dzienniku.</p>
             <Link to="/add" style={{ color:'var(--accent2)', textDecoration:'none', fontWeight:500 }}>Dodaj pierwszy skok →</Link>
           </div>

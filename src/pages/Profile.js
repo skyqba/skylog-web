@@ -208,7 +208,7 @@ export default function Profile() {
           {equipment.length === 0 && <div style={{ textAlign:'center', padding:'1rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>Brak sprzętu</div>}
           {equipment.map(eq => (
             <div key={eq.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.7rem 1rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'0.5rem', border:'1px solid var(--border)' }}>
-              <span style={{ fontSize:'0.9rem', fontWeight:500 }}>🪂 {eq.name}</span>
+              <span style={{ fontSize:'0.9rem', fontWeight:500 }}>{eq.name}</span>
               <button onClick={() => deleteChute(eq.id)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem' }}
                 onMouseEnter={e => e.target.style.color='var(--danger)'}
                 onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>

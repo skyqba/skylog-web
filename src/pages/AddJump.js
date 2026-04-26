@@ -80,7 +80,7 @@ export default function AddJump() {
     <div>
       <Navbar />
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '1.5rem 1rem' }}>
-        <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800, marginBottom: '1.5rem' }}>Nowy skok 🪂</h2>
+        <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800, marginBottom: '1.5rem' }}>Nowy skok </h2>
 
         <div className="card">
           <form onSubmit={handleSave}>
