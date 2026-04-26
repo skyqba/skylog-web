@@ -101,6 +101,17 @@ export default function Stats() {
   const topTypes  = Object.entries(perType).sort((a,b) => b[1]-a[1]).slice(0,6)
   const maxType   = topTypes[0]?.[1] || 1
 
+  // Skoki per rok+miesiąc
+  const perYearMonth = {}
+  withDate.forEach(j => {
+    const y = j.jump_date.slice(0,4)
+    const m = parseInt(j.jump_date.slice(5,7)) - 1
+    if (!perYearMonth[y]) perYearMonth[y] = Array(12).fill(0)
+    perYearMonth[y][m]++
+  })
+  const yearsSorted = Object.keys(perYearMonth).sort()
+  const maxYearMonth = Math.max(...yearsSorted.flatMap(y => perYearMonth[y]), 1)
+
   // Wysokość
   const withAlt   = jumps.filter(j => j.altitude > 0)
   const avgAlt    = withAlt.length ? Math.round(withAlt.reduce((s,j) => s + j.altitude, 0) / withAlt.length) : 0
@@ -363,22 +374,71 @@ export default function Stats() {
           </div>
         )}
 
-        {/* Skoki per miesiąc */}
-        <div className="card" style={{ marginBottom:'1.5rem' }}>
-          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Aktywność w ciągu roku (wszystkie lata)</h3>
-          <div style={{ display:'flex', alignItems:'flex-end', gap:4, height:80, marginBottom:8 }}>
-            {months.map((m, i) => {
-              const count = perMonth[i] || 0
-              const h = maxPerMonth > 0 ? (count / maxPerMonth) * 68 : 0
-              return (
-                <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
-                  <div style={{ width:'100%', background: count > 0 ? 'var(--accent2)' : 'var(--bg3)', borderRadius:'3px 3px 0 0', height:`${h}px`, minHeight: count > 0 ? 4 : 0, transition:'height 0.5s ease' }} title={`${m}: ${count} skoków`} />
-                  <div style={{ fontFamily:'var(--mono)', fontSize:'0.6rem', color:'var(--muted)' }}>{m}</div>
-                </div>
-              )
-            })}
+        {/* Tabela rok x miesiąc */}
+        {yearsSorted.length > 0 && (
+          <div className="card" style={{ marginBottom:'1.5rem' }}>
+            <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Liczba skoków — rok / miesiąc</h3>
+            <div style={{ overflowX:'auto' }}>
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.75rem' }}>
+                <thead>
+                  <tr style={{ borderBottom:'1px solid var(--border)' }}>
+                    <th style={{ padding:'0.4rem 0.6rem', textAlign:'left', fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1, whiteSpace:'nowrap' }}>Rok</th>
+                    {months.map(m => (
+                      <th key={m} style={{ padding:'0.4rem 0.4rem', textAlign:'center', fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:0.5, whiteSpace:'nowrap' }}>{m}</th>
+                    ))}
+                    <th style={{ padding:'0.4rem 0.6rem', textAlign:'right', fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1 }}>Suma</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {yearsSorted.map((yr, i) => {
+                    const row = perYearMonth[yr]
+                    const sum = row.reduce((s,v) => s+v, 0)
+                    return (
+                      <tr key={yr} style={{ borderBottom:'1px solid var(--border)', background: i % 2 === 0 ? 'var(--bg3)' : 'transparent' }}>
+                        <td style={{ padding:'0.45rem 0.6rem', fontFamily:'var(--head)', fontWeight:700, color:'var(--accent2)', whiteSpace:'nowrap' }}>{yr}</td>
+                        {row.map((cnt, mi) => (
+                          <td key={mi} style={{ padding:'0.45rem 0.4rem', textAlign:'center', position:'relative' }}>
+                            {cnt > 0 ? (
+                              <span style={{
+                                display:'inline-block',
+                                minWidth:22, height:22,
+                                lineHeight:'22px',
+                                borderRadius:4,
+                                background: `rgba(108,99,255,${0.15 + (cnt/maxYearMonth)*0.7})`,
+                                color: cnt/maxYearMonth > 0.5 ? '#fff' : 'var(--text)',
+                                fontWeight:600,
+                                fontSize:'0.72rem',
+                                fontFamily:'var(--mono)',
+                              }}>{cnt}</span>
+                            ) : (
+                              <span style={{ color:'var(--border2)', fontSize:'0.65rem' }}>·</span>
+                            )}
+                          </td>
+                        ))}
+                        <td style={{ padding:'0.45rem 0.6rem', textAlign:'right', fontFamily:'var(--mono)', fontWeight:700, color:'var(--text)', fontSize:'0.8rem' }}>{sum}</td>
+                      </tr>
+                    )
+                  })}
+                  {/* Suma per miesiąc */}
+                  <tr style={{ borderTop:'2px solid var(--border)' }}>
+                    <td style={{ padding:'0.45rem 0.6rem', fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase' }}>Suma</td>
+                    {months.map((_, mi) => {
+                      const total = yearsSorted.reduce((s, yr) => s + (perYearMonth[yr][mi] || 0), 0)
+                      return (
+                        <td key={mi} style={{ padding:'0.45rem 0.4rem', textAlign:'center', fontFamily:'var(--mono)', fontWeight:700, color:'var(--accent2)', fontSize:'0.75rem' }}>
+                          {total > 0 ? total : <span style={{ color:'var(--border2)' }}>·</span>}
+                        </td>
+                      )
+                    })}
+                    <td style={{ padding:'0.45rem 0.6rem', textAlign:'right', fontFamily:'var(--mono)', fontWeight:900, color:'var(--accent)', fontSize:'0.85rem' }}>
+                      {yearsSorted.reduce((s, yr) => s + perYearMonth[yr].reduce((a,b) => a+b, 0), 0)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Top strefy */}
         {topCities.length > 0 && (
