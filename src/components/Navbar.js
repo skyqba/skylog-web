@@ -18,7 +18,7 @@ export default function Navbar() {
       borderBottom: '1px solid var(--border)',
       position: 'sticky', top: 0, zIndex: 100,
     }}>
-      <Link to="/" style={{ display:'flex', alignItems:'center', gap:'0.5rem', textDecoration:'none' }}>
+      <Link to="/manual" style={{ display:'flex', alignItems:'center', gap:'0.5rem', textDecoration:'none' }}>
         <div>
           <span style={{ fontFamily:'var(--head)', fontSize:'1.35rem', fontWeight:900, color:'var(--text)', letterSpacing:'-0.5px' }}>
             Jump<span style={{ color:'var(--accent2)' }}>Log</span>

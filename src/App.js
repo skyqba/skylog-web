@@ -9,6 +9,7 @@ import Profile  from './pages/Profile'
 import Import   from './pages/Import'
 import Export   from './pages/Export'
 import EditJumps from './pages/EditJumps'
+import Manual    from './pages/Manual'
 
 function App() {
   const [session, setSession] = useState(undefined)
@@ -36,6 +37,7 @@ function App() {
         <Route path="/import"     element={ session  ? <Import />     : <Navigate to="/login" />} />
         <Route path="/export"     element={ session  ? <Export />     : <Navigate to="/login" />} />
         <Route path="/edit-jumps" element={ session  ? <EditJumps /> : <Navigate to="/login" />} />
+        <Route path="/manual"     element={ session  ? <Manual />    : <Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   )
