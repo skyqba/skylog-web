@@ -160,7 +160,7 @@ export default function Export() {
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
-      <script>window.onload = () => { window.print(); window.onafterprint = () => window.close(); }<\/script>
+      <script>window.onload = () => { window.print(); window.onafterprint = () => window.close(); }</script>
       </body></html>`
 
     const w = window.open('', '_blank')
