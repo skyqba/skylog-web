@@ -190,7 +190,7 @@ export default function Stats() {
               <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.85rem 1rem' }}>
                 <div style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Ogólna średnia</div>
                 <div style={{ fontFamily:'var(--head)', fontSize:'1.6rem', fontWeight:900, color:'var(--success)' }}>{overallAvg}</div>
-                <div style={{ fontSize:'0.72rem', color:'var(--muted)', marginTop:2 }}>z {dayAvgs.length} dni treningowych</div>
+                <div style={{ fontSize:'0.72rem', color:'var(--muted)', marginTop:2 }}>średnia z {dayAvgs.length} dni treningowych</div>
               </div>
               {bestDay && (
                 <div style={{ background:'rgba(52,211,153,0.07)', border:'1px solid rgba(52,211,153,0.2)', borderRadius:'var(--r)', padding:'0.85rem 1rem' }}>
