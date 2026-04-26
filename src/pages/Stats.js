@@ -157,7 +157,19 @@ export default function Stats() {
   const bestDayJumps = Object.entries(jumpsPerDay).sort((a,b) => b[1]-a[1])[0]
 
   const printStats = () => {
+    const style = document.createElement('style')
+    style.id = 'print-style'
+    style.innerHTML = `
+      @media print {
+        nav, button { display: none !important; }
+        body { background: white !important; color: black !important; }
+        .card { border: 1px solid #ddd !important; background: white !important; break-inside: avoid; }
+        * { color: black !important; background: white !important; border-color: #ddd !important; }
+      }
+    `
+    document.head.appendChild(style)
     window.print()
+    setTimeout(() => document.getElementById('print-style')?.remove(), 1000)
   }
 
   const downloadPDF = async () => {
@@ -247,6 +259,33 @@ export default function Stats() {
         alternateRowStyles: { fillColor: [245, 245, 250] },
       })
       y = doc.lastAutoTable.finalY + 8
+    }
+
+    // Skoki per rok i miesiąc
+    if (yearsSorted.length > 0) {
+      if (y > 200) { doc.addPage(); y = 14 }
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(11)
+      doc.text('Skoki per miesiąc — szczegółowo', 14, y); y += 6
+
+      for (const yr of yearsSorted) {
+        if (y > 240) { doc.addPage(); y = 14 }
+        const row = perYearMonth[yr]
+        const sum = row.reduce((s,v) => s+v, 0)
+        const monthRows = row
+          .map((cnt, mi) => cnt > 0 ? [months[mi], String(cnt)] : null)
+          .filter(Boolean)
+        autoTable(doc, {
+          startY: y,
+          head: [[`${yr}  —  łącznie ${sum} skoków`, 'Liczba skoków']],
+          body: monthRows,
+          styles: { fontSize: 9, font: 'helvetica' },
+          headStyles: { fillColor: [60, 55, 120], fontSize: 9 },
+          alternateRowStyles: { fillColor: [245, 245, 250] },
+        })
+        y = doc.lastAutoTable.finalY + 5
+      }
+      y += 3
     }
 
     // Top strefy
