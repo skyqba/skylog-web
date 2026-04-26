@@ -19,13 +19,12 @@ export default function Navbar() {
       position: 'sticky', top: 0, zIndex: 100,
     }}>
       <Link to="/" style={{ display:'flex', alignItems:'center', gap:'0.5rem', textDecoration:'none' }}>
-        <span style={{
-          width:30, height:30, borderRadius:8, background:'var(--accent)',
-          display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, flexShrink:0
-        }}></span>
-        <span style={{ fontFamily:'var(--head)', fontSize:'1.35rem', fontWeight:900, color:'var(--text)', letterSpacing:'-0.5px' }}>
-          Sky<span style={{ color:'var(--accent2)' }}>Log</span>
-        </span>
+        <div>
+          <span style={{ fontFamily:'var(--head)', fontSize:'1.35rem', fontWeight:900, color:'var(--text)', letterSpacing:'-0.5px' }}>
+            Sky<span style={{ color:'var(--accent2)' }}>Log</span>
+          </span>
+          <span style={{ display:'block', fontFamily:'var(--font)', fontSize:'0.62rem', color:'var(--muted)', letterSpacing:'0.5px', marginTop:'-2px' }}>by SkyQba ver 1.0</span>
+        </div>
       </Link>
 
       <div style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
