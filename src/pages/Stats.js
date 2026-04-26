@@ -64,7 +64,6 @@ export default function Stats() {
     const m = parseInt(j.jump_date.slice(5,7)) - 1
     perMonth[m] = (perMonth[m] || 0) + 1
   })
-  const maxPerMonth = Math.max(...Object.values(perMonth), 1)
 
   // Strefy
   const perCity = {}
