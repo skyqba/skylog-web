@@ -122,7 +122,7 @@ export default function Stats() {
 
   const withResult = jumps.filter(j => parseResult(j.result) !== null)
 
-  // Grupuj po dniu
+  // Grupuj po dniu — zachowaj surowe wyniki
   const byDay = {}
   withResult.forEach(j => {
     const day = j.jump_date || 'brak daty'
@@ -134,18 +134,18 @@ export default function Stats() {
     day,
     avg: results.reduce((s,r) => s+r, 0) / results.length,
     count: results.length,
+    results,
   })).sort((a,b) => a.day.localeCompare(b.day))
 
-  // Średnia krocząca: osobno dla 1 dnia i dla 3 poprzednich dni
+  // Osobno: średnia z 1 dnia i średnia z 3 poprzednich dni (wszystkie skoki łącznie)
   const dayAvgsWithRolling = dayAvgs.map((d, i) => {
-    // Średnia z 1 dnia — to samo co avg
     const oneDayAvg = d.avg
-    // Średnia z 3 poprzedzających dni (bez bieżącego)
-    const prev3 = dayAvgs.slice(Math.max(0, i - 3), i)
-    const prev3Avg = prev3.length > 0
-      ? prev3.reduce((s, x) => s + x.avg, 0) / prev3.length
+    const prev3Days = dayAvgs.slice(Math.max(0, i - 3), i)
+    const prev3Results = prev3Days.flatMap(x => x.results)
+    const prev3Avg = prev3Results.length > 0
+      ? prev3Results.reduce((s, r) => s + r, 0) / prev3Results.length
       : null
-    return { ...d, oneDayAvg, prev3Avg, prev3Count: prev3.length }
+    return { ...d, oneDayAvg, prev3Avg, prev3Count: prev3Days.length, prev3Jumps: prev3Results.length }
   })
 
   const overallAvg = dayAvgs.length
@@ -253,7 +253,7 @@ export default function Stats() {
           String(d.count),
           d.oneDayAvg.toFixed(3),
           d.prev3Avg !== null ? d.prev3Avg.toFixed(3) : '—',
-          d.prev3Count > 0 ? String(d.prev3Count) : 'brak',
+          d.prev3Count > 0 ? `${d.prev3Count} dni (${d.prev3Jumps} sk.)` : 'brak',
         ]),
         styles: { fontSize: 8, font: 'helvetica' },
         headStyles: { fillColor: [108, 99, 255] },
@@ -430,7 +430,7 @@ export default function Stats() {
                       <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', color:'var(--muted)' }}>{d.count}</td>
                       <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color: d.oneDayAvg <= parseFloat(overallAvg) ? 'var(--success)' : 'var(--danger)' }}>{d.oneDayAvg.toFixed(3)}</td>
                       <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color:'var(--accent2)' }}>{d.prev3Avg !== null ? d.prev3Avg.toFixed(3) : '—'}</td>
-                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontSize:'0.72rem', color:'var(--muted)' }}>{d.prev3Count > 0 ? d.prev3Count : 'brak'}</td>
+                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontSize:'0.72rem', color:'var(--muted)' }}>{d.prev3Count > 0 ? `${d.prev3Count} dni (${d.prev3Jumps} sk.)` : 'brak'}</td>
                     </tr>
                   ))}
                 </tbody>
