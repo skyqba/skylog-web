@@ -11,7 +11,6 @@ import Export   from './pages/Export'
 import EditJumps from './pages/EditJumps'
 import Manual    from './pages/Manual'
 import Stats     from './pages/Stats'
-import wawelLogo from './wawel.png'
 
 function App() {
   const [session, setSession] = useState(undefined)
@@ -30,24 +29,6 @@ function App() {
 
   return (
     <BrowserRouter>
-      {/* Logo WKS Wawel w tle */}
-      <img
-        src={wawelLogo}
-        alt=""
-        style={{
-          position: 'fixed',
-          left: '-80px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '350px',
-          height: '350px',
-          objectFit: 'contain',
-          opacity: 0.07,
-          pointerEvents: 'none',
-          zIndex: 0,
-          userSelect: 'none',
-        }}
-      />
       <Routes>
         <Route path="/login"    element={!session ? <Login />    : <Navigate to="/" />} />
         <Route path="/register" element={!session ? <Register /> : <Navigate to="/" />} />

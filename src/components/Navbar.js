@@ -1,5 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../supabase'
+import wawelLogo from '../wawel.png'
 
 export default function Navbar() {
   const navigate = useNavigate()
@@ -30,6 +31,12 @@ export default function Navbar() {
       <div style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
         <NavLink to="/"        label="Dziennik"   active={pathname === '/'} />
         <NavLink to="/profile" label="Profil"     active={pathname === '/profile'} />
+        <div style={{ display:'flex', alignItems:'center', gap:'0.4rem', marginLeft:'0.5rem', padding:'0.3rem 0.6rem', borderLeft:'1px solid var(--border)' }}>
+          <img src={wawelLogo} alt="WKS Wawel" style={{ width:24, height:24, objectFit:'contain', opacity:0.85 }} />
+          <span style={{ fontSize:'0.65rem', color:'var(--muted)', fontFamily:'var(--mono)', lineHeight:1.2, whiteSpace:'nowrap' }}>
+            Sekcja<br/>Spadochronowa
+          </span>
+        </div>
         <button onClick={logout} style={{
           padding:'0.4rem 0.9rem',
           background:'transparent',
