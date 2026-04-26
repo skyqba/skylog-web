@@ -136,18 +136,23 @@ export default function Stats() {
     count: results.length,
   })).sort((a,b) => a.day.localeCompare(b.day))
 
-  // Średnia krocząca: dany dzień + 3 poprzednie dni treningowe (4 dni łącznie)
+  // Średnia krocząca: osobno dla 1 dnia i dla 3 poprzednich dni
   const dayAvgsWithRolling = dayAvgs.map((d, i) => {
-    const window = dayAvgs.slice(Math.max(0, i - 3), i + 1)
-    const rollingAvg = window.reduce((s, x) => s + x.avg, 0) / window.length
-    return { ...d, rollingAvg, windowSize: window.length }
+    // Średnia z 1 dnia — to samo co avg
+    const oneDayAvg = d.avg
+    // Średnia z 3 poprzedzających dni (bez bieżącego)
+    const prev3 = dayAvgs.slice(Math.max(0, i - 3), i)
+    const prev3Avg = prev3.length > 0
+      ? prev3.reduce((s, x) => s + x.avg, 0) / prev3.length
+      : null
+    return { ...d, oneDayAvg, prev3Avg, prev3Count: prev3.length }
   })
 
   const overallAvg = dayAvgs.length
     ? (dayAvgs.reduce((s,d) => s + d.avg, 0) / dayAvgs.length).toFixed(3)
     : null
 
-  const bestDay = dayAvgs.length ? dayAvgs.reduce((best, d) => d.avg < best.avg ? d : best) : null
+  const bestDay  = dayAvgs.length ? dayAvgs.reduce((best, d)  => d.avg < best.avg  ? d : best)  : null
   const worstDay = dayAvgs.length ? dayAvgs.reduce((worst, d) => d.avg > worst.avg ? d : worst) : null
 
   const fmt = (d) => {
@@ -239,16 +244,16 @@ export default function Stats() {
       if (y > 230) { doc.addPage(); y = 14 }
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(11)
-      doc.text('Wyniki per dzień + średnia krocząca (4 dni)', 14, y); y += 6
+      doc.text('Wyniki per dzień — średnia 1 dnia i 3 poprzednich dni', 14, y); y += 6
       autoTable(doc, {
         startY: y,
-        head: [['Data', 'Skoków', 'Średnia dnia', 'Śr. krocząca (4 dni)', 'Okno']],
+        head: [['Data', 'Skoków', 'Śr. 1 dzień', 'Śr. 3 poprzednie dni', 'Ile poprz.']],
         body: dayAvgsWithRolling.map(d => [
           fmt(d.day),
           String(d.count),
-          d.avg.toFixed(3),
-          d.rollingAvg.toFixed(3),
-          d.windowSize < 4 ? `${d.windowSize} (brak danych)` : String(d.windowSize),
+          d.oneDayAvg.toFixed(3),
+          d.prev3Avg !== null ? d.prev3Avg.toFixed(3) : '—',
+          d.prev3Count > 0 ? String(d.prev3Count) : 'brak',
         ]),
         styles: { fontSize: 8, font: 'helvetica' },
         headStyles: { fillColor: [108, 99, 255] },
@@ -407,13 +412,13 @@ export default function Stats() {
 
             {/* Tabela z średnią kroczącą */}
             <h4 style={{ fontFamily:'var(--head)', fontSize:'0.88rem', fontWeight:700, marginBottom:'0.75rem', color:'var(--text)' }}>
-              Szczegółowe wyniki — średnia z dnia + 3 poprzednie dni treningowe
+              Szczegółowe wyniki — średnia z 1 dnia i średnia z 3 poprzedzających dni
             </h4>
             <div style={{ overflowX:'auto' }}>
               <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.8rem' }}>
                 <thead>
                   <tr style={{ background:'var(--bg3)', borderBottom:'1px solid var(--border)' }}>
-                    {['Data', 'Skoków', 'Średnia dnia', 'Średnia krocząca (4 dni)', 'Okno'].map(h => (
+                    {['Data', 'Skoków', 'Śr. 1 dzień', 'Śr. 3 poprzednie dni', 'Ile poprz. dni'].map(h => (
                       <th key={h} style={{ padding:'0.5rem 0.75rem', textAlign:'left', fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1, whiteSpace:'nowrap' }}>{h}</th>
                     ))}
                   </tr>
@@ -423,9 +428,9 @@ export default function Stats() {
                     <tr key={i} style={{ borderBottom:'1px solid var(--border)', background: i % 2 === 0 ? 'var(--bg3)' : 'transparent' }}>
                       <td style={{ padding:'0.45rem 0.75rem', whiteSpace:'nowrap', fontWeight:500 }}>{fmt(d.day)}</td>
                       <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', color:'var(--muted)' }}>{d.count}</td>
-                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color: d.avg <= parseFloat(overallAvg) ? 'var(--success)' : 'var(--danger)' }}>{d.avg.toFixed(3)}</td>
-                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color:'var(--accent2)' }}>{d.rollingAvg.toFixed(3)}</td>
-                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontSize:'0.72rem', color:'var(--muted)' }}>{d.windowSize} {d.windowSize < 4 ? '(brak danych)' : ''}</td>
+                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color: d.oneDayAvg <= parseFloat(overallAvg) ? 'var(--success)' : 'var(--danger)' }}>{d.oneDayAvg.toFixed(3)}</td>
+                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontWeight:700, color:'var(--accent2)' }}>{d.prev3Avg !== null ? d.prev3Avg.toFixed(3) : '—'}</td>
+                      <td style={{ padding:'0.45rem 0.75rem', fontFamily:'var(--mono)', fontSize:'0.72rem', color:'var(--muted)' }}>{d.prev3Count > 0 ? d.prev3Count : 'brak'}</td>
                     </tr>
                   ))}
                 </tbody>
