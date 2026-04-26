@@ -517,9 +517,30 @@ export default function Stats() {
           <div className="card" style={{ marginBottom:'1.5rem' }}>
             <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Skoki per miesiąc — szczegółowo</h3>
             {yearsSorted.map(yr => (
-              <div key={yr} style={{ marginBottom:'1rem' }}>
-                <div style={{ fontFamily:'var(--head)', fontSize:'0.85rem', fontWeight:800, color:'var(--accent2)', marginBottom:'0.4rem', paddingBottom:'0.25rem', borderBottom:'1px solid var(--border)' }}>
-                  {yr} — łącznie {perYearMonth[yr].reduce((a,b) => a+b, 0)} skoków
+              <div key={yr} style={{ marginBottom:'1.25rem' }}>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.4rem', paddingBottom:'0.25rem', borderBottom:'1px solid var(--border)' }}>
+                  <div style={{ fontFamily:'var(--head)', fontSize:'0.85rem', fontWeight:800, color:'var(--accent2)' }}>
+                    {yr} — łącznie {perYearMonth[yr].reduce((a,b) => a+b, 0)} skoków
+                  </div>
+                  <button
+                    onClick={() => {
+                      const monthRows = perYearMonth[yr]
+                        .map((cnt, mi) => cnt > 0 ? `${months[mi]}: ${cnt} skoków` : null)
+                        .filter(Boolean)
+                        .join('\n')
+                      const total = perYearMonth[yr].reduce((a,b) => a+b, 0)
+                      const subject = encodeURIComponent(`JumpLog — skoki ${yr}`)
+                      const body = encodeURIComponent(
+                        `Cześć Gośka,\n\nPrzesyłam statystyki skoków za ${yr}:\n\n${monthRows}\n\nŁącznie: ${total} skoków\n\nPozdrawiam,\nKamil`
+                      )
+                      window.location.href = `mailto:skyqba@gmail.com?subject=${subject}&body=${body}`
+                    }}
+                    style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--accent2)', cursor:'pointer', fontSize:'0.72rem', padding:'0.25rem 0.65rem', fontFamily:'var(--font)', transition:'all 0.2s' }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}
+                  >
+                    ✉ Wyślij do Gośki
+                  </button>
                 </div>
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:'0.35rem' }}>
                   {perYearMonth[yr].map((cnt, mi) => cnt > 0 ? (
