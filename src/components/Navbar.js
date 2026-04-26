@@ -21,7 +21,7 @@ export default function Navbar() {
       <Link to="/" style={{ display:'flex', alignItems:'center', gap:'0.5rem', textDecoration:'none' }}>
         <div>
           <span style={{ fontFamily:'var(--head)', fontSize:'1.35rem', fontWeight:900, color:'var(--text)', letterSpacing:'-0.5px' }}>
-            Sky<span style={{ color:'var(--accent2)' }}>Log</span>
+            Jump<span style={{ color:'var(--accent2)' }}>Log</span>
           </span>
           <span style={{ display:'block', fontFamily:'var(--font)', fontSize:'0.62rem', color:'var(--muted)', letterSpacing:'0.5px', marginTop:'-2px' }}>by SkyQba ver 1.0</span>
         </div>

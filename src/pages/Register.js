@@ -73,7 +73,7 @@ export default function Register() {
       <div style={{ width:'100%', maxWidth:460 }}>
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
           <div style={{ marginBottom:'0.25rem' }}>
-            <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:800, color:'var(--text)' }}>Sky<span style={{ color:'var(--accent2)' }}>Log</span></span>
+            <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:800, color:'var(--text)' }}>Jump<span style={{ color:'var(--accent2)' }}>Log</span></span>
           </div>
           <div style={{ fontFamily:'var(--font)', fontSize:'0.65rem', color:'var(--muted)' }}>by SkyQba ver 1.0</div>
         </div>

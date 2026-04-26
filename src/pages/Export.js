@@ -59,7 +59,7 @@ export default function Export() {
     // Nagłówek
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(18)
-    doc.text('Ksiazka Skokow - SkyLog', 14, 18)
+    doc.text('Ksiazka Skokow - JumpLog', 14, 18)
 
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
@@ -115,7 +115,7 @@ export default function Export() {
       }
     })
 
-    doc.save(`SkyLog_skoki_${new Date().toISOString().split('T')[0]}.pdf`)
+    doc.save(`JumpLog_skoki_${new Date().toISOString().split('T')[0]}.pdf`)
     setGenerating(false)
   }
 
@@ -135,7 +135,7 @@ export default function Export() {
       </tr>`).join('')
 
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
-      <title>SkyLog - Ksiazka Skokow</title>
+      <title>JumpLog - Ksiazka Skokow</title>
       <style>
         body { font-family: Arial, sans-serif; font-size: 11px; margin: 20px; color: #111; }
         h1 { font-size: 18px; margin-bottom: 4px; }
@@ -146,7 +146,7 @@ export default function Export() {
         tr:nth-child(even) { background: #f8f8fc; }
         @media print { body { margin: 10px; } }
       </style></head><body>
-      <h1>Ksiazka Skokow - SkyLog</h1>
+      <h1>Ksiazka Skokow - JumpLog</h1>
       <div class="meta">
         ${name ? `Skoczek: <strong>${name}</strong> &nbsp;|&nbsp; ` : ''}
         ${profile?.license_number ? `Nr licencji: <strong>${profile.license_number}</strong> &nbsp;|&nbsp; ` : ''}
