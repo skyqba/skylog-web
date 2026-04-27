@@ -42,10 +42,10 @@ export default function AddJump() {
     city: '', parachute: '', altitude: '', delay: '', aircraft: '', notes: '', result: '',
     jump_type: '', custom_type: '',
   })
-  const [equipment, setEquipment]           = useState([])
-  const [dropzones, setDropzones]           = useState([])
-  const [error, setError]                   = useState('')
-  const [loading, setLoading]               = useState(false)
+  const [equipment, setEquipment]                     = useState([])
+  const [dropzones, setDropzones]                     = useState([])
+  const [error, setError]                             = useState('')
+  const [loading, setLoading]                         = useState(false)
   const [aircraftSuggestions, setAircraftSuggestions] = useState([])
   const navigate = useNavigate()
 
@@ -123,14 +123,27 @@ export default function AddJump() {
           <form onSubmit={handleSave}>
 
             {/* Numer + Data */}
-            <div className="form-row">
-              <div className="form-group">
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.9rem' }}>
+              <div style={{ flex: '0 0 140px' }}>
                 <label className="label">Numer skoku *</label>
-                <input className="input" type="number" placeholder="42" value={form.number} onChange={set('number')} />
+                <input
+                  className="input"
+                  type="number"
+                  placeholder="42"
+                  value={form.number}
+                  onChange={set('number')}
+                />
               </div>
-              <div className="form-group">
+              <div style={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden' }}>
                 <label className="label">Data skoku *</label>
-                <input className="input" type="date" value={form.jump_date} onChange={set('jump_date')} required />
+                <input
+                  className="input"
+                  type="date"
+                  value={form.jump_date}
+                  onChange={set('jump_date')}
+                  required
+                  style={{ width: '100%', minWidth: 0 }}
+                />
               </div>
             </div>
 
@@ -203,12 +216,12 @@ export default function AddJump() {
             </div>
 
             {/* Wysokość + Opóźnienie */}
-            <div className="form-row">
-              <div className="form-group">
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.9rem' }}>
+              <div style={{ flex: '1 1 auto', minWidth: 0 }}>
                 <label className="label">Wysokość (m)</label>
                 <input className="input" type="number" placeholder="4000" value={form.altitude} onChange={set('altitude')} />
               </div>
-              <div className="form-group">
+              <div style={{ flex: '1 1 auto', minWidth: 0 }}>
                 <label className="label">Opóźnienie (s)</label>
                 <input className="input" type="number" placeholder="60" value={form.delay} onChange={set('delay')} />
               </div>
