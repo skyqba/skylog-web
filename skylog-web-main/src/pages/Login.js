@@ -87,7 +87,7 @@ export default function Login() {
               {resetMode ? '← Wróć do logowania' : 'Zapomniałeś hasła?'}
             </button>
             <Link to="/register" style={{ color:'var(--accent2)', fontSize:'0.82rem', textDecoration:'none' }}>
-              Nie masz konta? Zarejestruj się →
+              Nie masz konta? Zarejestruj się i huj →
             </Link>
           </div>
         </div>

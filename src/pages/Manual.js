@@ -65,7 +65,7 @@ export default function Manual() {
         {/* Nagłówek */}
         <div style={{ textAlign: 'center', marginBottom: '2.5rem', padding: '2rem', background: 'var(--bg2)', border: '1px solid var(--border2)', borderRadius: 'var(--r2)', borderTop: '3px solid var(--accent)' }}>
           <div style={{ fontFamily: 'var(--head)', fontSize: '2rem', fontWeight: 900, marginBottom: '0.25rem' }}>
-            Jump<span style={{ color: 'var(--accent2)' }}>Log</span>
+            Sky Jump<span style={{ color: 'var(--accent2)' }}>Log</span>
           </div>
           <div style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '0.75rem' }}>by SkyQba ver 1.0</div>
           <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.25rem' }}>Instrukcja użytkownika</div>
@@ -237,7 +237,7 @@ export default function Manual() {
 
         {/* Stopka */}
         <div style={{ textAlign: 'center', padding: '1.5rem', borderTop: '1px solid var(--border)', marginTop: '1rem' }}>
-          <div style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800, color: 'var(--accent)', marginBottom: '0.25rem' }}>JumpLog by SkyQba</div>
+          <div style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800, color: 'var(--accent)', marginBottom: '0.25rem' }}>Sky JumpLog by SkyQba</div>
           <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Elektroniczny Dziennik Skoków Spadochronowych · ver 1.0</div>
         </div>
 
