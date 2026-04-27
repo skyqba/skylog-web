@@ -145,7 +145,7 @@ export default function AddJump() {
                   {dropzones.map(dz => <option key={dz.id} value={dz.name}>{dz.name}</option>)}
                 </select>
               )}
-              <input className="input" placeholder="lub wpisz ręcznie..." value={form.city} onChange={set('city')} />
+              <input className="input" placeholder="lub wpisz ręcznie..." maxLength={150} value={form.city} onChange={set('city')} />
               {dropzones.length === 0 && (
                 <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.35rem' }}>
                   💡 Dodaj strefy zrzutu w <span style={{ color: 'var(--accent2)' }}>Profilu</span>
@@ -162,7 +162,7 @@ export default function AddJump() {
                   {equipment.map(eq => <option key={eq.id} value={eq.name}>{eq.name}</option>)}
                 </select>
               )}
-              <input className="input" placeholder="lub wpisz ręcznie..." value={form.parachute} onChange={set('parachute')} />
+              <input className="input" placeholder="lub wpisz ręcznie..." maxLength={150} value={form.parachute} onChange={set('parachute')} />
             </div>
 
             {/* Wysokość + Opóźnienie */}
@@ -180,19 +180,19 @@ export default function AddJump() {
             {/* Samolot */}
             <div className="form-group">
               <label className="label">Samolot</label>
-              <input className="input" placeholder="np. Cessna 182" value={form.aircraft} onChange={set('aircraft')} />
+              <input className="input" placeholder="np. Cessna 182" value={form.aircraft} maxLength={150} onChange={set('aircraft')} />
             </div>
 
             {/* Wynik */}
             <div className="form-group">
               <label className="label">Wynik</label>
-              <input className="input" placeholder="np. 0.05, 1 miejsce, zaliczony..." value={form.result} onChange={set('result')} />
+              <input className="input" placeholder="np. 0.05, 1 miejsce, zaliczony..." value={form.result} maxLength={150} onChange={set('result')} />
             </div>
 
             {/* Uwagi */}
             <div className="form-group">
               <label className="label">Uwagi</label>
-              <textarea className="input" placeholder="Dodatkowe uwagi..." value={form.notes} onChange={set('notes')} rows={3} style={{ resize: 'vertical', fontFamily: 'var(--font)' }} />
+              <textarea className="input" placeholder="Dodatkowe uwagi..." value={form.notes} maxLength={150} onChange={set('notes')} rows={3} style={{ resize: 'vertical', fontFamily: 'var(--font)' }} />
             </div>
 
             {error && (
