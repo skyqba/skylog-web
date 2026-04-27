@@ -17,16 +17,36 @@ const JUMP_TYPES = [
   { value: 'inny',                  label: 'Inny...' },
 ]
 
+const AIRCRAFT_LIST = [
+  'Cessna 182',
+  'Cessna 206',
+  'Cessna 208 Caravan',
+  'Cessna 208B Grand Caravan',
+  'Pilatus PC-6 Porter',
+  'Antonov An-2',
+  'Antonov An-28',
+  'AN-28 Bryza',
+  'Let L-410 Turbolet',
+  'PAC 750 XL',
+  'de Havilland DHC-6 Twin Otter',
+  'Beechcraft King Air',
+  'CASA C-295',
+  'Mi-8',
+  'Mi-2',
+  'AS350',
+]
+
 export default function AddJump() {
   const [form, setForm] = useState({
     number: '', jump_date: new Date().toISOString().split('T')[0],
     city: '', parachute: '', altitude: '', delay: '', aircraft: '', notes: '', result: '',
     jump_type: '', custom_type: '',
   })
-  const [equipment, setEquipment] = useState([])
-  const [dropzones, setDropzones] = useState([])
-  const [error, setError]         = useState('')
-  const [loading, setLoading]     = useState(false)
+  const [equipment, setEquipment]           = useState([])
+  const [dropzones, setDropzones]           = useState([])
+  const [error, setError]                   = useState('')
+  const [loading, setLoading]               = useState(false)
+  const [aircraftSuggestions, setAircraftSuggestions] = useState([])
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -46,6 +66,23 @@ export default function AddJump() {
   }, [])
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
+
+  const handleAircraftChange = (e) => {
+    const val = e.target.value
+    setForm(f => ({ ...f, aircraft: val }))
+    if (val.length > 0) {
+      setAircraftSuggestions(
+        AIRCRAFT_LIST.filter(a => a.toLowerCase().includes(val.toLowerCase()))
+      )
+    } else {
+      setAircraftSuggestions([])
+    }
+  }
+
+  const handleAircraftSelect = (a) => {
+    setForm(f => ({ ...f, aircraft: a }))
+    setAircraftSuggestions([])
+  }
 
   const handleSave = async (e) => {
     e.preventDefault()
@@ -80,7 +117,7 @@ export default function AddJump() {
     <div>
       <Navbar />
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '1.5rem 1rem' }}>
-        <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800, marginBottom: '1.5rem' }}>Nowy skok </h2>
+        <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800, marginBottom: '1.5rem' }}>Nowy skok</h2>
 
         <div className="card">
           <form onSubmit={handleSave}>
@@ -178,9 +215,40 @@ export default function AddJump() {
             </div>
 
             {/* Samolot */}
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative' }}>
               <label className="label">Samolot</label>
-              <input className="input" placeholder="np. Cessna 182" value={form.aircraft} maxLength={150} onChange={set('aircraft')} />
+              <input
+                className="input"
+                placeholder="np. Cessna 182..."
+                value={form.aircraft}
+                maxLength={150}
+                onChange={handleAircraftChange}
+                onBlur={() => setTimeout(() => setAircraftSuggestions([]), 150)}
+                autoComplete="off"
+              />
+              {aircraftSuggestions.length > 0 && (
+                <div style={{
+                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                  background: 'var(--bg2)', border: '1px solid var(--border)',
+                  borderRadius: 'var(--r)', overflow: 'hidden', marginTop: 2,
+                }}>
+                  {aircraftSuggestions.map(a => (
+                    <div
+                      key={a}
+                      onMouseDown={() => handleAircraftSelect(a)}
+                      style={{
+                        padding: '0.55rem 0.9rem', fontSize: '0.85rem', color: 'var(--text)',
+                        cursor: 'pointer', borderBottom: '1px solid var(--border)',
+                        transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg3)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      {a}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Wynik */}
