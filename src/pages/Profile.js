@@ -232,9 +232,22 @@ export default function Profile() {
         </div>
 
         <PersonalSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
-        <LicenseSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
         <InsuranceSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
         <MedicalSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
+
+        {/* Moje uprawnienia */}
+        <Link to="/qualifications" style={{ textDecoration:'none', display:'block', marginBottom:'1rem' }}>
+          <div className="card" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}
+          >
+            <div>
+              <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.15rem' }}>Moje uprawnienia</div>
+              <div style={{ fontSize:'0.82rem', color:'var(--muted)' }}>Świadectwo kwalifikacji, uprawnienia instruktorskie</div>
+            </div>
+            <span style={{ color:'var(--accent2)', fontSize:'1.2rem' }}>→</span>
+          </div>
+        </Link>
 
         {/* Moje komplety spadochronowe */}
         <div className="card" style={{ marginBottom:'1rem' }}>
@@ -291,8 +304,7 @@ export default function Profile() {
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.75rem' }}>
                       <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color:'var(--accent2)' }}>{rig.name}</div>
                       <div style={{ display:'flex', gap:'0.4rem' }}>
-                        <button
-                          onClick={() => setEditingRig({ ...rig })}
+                        <button onClick={() => setEditingRig({ ...rig })}
                           style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--muted)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.6rem', fontFamily:'var(--font)' }}
                           onMouseEnter={e => { e.currentTarget.style.borderColor='var(--accent)'; e.currentTarget.style.color='var(--accent2)' }}
                           onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border2)'; e.currentTarget.style.color='var(--muted)' }}
@@ -303,42 +315,13 @@ export default function Profile() {
                       </div>
                     </div>
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', fontSize:'0.82rem' }}>
-                      {rig.main && (
-                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
-                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Główny</div>
-                          <div style={{ fontWeight:600 }}>{rig.main}</div>
-                        </div>
-                      )}
-                      {rig.reserve && (
-                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
-                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Zapasowy</div>
-                          <div style={{ fontWeight:600 }}>{rig.reserve}</div>
-                        </div>
-                      )}
-                      {rig.container && (
-                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
-                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Pokrowiec</div>
-                          <div style={{ fontWeight:600 }}>{rig.container}</div>
-                        </div>
-                      )}
-                      {rig.aad && (
-                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
-                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Automat</div>
-                          <div style={{ fontWeight:600 }}>{rig.aad}</div>
-                        </div>
-                      )}
-                      {rig.reserve_expiry && (
-                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem', gridColumn:'1 / -1' }}>
-                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Koniec ważności spadochronu zapasowego</div>
-                          <div style={{ fontWeight:600 }}>{new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')}</div>
-                        </div>
-                      )}
+                      {rig.main && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Główny</div><div style={{ fontWeight:600 }}>{rig.main}</div></div>}
+                      {rig.reserve && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Zapasowy</div><div style={{ fontWeight:600 }}>{rig.reserve}</div></div>}
+                      {rig.container && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Pokrowiec</div><div style={{ fontWeight:600 }}>{rig.container}</div></div>}
+                      {rig.aad && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Automat</div><div style={{ fontWeight:600 }}>{rig.aad}</div></div>}
+                      {rig.reserve_expiry && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem', gridColumn:'1 / -1' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Koniec ważności zapasowego</div><div style={{ fontWeight:600 }}>{new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')}</div></div>}
                     </div>
-                    {status && (
-                      <div style={{ marginTop:'0.75rem', padding:'0.6rem 0.9rem', borderRadius:'var(--r)', fontSize:'0.82rem', fontWeight:600, color:status.color, background:'rgba(255,255,255,0.04)', border:`1px solid ${status.color}` }}>
-                        {status.label}
-                      </div>
-                    )}
+                    {status && <div style={{ marginTop:'0.75rem', padding:'0.6rem 0.9rem', borderRadius:'var(--r)', fontSize:'0.82rem', fontWeight:600, color:status.color, background:'rgba(255,255,255,0.04)', border:`1px solid ${status.color}` }}>{status.label}</div>}
                   </>
                 )}
               </div>
@@ -353,26 +336,11 @@ export default function Profile() {
                 <input className="input" placeholder="np. Mój główny zestaw" value={newRig.name} onChange={e => setNewRig(r => ({ ...r, name: e.target.value }))} />
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
-                <div className="form-group">
-                  <label className="label">Spadochron główny</label>
-                  <input className="input" placeholder="np. Pilot 168" value={newRig.main} onChange={e => setNewRig(r => ({ ...r, main: e.target.value }))} />
-                </div>
-                <div className="form-group">
-                  <label className="label">Spadochron zapasowy</label>
-                  <input className="input" placeholder="np. Nano 160" value={newRig.reserve} onChange={e => setNewRig(r => ({ ...r, reserve: e.target.value }))} />
-                </div>
-                <div className="form-group">
-                  <label className="label">Pokrowiec</label>
-                  <input className="input" placeholder="np. Javelin Odyssey" value={newRig.container} onChange={e => setNewRig(r => ({ ...r, container: e.target.value }))} />
-                </div>
-                <div className="form-group">
-                  <label className="label">Automat (AAD)</label>
-                  <input className="input" placeholder="np. Cypres 2" value={newRig.aad} onChange={e => setNewRig(r => ({ ...r, aad: e.target.value }))} />
-                </div>
-                <div className="form-group" style={{ gridColumn:'1 / -1' }}>
-                  <label className="label">Koniec ważności spadochronu zapasowego</label>
-                  <input className="input" type="date" value={newRig.reserve_expiry} onChange={e => setNewRig(r => ({ ...r, reserve_expiry: e.target.value }))} />
-                </div>
+                <div className="form-group"><label className="label">Spadochron główny</label><input className="input" placeholder="np. Pilot 168" value={newRig.main} onChange={e => setNewRig(r => ({ ...r, main: e.target.value }))} /></div>
+                <div className="form-group"><label className="label">Spadochron zapasowy</label><input className="input" placeholder="np. Nano 160" value={newRig.reserve} onChange={e => setNewRig(r => ({ ...r, reserve: e.target.value }))} /></div>
+                <div className="form-group"><label className="label">Pokrowiec</label><input className="input" placeholder="np. Javelin Odyssey" value={newRig.container} onChange={e => setNewRig(r => ({ ...r, container: e.target.value }))} /></div>
+                <div className="form-group"><label className="label">Automat (AAD)</label><input className="input" placeholder="np. Cypres 2" value={newRig.aad} onChange={e => setNewRig(r => ({ ...r, aad: e.target.value }))} /></div>
+                <div className="form-group" style={{ gridColumn:'1 / -1' }}><label className="label">Koniec ważności spadochronu zapasowego</label><input className="input" type="date" value={newRig.reserve_expiry} onChange={e => setNewRig(r => ({ ...r, reserve_expiry: e.target.value }))} /></div>
               </div>
               <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
                 <button className="btn ghost" style={{ flex:1 }} onClick={() => { setShowAddRig(false); setNewRig({ name:'', main:'', reserve:'', container:'', aad:'', reserve_expiry:'' }) }}>Anuluj</button>
@@ -382,14 +350,11 @@ export default function Profile() {
           )}
 
           {!showAddRig && !editingRig && (
-            <button
-              onClick={() => setShowAddRig(true)}
+            <button onClick={() => setShowAddRig(true)}
               style={{ width:'100%', padding:'0.65rem', background:'var(--bg3)', border:'2px dashed var(--border2)', borderRadius:'var(--r)', color:'var(--accent2)', fontFamily:'var(--font)', fontSize:'0.88rem', fontWeight:500, cursor:'pointer', transition:'all 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
               onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}
-            >
-              + Dodaj komplet spadochronowy
-            </button>
+            >+ Dodaj komplet spadochronowy</button>
           )}
         </div>
 
@@ -457,31 +422,6 @@ function PersonalSection({ profileBase, saving, setSaving, msgs, showMsg }) {
         <div className="form-group"><label className="label">E-mail</label><input className="input" value={profileBase.email||''} disabled style={{ opacity:0.5, cursor:'not-allowed' }} readOnly /></div>
         {msgs['personal'] && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem' }}>{msgs['personal']}</p>}
         <button className="btn" type="submit" disabled={saving['personal']}>{saving['personal'] ? 'Zapisywanie...' : 'Zapisz'}</button>
-      </form>
-    </div>
-  )
-}
-
-function LicenseSection({ profileBase, saving, setSaving, msgs, showMsg }) {
-  const [number, setNumber] = useState(profileBase.license_number || '')
-  const [expiry, setExpiry] = useState(profileBase.license_expiry || '')
-  const save = async (e) => {
-    e.preventDefault()
-    setSaving(s => ({ ...s, license:true }))
-    await supabase.from('profiles').update({ license_number: number||null, license_expiry: expiry||null }).eq('id', profileBase.id)
-    showMsg('license', 'Zapisano!')
-    setSaving(s => ({ ...s, license:false }))
-  }
-  return (
-    <div className="card" style={{ marginBottom:'1rem' }}>
-      <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Licencja skoczka</h3>
-      <form onSubmit={save}>
-        <div className="form-row">
-          <div className="form-group"><label className="label">Numer licencji</label><input className="input" value={number} onChange={e => setNumber(e.target.value)} placeholder="np. APA-1234" /></div>
-          <div className="form-group"><label className="label">Data ważności</label><input className="input" type="date" value={expiry} onChange={e => setExpiry(e.target.value)} /></div>
-        </div>
-        {msgs['license'] && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem' }}>{msgs['license']}</p>}
-        <button className="btn" type="submit" disabled={saving['license']}>{saving['license'] ? 'Zapisywanie...' : 'Zapisz'}</button>
       </form>
     </div>
   )
