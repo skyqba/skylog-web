@@ -7,31 +7,34 @@ export default function Profile() {
   const [profileBase, setProfileBase] = useState(null)
   const [preview, setPreview]         = useState(null)
   const [uploading, setUploading]     = useState(false)
-  const [equipment, setEquipment]     = useState([])
   const [dropzones, setDropzones]     = useState([])
   const [docs, setDocs]               = useState([])
   const [uploadingDoc, setUploadingDoc] = useState(false)
-  const [newChute, setNewChute]       = useState('')
   const [newDz, setNewDz]             = useState('')
   const [msgs, setMsgs]               = useState({})
   const [saving, setSaving]           = useState({})
-  const fileRef    = useRef()
-  const docRef     = useRef()
-  const navigate   = useNavigate()
+  const [rigs, setRigs]               = useState([])
+  const [showAddRig, setShowAddRig]   = useState(false)
+  const [editingRig, setEditingRig]   = useState(null)
+  const [newRig, setNewRig]           = useState({ name:'', main:'', reserve:'', container:'', aad:'', reserve_pack_date:'', reserve_expiry:'' })
+  const [savingRig, setSavingRig]     = useState(false)
+  const fileRef  = useRef()
+  const docRef   = useRef()
+  const navigate = useNavigate()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
-    const [{ data: prof }, { data: eq }, { data: dz }, { data: docList }] = await Promise.all([
+    const [{ data: prof }, { data: dz }, { data: docList }, { data: rigList }] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
-      supabase.from('equipment').select('*').eq('user_id', user.id).order('created_at'),
       supabase.from('dropzones').select('*').eq('user_id', user.id).order('name'),
       supabase.storage.from('documents').list(user.id, { sortBy: { column: 'created_at', order: 'desc' } }),
+      supabase.from('rigs').select('*').eq('user_id', user.id).order('created_at'),
     ])
     setProfileBase({ ...prof, email: user.email, uid: user.id })
     if (prof?.avatar_url) setPreview(prof.avatar_url + '?t=' + Date.now())
-    setEquipment(eq || [])
     setDropzones(dz || [])
     setDocs(docList || [])
+    setRigs(rigList || [])
   }, [])
 
   useEffect(() => { load() }, [load])
@@ -81,27 +84,12 @@ export default function Profile() {
 
   const downloadDoc = async (name) => {
     const { data } = await supabase.storage.from('documents').createSignedUrl(`${profileBase.uid}/${name}`, 300)
-    if (data?.signedUrl) {
-      window.location.href = data.signedUrl
-    }
+    if (data?.signedUrl) window.location.href = data.signedUrl
   }
 
   const deleteDoc = async (name) => {
     await supabase.storage.from('documents').remove([`${profileBase.uid}/${name}`])
     setDocs(d => d.filter(x => x.name !== name))
-  }
-
-  const addChute = async () => {
-    if (!newChute.trim()) return
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data } = await supabase.from('equipment').insert({ user_id: user.id, name: newChute.trim(), type: 'main' }).select().single()
-    if (data) setEquipment(eq => [...eq, data])
-    setNewChute('')
-  }
-
-  const deleteChute = async (id) => {
-    await supabase.from('equipment').delete().eq('id', id)
-    setEquipment(eq => eq.filter(e => e.id !== id))
   }
 
   const addDropzone = async () => {
@@ -115,6 +103,58 @@ export default function Profile() {
   const deleteDz = async (id) => {
     await supabase.from('dropzones').delete().eq('id', id)
     setDropzones(dz => dz.filter(d => d.id !== id))
+  }
+
+  const saveRig = async () => {
+    if (!newRig.name.trim()) return
+    setSavingRig(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data } = await supabase.from('rigs').insert({
+      user_id: user.id,
+      name: newRig.name.trim(),
+      main: newRig.main.trim() || null,
+      reserve: newRig.reserve.trim() || null,
+      container: newRig.container.trim() || null,
+      aad: newRig.aad.trim() || null,
+      reserve_pack_date: newRig.reserve_pack_date || null,
+      reserve_expiry: newRig.reserve_expiry || null,
+    }).select().single()
+    if (data) {
+      setRigs(r => [...r, data])
+      setNewRig({ name:'', main:'', reserve:'', container:'', aad:'', reserve_pack_date:'', reserve_expiry:'' })
+      setShowAddRig(false)
+    }
+    setSavingRig(false)
+  }
+
+  const updateRig = async () => {
+    if (!editingRig) return
+    setSavingRig(true)
+    const { data } = await supabase.from('rigs').update({
+      name: editingRig.name.trim(),
+      main: editingRig.main?.trim() || null,
+      reserve: editingRig.reserve?.trim() || null,
+      container: editingRig.container?.trim() || null,
+      aad: editingRig.aad?.trim() || null,
+      reserve_pack_date: editingRig.reserve_pack_date || null,
+      reserve_expiry: editingRig.reserve_expiry || null,
+    }).eq('id', editingRig.id).select().single()
+    if (data) setRigs(r => r.map(x => x.id === data.id ? data : x))
+    setEditingRig(null)
+    setSavingRig(false)
+  }
+
+  const deleteRig = async (id) => {
+    await supabase.from('rigs').delete().eq('id', id)
+    setRigs(r => r.filter(x => x.id !== id))
+  }
+
+  const rigStatus = (expiry) => {
+    if (!expiry) return null
+    const days = Math.ceil((new Date(expiry) - new Date()) / (1000 * 60 * 60 * 24))
+    if (days < 0)   return { color:'var(--danger)', label:`Zapas przeterminowany o ${Math.abs(days)} dni!` }
+    if (days <= 30) return { color:'#FBBF24',       label:`Zapas wygasa za ${days} dni` }
+    return              { color:'var(--success)',   label:`Zapas ważny jeszcze ${days} dni` }
   }
 
   const fileIcon = (name) => {
@@ -160,13 +200,11 @@ export default function Profile() {
         <div className="card" style={{ marginBottom:'1rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>Dokumenty spadochronowe</h3>
           <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1.25rem' }}>Skany licencji, ubezpieczenia, badań lotniczych i innych dokumentów</p>
-
           {docs.length === 0 && (
             <div style={{ textAlign:'center', padding:'1.5rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>
               Brak dokumentów — dodaj pierwszy poniżej
             </div>
           )}
-
           {docs.map(doc => (
             <div key={doc.name} style={{ display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.75rem 1rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'0.5rem', border:'1px solid var(--border)' }}>
               <span style={{ fontSize:22, flexShrink:0 }}>{fileIcon(doc.name)}</span>
@@ -182,9 +220,7 @@ export default function Profile() {
               </div>
             </div>
           ))}
-
           {msgs['docs'] && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem' }}>{msgs['docs']}</p>}
-
           <button
             onClick={() => docRef.current.click()}
             disabled={uploadingDoc}
@@ -201,25 +237,183 @@ export default function Profile() {
         <LicenseSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
         <InsuranceSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
         <MedicalSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
-        <ReserveSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
 
-        {/* Spadochron główny */}
+        {/* Moje komplety spadochronowe */}
         <div className="card" style={{ marginBottom:'1rem' }}>
-          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>Spadochron główny</h3>
-          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Lista dostępna przy dodawaniu skoku</p>
-          {equipment.length === 0 && <div style={{ textAlign:'center', padding:'1rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>Brak sprzętu</div>}
-          {equipment.map(eq => (
-            <div key={eq.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.7rem 1rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'0.5rem', border:'1px solid var(--border)' }}>
-              <span style={{ fontSize:'0.9rem', fontWeight:500 }}>{eq.name}</span>
-              <button onClick={() => deleteChute(eq.id)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem' }}
-                onMouseEnter={e => e.target.style.color='var(--danger)'}
-                onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>Moje komplety spadochronowe</h3>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Sprzęt na którym skaczesz — spadochron główny, zapasowy, pokrowiec i automat</p>
+
+          {rigs.length === 0 && !showAddRig && (
+            <div style={{ textAlign:'center', padding:'1.5rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>
+              Brak sprzętu — dodaj pierwszy komplet poniżej
             </div>
-          ))}
-          <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
-            <input className="input" placeholder="Nazwa np. Pilot 168" value={newChute} onChange={e => setNewChute(e.target.value)} onKeyDown={e => e.key==='Enter' && addChute()} style={{ flex:1 }} />
-            <button onClick={addChute} disabled={!newChute.trim()} className="btn" style={{ width:'auto', padding:'0 1.25rem' }}>+ Dodaj</button>
-          </div>
+          )}
+
+          {rigs.map(rig => {
+            const status = rigStatus(rig.reserve_expiry)
+            const isEditing = editingRig?.id === rig.id
+            return (
+              <div key={rig.id} style={{ background:'var(--bg3)', borderRadius:'var(--r)', padding:'1rem', marginBottom:'0.75rem', border:`1px solid ${isEditing ? 'var(--accent)' : 'var(--border)'}` }}>
+
+                {isEditing ? (
+                  // Tryb edycji
+                  <>
+                    <div style={{ fontFamily:'var(--head)', fontSize:'0.9rem', fontWeight:800, marginBottom:'0.75rem', color:'var(--accent2)' }}>Edycja kompletu</div>
+                    <div className="form-group">
+                      <label className="label">Nazwa kompletu *</label>
+                      <input className="input" value={editingRig.name} onChange={e => setEditingRig(r => ({ ...r, name: e.target.value }))} />
+                    </div>
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
+                      <div className="form-group">
+                        <label className="label">Spadochron główny</label>
+                        <input className="input" placeholder="np. Pilot 168" value={editingRig.main || ''} onChange={e => setEditingRig(r => ({ ...r, main: e.target.value }))} />
+                      </div>
+                      <div className="form-group">
+                        <label className="label">Spadochron zapasowy</label>
+                        <input className="input" placeholder="np. Nano 160" value={editingRig.reserve || ''} onChange={e => setEditingRig(r => ({ ...r, reserve: e.target.value }))} />
+                      </div>
+                      <div className="form-group">
+                        <label className="label">Pokrowiec</label>
+                        <input className="input" placeholder="np. Javelin Odyssey" value={editingRig.container || ''} onChange={e => setEditingRig(r => ({ ...r, container: e.target.value }))} />
+                      </div>
+                      <div className="form-group">
+                        <label className="label">Automat (AAD)</label>
+                        <input className="input" placeholder="np. Cypres 2" value={editingRig.aad || ''} onChange={e => setEditingRig(r => ({ ...r, aad: e.target.value }))} />
+                      </div>
+                      <div className="form-group">
+                        <label className="label">Data ułożenia zapasu</label>
+                        <input className="input" type="date" value={editingRig.reserve_pack_date || ''} onChange={e => setEditingRig(r => ({ ...r, reserve_pack_date: e.target.value }))} />
+                      </div>
+                      <div className="form-group">
+                        <label className="label">Koniec ważności zapasu</label>
+                        <input className="input" type="date" value={editingRig.reserve_expiry || ''} onChange={e => setEditingRig(r => ({ ...r, reserve_expiry: e.target.value }))} />
+                      </div>
+                    </div>
+                    <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
+                      <button className="btn ghost" style={{ flex:1 }} onClick={() => setEditingRig(null)}>Anuluj</button>
+                      <button className="btn" style={{ flex:1 }} onClick={updateRig} disabled={savingRig || !editingRig.name.trim()}>{savingRig ? 'Zapisywanie...' : 'Zapisz zmiany'}</button>
+                    </div>
+                  </>
+                ) : (
+                  // Tryb podglądu
+                  <>
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.75rem' }}>
+                      <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color:'var(--accent2)' }}>{rig.name}</div>
+                      <div style={{ display:'flex', gap:'0.4rem' }}>
+                        <button
+                          onClick={() => setEditingRig({ ...rig })}
+                          style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--muted)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.6rem', fontFamily:'var(--font)' }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor='var(--accent)'; e.currentTarget.style.color='var(--accent2)' }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border2)'; e.currentTarget.style.color='var(--muted)' }}
+                        >✏ Edytuj</button>
+                        <button onClick={() => deleteRig(rig.id)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem' }}
+                          onMouseEnter={e => e.target.style.color='var(--danger)'}
+                          onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>
+                      </div>
+                    </div>
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', fontSize:'0.82rem' }}>
+                      {rig.main && (
+                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
+                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Główny</div>
+                          <div style={{ fontWeight:600 }}>{rig.main}</div>
+                        </div>
+                      )}
+                      {rig.reserve && (
+                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
+                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Zapasowy</div>
+                          <div style={{ fontWeight:600 }}>{rig.reserve}</div>
+                        </div>
+                      )}
+                      {rig.container && (
+                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
+                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Pokrowiec</div>
+                          <div style={{ fontWeight:600 }}>{rig.container}</div>
+                        </div>
+                      )}
+                      {rig.aad && (
+                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
+                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Automat</div>
+                          <div style={{ fontWeight:600 }}>{rig.aad}</div>
+                        </div>
+                      )}
+                    </div>
+                    {(rig.reserve_pack_date || rig.reserve_expiry) && (
+                      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', fontSize:'0.82rem', marginTop:'0.5rem' }}>
+                        {rig.reserve_pack_date && (
+                          <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
+                            <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Data ułożenia</div>
+                            <div style={{ fontWeight:600 }}>{new Date(rig.reserve_pack_date).toLocaleDateString('pl-PL')}</div>
+                          </div>
+                        )}
+                        {rig.reserve_expiry && (
+                          <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
+                            <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Koniec ważności</div>
+                            <div style={{ fontWeight:600 }}>{new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {status && (
+                      <div style={{ marginTop:'0.75rem', padding:'0.6rem 0.9rem', borderRadius:'var(--r)', fontSize:'0.82rem', fontWeight:600, color:status.color, background:'rgba(255,255,255,0.04)', border:`1px solid ${status.color}` }}>
+                        {status.label}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )
+          })}
+
+          {showAddRig && (
+            <div style={{ background:'var(--bg3)', borderRadius:'var(--r)', padding:'1rem', marginBottom:'0.75rem', border:'1px solid var(--border2)' }}>
+              <div style={{ fontFamily:'var(--head)', fontSize:'0.9rem', fontWeight:800, marginBottom:'0.75rem', color:'var(--accent2)' }}>Nowy komplet</div>
+              <div className="form-group">
+                <label className="label">Nazwa kompletu *</label>
+                <input className="input" placeholder="np. Mój główny zestaw" value={newRig.name} onChange={e => setNewRig(r => ({ ...r, name: e.target.value }))} />
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
+                <div className="form-group">
+                  <label className="label">Spadochron główny</label>
+                  <input className="input" placeholder="np. Pilot 168" value={newRig.main} onChange={e => setNewRig(r => ({ ...r, main: e.target.value }))} />
+                </div>
+                <div className="form-group">
+                  <label className="label">Spadochron zapasowy</label>
+                  <input className="input" placeholder="np. Nano 160" value={newRig.reserve} onChange={e => setNewRig(r => ({ ...r, reserve: e.target.value }))} />
+                </div>
+                <div className="form-group">
+                  <label className="label">Pokrowiec</label>
+                  <input className="input" placeholder="np. Javelin Odyssey" value={newRig.container} onChange={e => setNewRig(r => ({ ...r, container: e.target.value }))} />
+                </div>
+                <div className="form-group">
+                  <label className="label">Automat (AAD)</label>
+                  <input className="input" placeholder="np. Cypres 2" value={newRig.aad} onChange={e => setNewRig(r => ({ ...r, aad: e.target.value }))} />
+                </div>
+                <div className="form-group">
+                  <label className="label">Data ułożenia zapasu</label>
+                  <input className="input" type="date" value={newRig.reserve_pack_date} onChange={e => setNewRig(r => ({ ...r, reserve_pack_date: e.target.value }))} />
+                </div>
+                <div className="form-group">
+                  <label className="label">Koniec ważności zapasu</label>
+                  <input className="input" type="date" value={newRig.reserve_expiry} onChange={e => setNewRig(r => ({ ...r, reserve_expiry: e.target.value }))} />
+                </div>
+              </div>
+              <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
+                <button className="btn ghost" style={{ flex:1 }} onClick={() => { setShowAddRig(false); setNewRig({ name:'', main:'', reserve:'', container:'', aad:'', reserve_pack_date:'', reserve_expiry:'' }) }}>Anuluj</button>
+                <button className="btn" style={{ flex:1 }} onClick={saveRig} disabled={savingRig || !newRig.name.trim()}>{savingRig ? 'Zapisywanie...' : 'Zapisz komplet'}</button>
+              </div>
+            </div>
+          )}
+
+          {!showAddRig && !editingRig && (
+            <button
+              onClick={() => setShowAddRig(true)}
+              style={{ width:'100%', padding:'0.65rem', background:'var(--bg3)', border:'2px dashed var(--border2)', borderRadius:'var(--r)', color:'var(--accent2)', fontFamily:'var(--font)', fontSize:'0.88rem', fontWeight:500, cursor:'pointer', transition:'all 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}
+            >
+              + Dodaj komplet spadochronowy
+            </button>
+          )}
         </div>
 
         {/* Strefy zrzutu */}
@@ -360,40 +554,6 @@ function MedicalSection({ profileBase, saving, setSaving, msgs, showMsg }) {
         <div className="form-group"><label className="label">Data ważności badań</label><input className="input" type="date" value={expiry} onChange={e => setExpiry(e.target.value)} /></div>
         {msgs['medical'] && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem' }}>{msgs['medical']}</p>}
         <button className="btn" type="submit" disabled={saving['medical']}>{saving['medical'] ? 'Zapisywanie...' : 'Zapisz'}</button>
-      </form>
-    </div>
-  )
-}
-
-function ReserveSection({ profileBase, saving, setSaving, msgs, showMsg }) {
-  const [name, setName]         = useState(profileBase.reserve_name || '')
-  const [packDate, setPackDate] = useState(profileBase.reserve_pack_date || '')
-  const [expiry, setExpiry]     = useState(profileBase.reserve_expiry || '')
-  const days = expiry ? Math.ceil((new Date(expiry) - new Date()) / (1000*60*60*24)) : null
-  const status = days !== null
-    ? days < 0   ? { color:'var(--danger)', label:`Przeterminowany o ${Math.abs(days)} dni!` }
-    : days <= 30 ? { color:'#FBBF24', label:`Wygasa za ${days} dni` }
-    :              { color:'var(--success)', label:`Ważny jeszcze ${days} dni` }
-    : null
-  const save = async (e) => {
-    e.preventDefault()
-    setSaving(s => ({ ...s, reserve:true }))
-    await supabase.from('profiles').update({ reserve_name: name||null, reserve_pack_date: packDate||null, reserve_expiry: expiry||null }).eq('id', profileBase.id)
-    showMsg('reserve', 'Zapisano!')
-    setSaving(s => ({ ...s, reserve:false }))
-  }
-  return (
-    <div className="card" style={{ marginBottom:'1rem' }}>
-      <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Spadochron zapasowy</h3>
-      <form onSubmit={save}>
-        <div className="form-group"><label className="label">Nazwa</label><input className="input" value={name} onChange={e => setName(e.target.value)} placeholder="np. Nano 160, Raven 181..." /></div>
-        <div className="form-row">
-          <div className="form-group"><label className="label">Data ułożenia</label><input className="input" type="date" value={packDate} onChange={e => setPackDate(e.target.value)} /></div>
-          <div className="form-group"><label className="label">Data końca ważności</label><input className="input" type="date" value={expiry} onChange={e => setExpiry(e.target.value)} /></div>
-        </div>
-        {status && <div style={{ padding:'0.75rem 1rem', borderRadius:'var(--r)', marginBottom:'1rem', fontSize:'0.85rem', fontWeight:600, color:status.color, background:'rgba(255,255,255,0.04)', border:`1px solid ${status.color}` }}>{status.label}</div>}
-        {msgs['reserve'] && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem' }}>{msgs['reserve']}</p>}
-        <button className="btn" type="submit" disabled={saving['reserve']}>{saving['reserve'] ? 'Zapisywanie...' : 'Zapisz'}</button>
       </form>
     </div>
   )

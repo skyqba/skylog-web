@@ -7,6 +7,7 @@ import JumpCard from '../components/JumpCard'
 export default function Journal() {
   const [jumps, setJumps]     = useState([])
   const [profile, setProfile] = useState(null)
+  const [rigs, setRigs]       = useState([])
   const [loading, setLoading] = useState(true)
   const [showDocs, setShowDocs] = useState(false)
   const [search, setSearch]   = useState('')
@@ -15,12 +16,14 @@ export default function Journal() {
 
   const fetchAll = async () => {
     const { data: { user } } = await supabase.auth.getUser()
-    const [{ data: j }, { data: prof }] = await Promise.all([
+    const [{ data: j }, { data: prof }, { data: rigList }] = await Promise.all([
       supabase.from('jumps').select('*').order('number', { ascending: false }),
-      supabase.from('profiles').select('reserve_name,reserve_expiry,license_expiry,insurance_expiry,medical_expiry').eq('id', user.id).single()
+      supabase.from('profiles').select('license_expiry,insurance_expiry,medical_expiry').eq('id', user.id).single(),
+      supabase.from('rigs').select('id,name,reserve_expiry').eq('user_id', user.id),
     ])
     setJumps(j || [])
     setProfile(prof)
+    setRigs(rigList || [])
     setLoading(false)
   }
 
@@ -36,9 +39,9 @@ export default function Journal() {
 
   const docColor = (days) => {
     if (days === null) return null
-    if (days < 0)   return { color:'var(--danger)',  dot:'#F87171' }
-    if (days <= 30) return { color:'#FBBF24',        dot:'#FBBF24' }
-    return               { color:'var(--success)',   dot:'#34D399' }
+    if (days < 0)   return { color:'var(--danger)', dot:'#F87171' }
+    if (days <= 30) return { color:'#FBBF24',       dot:'#FBBF24' }
+    return               { color:'var(--success)',  dot:'#34D399' }
   }
 
   const docs = profile ? [
@@ -49,25 +52,33 @@ export default function Journal() {
 
   const urgentDocs = docs.filter(d => d.days !== null && d.days <= 30)
 
+  const urgentRigs = rigs
+    .filter(r => r.reserve_expiry)
+    .map(r => ({ ...r, days: daysUntil(r.reserve_expiry) }))
+    .filter(r => r.days !== null && r.days <= 60)
+    .sort((a, b) => a.days - b.days)
+
   return (
     <div>
       <Navbar />
       <div style={{ maxWidth:680, margin:'0 auto', padding:'1.5rem 1rem' }}>
 
-        {/* Baner ważności zapasowego */}
-        {profile?.reserve_expiry && daysUntil(profile.reserve_expiry) <= 60 && (() => {
-          const days = daysUntil(profile.reserve_expiry)
-          const expired = days < 0
+        {/* Banery ważności zapasowych */}
+        {urgentRigs.map(rig => {
+          const expired = rig.days < 0
           return (
-            <div style={{ display:'flex', alignItems:'center', gap:'1rem', padding:'1rem 1.25rem', borderRadius:'var(--r2)', marginBottom:'1rem', background: expired ? 'rgba(248,113,113,0.12)' : 'rgba(251,191,36,0.08)', border:`2px solid ${expired ? 'rgba(248,113,113,0.6)' : 'rgba(251,191,36,0.5)'}` }}>
-              <div style={{ fontSize:32, flexShrink:0 }}>{expired ? '🚨' : days <= 14 ? '⚠️' : '📅'}</div>
+            <div key={rig.id} style={{ display:'flex', alignItems:'center', gap:'1rem', padding:'1rem 1.25rem', borderRadius:'var(--r2)', marginBottom:'1rem', background: expired ? 'rgba(248,113,113,0.12)' : 'rgba(251,191,36,0.08)', border:`2px solid ${expired ? 'rgba(248,113,113,0.6)' : 'rgba(251,191,36,0.5)'}` }}>
+              <div style={{ fontSize:28, flexShrink:0 }}>{expired ? '🚨' : rig.days <= 14 ? '⚠️' : '📅'}</div>
               <div style={{ flex:1 }}>
-                <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color: expired ? 'var(--danger)' : '#FBBF24', marginBottom:2 }}>
-                  {expired ? 'NIEAKTUALNE UŁOŻENIE SPADOCHRONU ZAPASOWEGO!' : 'Zbliża się koniec ważności ułożenia zapasowego'}
+                <div style={{ fontFamily:'var(--head)', fontSize:'0.95rem', fontWeight:800, color: expired ? 'var(--danger)' : '#FBBF24', marginBottom:2 }}>
+                  {expired ? 'NIEAKTUALNE UŁOŻENIE ZAPASOWEGO!' : 'Zbliża się koniec ważności ułożenia zapasowego'}
                 </div>
                 <div style={{ fontSize:'0.82rem', color: expired ? 'var(--danger)' : '#FBBF24', opacity:0.9 }}>
-                  {profile.reserve_name && <span style={{ fontWeight:600 }}>{profile.reserve_name} — </span>}
-                  {expired ? `Nieważne od ${Math.abs(days)} dni. Ważność: ${new Date(profile.reserve_expiry).toLocaleDateString('pl-PL')}` : `Koniec ważności: ${new Date(profile.reserve_expiry).toLocaleDateString('pl-PL')} · zostało ${days} dni`}
+                  <span style={{ fontWeight:600 }}>{rig.name} — </span>
+                  {expired
+                    ? `Nieważne od ${Math.abs(rig.days)} dni. Ważność: ${new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')}`
+                    : `Koniec ważności: ${new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')} · zostało ${rig.days} dni`
+                  }
                 </div>
               </div>
               <Link to="/profile" style={{ textDecoration:'none', flexShrink:0 }}>
@@ -75,9 +86,9 @@ export default function Journal() {
               </Link>
             </div>
           )
-        })()}
+        })}
 
-        {/* Dokumenty — subtelne przypomnienie */}
+        {/* Dokumenty */}
         {docs.length > 0 && (
           <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'var(--r2)', marginBottom:'1rem', overflow:'hidden' }}>
             <button onClick={() => setShowDocs(d => !d)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 1.1rem', background:'transparent', border:'none', cursor:'pointer', color:'var(--text)', fontFamily:'var(--font)' }}>
@@ -92,7 +103,6 @@ export default function Journal() {
               </div>
               <span style={{ color:'var(--muted)', fontSize:'0.8rem' }}>{showDocs ? '▲' : '▼'}</span>
             </button>
-
             {showDocs && (
               <div style={{ borderTop:'1px solid var(--border)', padding:'0.75rem 1.1rem', display:'flex', flexDirection:'column', gap:'0.6rem' }}>
                 {docs.map(doc => {
@@ -104,11 +114,9 @@ export default function Journal() {
                         <div style={{ width:7, height:7, borderRadius:'50%', background: c?.dot || 'var(--muted)', flexShrink:0 }} />
                         <span style={{ fontSize:'0.85rem', color:'var(--muted)' }}>{doc.label}</span>
                       </div>
-                      <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
-                        <span style={{ fontFamily:'var(--mono)', fontSize:'0.78rem', color: c?.color || 'var(--muted)' }}>
-                          {doc.days < 0 ? `Nieważny od ${Math.abs(doc.days)} dni` : doc.days <= 30 ? `Wygasa za ${doc.days} dni` : `Ważny do ${fmt}`}
-                        </span>
-                      </div>
+                      <span style={{ fontFamily:'var(--mono)', fontSize:'0.78rem', color: c?.color || 'var(--muted)' }}>
+                        {doc.days < 0 ? `Nieważny od ${Math.abs(doc.days)} dni` : doc.days <= 30 ? `Wygasa za ${doc.days} dni` : `Ważny do ${fmt}`}
+                      </span>
                     </div>
                   )
                 })}
@@ -133,7 +141,6 @@ export default function Journal() {
 
         <h2 style={{ fontFamily:'var(--head)', fontSize:'1.1rem', fontWeight:800, marginBottom:'1rem' }}>Dziennik skoków</h2>
 
-        {/* Wyszukiwarka */}
         {!loading && jumps.length > 0 && (
           <div style={{ marginBottom:'1rem', position:'relative' }}>
             <input
