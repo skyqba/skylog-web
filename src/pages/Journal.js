@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 import JumpCard from '../components/JumpCard'
+import {
+  getCachedJumps, setCachedJumps,
+  getCachedProfile, setCachedProfile,
+  getCachedRigs, setCachedRigs,
+  getCachedQuals, setCachedQuals
+} from '../localCache'
 
 export default function Journal() {
   const [jumps, setJumps]         = useState([])
@@ -13,6 +19,7 @@ export default function Journal() {
   const [showDocs, setShowDocs]   = useState(false)
   const [search, setSearch]       = useState('')
   const [repeating, setRepeating] = useState(false)
+  const [offline, setOffline]     = useState(!navigator.onLine)
   const [dismissedRigs, setDismissedRigs]   = useState(() => JSON.parse(sessionStorage.getItem('dismissedRigs') || '[]'))
   const [dismissedQuals, setDismissedQuals] = useState(() => JSON.parse(sessionStorage.getItem('dismissedQuals') || '[]'))
   const [confirmDismiss, setConfirmDismiss] = useState(null)
@@ -23,17 +30,44 @@ export default function Journal() {
   })()
   const alertOn = (key) => alertSettings[key] !== false
 
+  useEffect(() => {
+    const handleOnline  = () => { setOffline(false); fetchAll() }
+    const handleOffline = () => setOffline(true)
+    window.addEventListener('online',  handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online',  handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
   useEffect(() => { fetchAll() }, [])
 
   const fetchAll = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
+
+    if (!navigator.onLine) {
+      setJumps(getCachedJumps())
+      setProfile(getCachedProfile())
+      setRigs(getCachedRigs())
+      setQuals(getCachedQuals())
+      setLoading(false)
+      return
+    }
+
     const [{ data: j }, { data: prof }, { data: rigList }, { data: q }] = await Promise.all([
       supabase.from('jumps').select('*').order('number', { ascending: false }),
       supabase.from('profiles').select('insurance_expiry,medical_expiry').eq('id', user.id).single(),
       supabase.from('rigs').select('id,name,reserve_expiry').eq('user_id', user.id),
       supabase.from('qualifications').select('*').eq('user_id', user.id).single(),
     ])
+
+    setCachedJumps(j || [])
+    setCachedProfile(prof)
+    setCachedRigs(rigList || [])
+    setCachedQuals(q || null)
+
     setJumps(j || [])
     setProfile(prof)
     setRigs(rigList || [])
@@ -44,6 +78,7 @@ export default function Journal() {
   const deleteJump = async (id) => {
     await supabase.from('jumps').delete().eq('id', id)
     setJumps(j => j.filter(x => x.id !== id))
+    setCachedJumps(getCachedJumps().filter(x => x.id !== id))
   }
 
   const repeatLastJump = async () => {
@@ -66,7 +101,10 @@ export default function Journal() {
       notes:     null,
       result:    null,
     }).select().single()
-    if (!error && data) setJumps(j => [data, ...j])
+    if (!error && data) {
+      setJumps(j => [data, ...j])
+      setCachedJumps([data, ...getCachedJumps()])
+    }
     setRepeating(false)
   }
 
@@ -90,12 +128,10 @@ export default function Journal() {
     quals?.has_ins && quals?.ins_sl && quals?.ins_sl_expiry   ? { label:'INS/SL',  expiry: quals.ins_sl_expiry,  days: daysUntil(quals.ins_sl_expiry) } : null,
     quals?.has_ins && quals?.ins_aff && quals?.ins_aff_expiry ? { label:'INS/AFF', expiry: quals.ins_aff_expiry, days: daysUntil(quals.ins_aff_expiry) } : null,
     quals?.has_ins && quals?.ins_t && quals?.ins_t_expiry     ? { label:'INS/T',   expiry: quals.ins_t_expiry,   days: daysUntil(quals.ins_t_expiry) } : null,
-    // Licencja USPA — bezterminowa
     (quals?.uspa_number || quals?.uspa_class) ? {
       label: `Licencja USPA${quals.uspa_class ? ` — klasa ${quals.uspa_class}` : ''}${quals.uspa_number ? ` (${quals.uspa_number})` : ''}`,
       expiry: null, days: null, noExpiry: true
     } : null,
-    // Uprawnienia USPA — bezterminowe
     quals?.uspa_coach      ? { label:'USPA Coach',      expiry: null, days: null, noExpiry: true } : null,
     quals?.uspa_instructor ? { label:'USPA Instructor', expiry: null, days: null, noExpiry: true } : null,
     quals?.uspa_examiner   ? { label:'USPA Examiner',   expiry: null, days: null, noExpiry: true } : null,
@@ -125,11 +161,11 @@ export default function Journal() {
    .sort((a, b) => a.days - b.days)
 
   const qualAlerts = quals ? [
-    quals.cert_expiry && alertOn('alert_cert')                                                     ? { key:'cert',       label:'Świadectwo kwalifikacji', days: daysUntil(quals.cert_expiry) } : null,
-    quals.has_tandem && quals.tandem_expiry && alertOn('alert_tandem')                             ? { key:'tandem',     label:'Uprawnienie Tandem',      days: daysUntil(quals.tandem_expiry) } : null,
-    quals.has_ins && quals.ins_sl  && quals.ins_sl_expiry  && alertOn('alert_ins')                ? { key:'ins_sl',     label:'INS/SL',                  days: daysUntil(quals.ins_sl_expiry) } : null,
-    quals.has_ins && quals.ins_aff && quals.ins_aff_expiry && alertOn('alert_ins')                ? { key:'ins_aff',    label:'INS/AFF',                 days: daysUntil(quals.ins_aff_expiry) } : null,
-    quals.has_ins && quals.ins_t   && quals.ins_t_expiry   && alertOn('alert_ins')                ? { key:'ins_t',      label:'INS/T',                   days: daysUntil(quals.ins_t_expiry) } : null,
+    quals.cert_expiry && alertOn('alert_cert')                                  ? { key:'cert',    label:'Świadectwo kwalifikacji', days: daysUntil(quals.cert_expiry) } : null,
+    quals.has_tandem && quals.tandem_expiry && alertOn('alert_tandem')          ? { key:'tandem',  label:'Uprawnienie Tandem',      days: daysUntil(quals.tandem_expiry) } : null,
+    quals.has_ins && quals.ins_sl  && quals.ins_sl_expiry  && alertOn('alert_ins') ? { key:'ins_sl',  label:'INS/SL',               days: daysUntil(quals.ins_sl_expiry) } : null,
+    quals.has_ins && quals.ins_aff && quals.ins_aff_expiry && alertOn('alert_ins') ? { key:'ins_aff', label:'INS/AFF',              days: daysUntil(quals.ins_aff_expiry) } : null,
+    quals.has_ins && quals.ins_t   && quals.ins_t_expiry   && alertOn('alert_ins') ? { key:'ins_t',   label:'INS/T',                days: daysUntil(quals.ins_t_expiry) } : null,
   ].filter(a => a !== null && a.days !== null && a.days <= 60 && !dismissedQuals.includes(a.key))
    .sort((a, b) => a.days - b.days) : []
 
@@ -173,6 +209,12 @@ export default function Journal() {
     <div>
       <Navbar />
       <div style={{ maxWidth:680, margin:'0 auto', padding:'1.5rem 1rem' }}>
+
+        {offline && (
+          <div style={{ background:'rgba(251,191,36,0.1)', border:'1px solid rgba(251,191,36,0.4)', borderRadius:'var(--r)', padding:'0.65rem 0.9rem', color:'#FBBF24', fontSize:'0.82rem', marginBottom:'1rem', fontWeight:500 }}>
+            ⚡ Tryb offline — wyświetlane dane z ostatniej synchronizacji
+          </div>
+        )}
 
         {confirmDelete && (
           <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
