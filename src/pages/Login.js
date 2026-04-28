@@ -1,22 +1,46 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../supabase'
 
 export default function Login() {
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(false)
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
   const [resetMode, setResetMode] = useState(false)
   const [resetSent, setResetSent] = useState(false)
   const navigate = useNavigate()
 
+  useEffect(() => {
+    const savedEmail    = localStorage.getItem('skyjumplog_email')
+    const savedPassword = localStorage.getItem('skyjumplog_password')
+    const savedRemember = localStorage.getItem('skyjumplog_remember')
+    if (savedRemember === 'true' && savedEmail && savedPassword) {
+      setEmail(savedEmail)
+      setPassword(savedPassword)
+      setRemember(true)
+    }
+  }, [])
+
   const handleLogin = async (e) => {
     e.preventDefault()
     setLoading(true); setError('')
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) setError(error.message)
-    else navigate('/')
+    if (error) {
+      setError(error.message)
+    } else {
+      if (remember) {
+        localStorage.setItem('skyjumplog_email', email)
+        localStorage.setItem('skyjumplog_password', password)
+        localStorage.setItem('skyjumplog_remember', 'true')
+      } else {
+        localStorage.removeItem('skyjumplog_email')
+        localStorage.removeItem('skyjumplog_password')
+        localStorage.removeItem('skyjumplog_remember')
+      }
+      navigate('/')
+    }
     setLoading(false)
   }
 
@@ -76,6 +100,22 @@ export default function Login() {
                 <input className="input" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
               </div>
             )}
+
+            {!resetMode && (
+              <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'1rem' }}>
+                <input
+                  type="checkbox"
+                  id="remember"
+                  checked={remember}
+                  onChange={e => setRemember(e.target.checked)}
+                  style={{ width:15, height:15, accentColor:'var(--accent)', cursor:'pointer' }}
+                />
+                <label htmlFor="remember" style={{ fontSize:'0.82rem', color:'var(--muted)', cursor:'pointer', fontFamily:'var(--font)' }}>
+                  Zapamiętaj moje dane
+                </label>
+              </div>
+            )}
+
             <button className="btn" type="submit" disabled={loading}>
               {loading ? 'Proszę czekać...' : resetMode ? 'Wyślij link resetujący' : 'Zaloguj się'}
             </button>
