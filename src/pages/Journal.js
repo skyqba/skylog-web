@@ -5,12 +5,13 @@ import Navbar from '../components/Navbar'
 import JumpCard from '../components/JumpCard'
 
 export default function Journal() {
-  const [jumps, setJumps]     = useState([])
-  const [profile, setProfile] = useState(null)
-  const [rigs, setRigs]       = useState([])
-  const [loading, setLoading] = useState(true)
+  const [jumps, setJumps]       = useState([])
+  const [profile, setProfile]   = useState(null)
+  const [rigs, setRigs]         = useState([])
+  const [loading, setLoading]   = useState(true)
   const [showDocs, setShowDocs] = useState(false)
-  const [search, setSearch]   = useState('')
+  const [search, setSearch]     = useState('')
+  const [repeating, setRepeating] = useState(false)
 
   useEffect(() => { fetchAll() }, [])
 
@@ -30,6 +31,32 @@ export default function Journal() {
   const deleteJump = async (id) => {
     await supabase.from('jumps').delete().eq('id', id)
     setJumps(j => j.filter(x => x.id !== id))
+  }
+
+  const repeatLastJump = async () => {
+    if (jumps.length === 0) return
+    setRepeating(true)
+    const last = jumps[0]
+    const { data: { user } } = await supabase.auth.getUser()
+    const nextNum = last.number + 1
+    const today = new Date().toISOString().split('T')[0]
+    const { data, error } = await supabase.from('jumps').insert({
+      user_id:   user.id,
+      number:    nextNum,
+      jump_date: today,
+      city:      last.city || null,
+      parachute: last.parachute || null,
+      altitude:  last.altitude || null,
+      delay:     last.delay || null,
+      aircraft:  last.aircraft || null,
+      jump_type: last.jump_type || null,
+      notes:     null,
+      result:    null,
+    }).select().single()
+    if (!error && data) {
+      setJumps(j => [data, ...j])
+    }
+    setRepeating(false)
   }
 
   const daysUntil = (date) => {
@@ -134,9 +161,21 @@ export default function Journal() {
               {loading ? '—' : (jumps.length > 0 ? Math.max(...jumps.map(j => j.number || 0)) : 0)}
             </div>
           </div>
-          <Link to="/add" style={{ textDecoration:'none' }}>
-            <button className="btn small">+ Dodaj skok</button>
-          </Link>
+          <div style={{ display:'flex', gap:'0.5rem' }}>
+            {jumps.length > 0 && (
+              <button
+                className="btn ghost small"
+                onClick={repeatLastJump}
+                disabled={repeating}
+                title="Dodaj skok z tymi samymi danymi co poprzedni"
+              >
+                {repeating ? '...' : '⟳ Powtórz ostatni'}
+              </button>
+            )}
+            <Link to="/add" style={{ textDecoration:'none' }}>
+              <button className="btn small">+ Dodaj skok</button>
+            </Link>
+          </div>
         </div>
 
         <h2 style={{ fontFamily:'var(--head)', fontSize:'1.1rem', fontWeight:800, marginBottom:'1rem' }}>Dziennik skoków</h2>
