@@ -4,11 +4,13 @@ import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 import JumpCard from '../components/JumpCard'
 import {
-  getCachedJumps, setCachedJumps,
-  getCachedProfile, setCachedProfile,
-  getCachedRigs, setCachedRigs,
-  getCachedQuals, setCachedQuals
-} from '../localCache'
+  dbGetJumps, dbSetJumps,
+  dbGetProfile, dbSetProfile,
+  dbGetRigs, dbSetRigs,
+  dbGetQuals, dbSetQuals,
+  dbAddJump, dbDeleteJump
+} from '../db'
+import { saveToQueue } from '../offlineQueue'
 
 export default function Journal() {
   const [jumps, setJumps]         = useState([])
@@ -48,10 +50,10 @@ export default function Journal() {
     if (!user) return
 
     if (!navigator.onLine) {
-      setJumps(getCachedJumps())
-      setProfile(getCachedProfile())
-      setRigs(getCachedRigs())
-      setQuals(getCachedQuals())
+      setJumps(await dbGetJumps())
+      setProfile(await dbGetProfile())
+      setRigs(await dbGetRigs())
+      setQuals(await dbGetQuals())
       setLoading(false)
       return
     }
@@ -63,10 +65,10 @@ export default function Journal() {
       supabase.from('qualifications').select('*').eq('user_id', user.id).single(),
     ])
 
-    setCachedJumps(j || [])
-    setCachedProfile(prof)
-    setCachedRigs(rigList || [])
-    setCachedQuals(q || null)
+    await dbSetJumps(j || [])
+    await dbSetProfile(prof)
+    await dbSetRigs(rigList || [])
+    await dbSetQuals(q || null)
 
     setJumps(j || [])
     setProfile(prof)
@@ -76,9 +78,13 @@ export default function Journal() {
   }
 
   const deleteJump = async (id) => {
-    await supabase.from('jumps').delete().eq('id', id)
+    await dbDeleteJump(id)
     setJumps(j => j.filter(x => x.id !== id))
-    setCachedJumps(getCachedJumps().filter(x => x.id !== id))
+    if (navigator.onLine) {
+      await supabase.from('jumps').delete().eq('id', id)
+    } else {
+      await saveToQueue({ type: 'DELETE_JUMP', payload: { id } })
+    }
   }
 
   const repeatLastJump = async () => {
@@ -102,8 +108,8 @@ export default function Journal() {
       result:    null,
     }).select().single()
     if (!error && data) {
+      await dbAddJump(data)
       setJumps(j => [data, ...j])
-      setCachedJumps([data, ...getCachedJumps()])
     }
     setRepeating(false)
   }
@@ -161,11 +167,11 @@ export default function Journal() {
    .sort((a, b) => a.days - b.days)
 
   const qualAlerts = quals ? [
-    quals.cert_expiry && alertOn('alert_cert')                                  ? { key:'cert',    label:'Świadectwo kwalifikacji', days: daysUntil(quals.cert_expiry) } : null,
-    quals.has_tandem && quals.tandem_expiry && alertOn('alert_tandem')          ? { key:'tandem',  label:'Uprawnienie Tandem',      days: daysUntil(quals.tandem_expiry) } : null,
-    quals.has_ins && quals.ins_sl  && quals.ins_sl_expiry  && alertOn('alert_ins') ? { key:'ins_sl',  label:'INS/SL',               days: daysUntil(quals.ins_sl_expiry) } : null,
-    quals.has_ins && quals.ins_aff && quals.ins_aff_expiry && alertOn('alert_ins') ? { key:'ins_aff', label:'INS/AFF',              days: daysUntil(quals.ins_aff_expiry) } : null,
-    quals.has_ins && quals.ins_t   && quals.ins_t_expiry   && alertOn('alert_ins') ? { key:'ins_t',   label:'INS/T',                days: daysUntil(quals.ins_t_expiry) } : null,
+    quals.cert_expiry && alertOn('alert_cert')                                     ? { key:'cert',    label:'Świadectwo kwalifikacji', days: daysUntil(quals.cert_expiry) } : null,
+    quals.has_tandem && quals.tandem_expiry && alertOn('alert_tandem')             ? { key:'tandem',  label:'Uprawnienie Tandem',      days: daysUntil(quals.tandem_expiry) } : null,
+    quals.has_ins && quals.ins_sl  && quals.ins_sl_expiry  && alertOn('alert_ins') ? { key:'ins_sl',  label:'INS/SL',                  days: daysUntil(quals.ins_sl_expiry) } : null,
+    quals.has_ins && quals.ins_aff && quals.ins_aff_expiry && alertOn('alert_ins') ? { key:'ins_aff', label:'INS/AFF',                 days: daysUntil(quals.ins_aff_expiry) } : null,
+    quals.has_ins && quals.ins_t   && quals.ins_t_expiry   && alertOn('alert_ins') ? { key:'ins_t',   label:'INS/T',                   days: daysUntil(quals.ins_t_expiry) } : null,
   ].filter(a => a !== null && a.days !== null && a.days <= 60 && !dismissedQuals.includes(a.key))
    .sort((a, b) => a.days - b.days) : []
 
