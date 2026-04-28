@@ -1,4 +1,4 @@
-import { dbGetQueue, dbAddToQueue, dbClearQueue, dbRemoveFromQueue } from './db'
+import { dbGetQueue, dbAddToQueue, dbRemoveFromQueue } from './db'
 
 export const isOnline = () => navigator.onLine
 
