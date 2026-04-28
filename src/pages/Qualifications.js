@@ -28,17 +28,11 @@ export default function Qualifications() {
 
   const [uspaNumber, setUspaNumber]   = useState('')
   const [uspaClass, setUspaClass]     = useState('')
-  const [uspaExpiry, setUspaExpiry]   = useState('')
   const [uspaCoach, setUspaCoach]     = useState(false)
   const [uspaInstructor, setUspaInstructor] = useState(false)
   const [uspaExaminer, setUspaExaminer]     = useState(false)
   const [uspaJudge, setUspaJudge]           = useState(false)
   const [uspaPro, setUspaPro]               = useState(false)
-  const [uspaCoachExpiry, setUspaCoachExpiry]           = useState('')
-  const [uspaInstructorExpiry, setUspaInstructorExpiry] = useState('')
-  const [uspaExaminerExpiry, setUspaExaminerExpiry]     = useState('')
-  const [uspaJudgeExpiry, setUspaJudgeExpiry]           = useState('')
-  const [uspaProExpiry, setUspaProExpiry]               = useState('')
 
   useEffect(() => {
     const load = async () => {
@@ -61,17 +55,11 @@ export default function Qualifications() {
         setInsTExpiry(q.ins_t_expiry || '')
         setUspaNumber(q.uspa_number || '')
         setUspaClass(q.uspa_class || '')
-        setUspaExpiry(q.uspa_expiry || '')
         setUspaCoach(q.uspa_coach || false)
         setUspaInstructor(q.uspa_instructor || false)
         setUspaExaminer(q.uspa_examiner || false)
         setUspaJudge(q.uspa_judge || false)
         setUspaPro(q.uspa_pro || false)
-        setUspaCoachExpiry(q.uspa_coach_expiry || '')
-        setUspaInstructorExpiry(q.uspa_instructor_expiry || '')
-        setUspaExaminerExpiry(q.uspa_examiner_expiry || '')
-        setUspaJudgeExpiry(q.uspa_judge_expiry || '')
-        setUspaProExpiry(q.uspa_pro_expiry || '')
       }
     }
     load()
@@ -105,17 +93,11 @@ export default function Qualifications() {
   }
 
   const alerts = [
-    expiryAlert(certExpiry,           'Świadectwo kwalifikacji'),
-    expiryAlert(tandemExpiry,         'Uprawnienie Tandem'),
-    expiryAlert(insSlExpiry,          'INS/SL'),
-    expiryAlert(insAffExpiry,         'INS/AFF'),
-    expiryAlert(insTExpiry,           'INS/T'),
-    expiryAlert(uspaExpiry,           'Licencja USPA'),
-    expiryAlert(uspaCoachExpiry,      'USPA Coach'),
-    expiryAlert(uspaInstructorExpiry, 'USPA Instructor'),
-    expiryAlert(uspaExaminerExpiry,   'USPA Examiner'),
-    expiryAlert(uspaJudgeExpiry,      'USPA Judge'),
-    expiryAlert(uspaProExpiry,        'USPA PRO Rating'),
+    expiryAlert(certExpiry,   'Świadectwo kwalifikacji'),
+    expiryAlert(tandemExpiry, 'Uprawnienie Tandem'),
+    expiryAlert(insSlExpiry,  'INS/SL'),
+    expiryAlert(insAffExpiry, 'INS/AFF'),
+    expiryAlert(insTExpiry,   'INS/T'),
   ].filter(Boolean)
 
   const save = async () => {
@@ -136,17 +118,17 @@ export default function Qualifications() {
       ins_t_expiry:           (hasIns && insT)   ? insTExpiry   || null : null,
       uspa_number:            uspaNumber || null,
       uspa_class:             uspaClass || null,
-      uspa_expiry:            uspaExpiry || null,
+      uspa_expiry:            null,
       uspa_coach:             uspaCoach,
       uspa_instructor:        uspaInstructor,
       uspa_examiner:          uspaExaminer,
       uspa_judge:             uspaJudge,
       uspa_pro:               uspaPro,
-      uspa_coach_expiry:      uspaCoach      ? uspaCoachExpiry      || null : null,
-      uspa_instructor_expiry: uspaInstructor ? uspaInstructorExpiry || null : null,
-      uspa_examiner_expiry:   uspaExaminer   ? uspaExaminerExpiry   || null : null,
-      uspa_judge_expiry:      uspaJudge      ? uspaJudgeExpiry      || null : null,
-      uspa_pro_expiry:        uspaPro        ? uspaProExpiry        || null : null,
+      uspa_coach_expiry:      null,
+      uspa_instructor_expiry: null,
+      uspa_examiner_expiry:   null,
+      uspa_judge_expiry:      null,
+      uspa_pro_expiry:        null,
       updated_at:             new Date().toISOString(),
     }
     if (data) {
@@ -177,13 +159,12 @@ export default function Qualifications() {
     )
   }
 
-  const UspaPermission = ({ checked, onCheck, label, expiry, onExpiry }) => (
+  const UspaPermission = ({ checked, onCheck, label }) => (
     <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.75rem' }}>
-      <label style={{ display:'flex', alignItems:'center', gap:'0.6rem', cursor:'pointer', marginBottom: checked ? '0.5rem' : 0 }}>
+      <label style={{ display:'flex', alignItems:'center', gap:'0.6rem', cursor:'pointer' }}>
         <input type="checkbox" checked={checked} onChange={e => onCheck(e.target.checked)} style={checkboxStyle} />
         <span style={{ fontSize:'0.88rem', fontWeight:500 }}>{label}</span>
       </label>
-      {checked && <DateField label="Data ważności" value={expiry} onChange={onExpiry} />}
     </div>
   )
 
@@ -273,7 +254,8 @@ export default function Qualifications() {
         {/* Licencja USPA */}
         <div className="card" style={{ marginBottom:'1rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Licencja USPA</h3>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem', marginBottom:'0.75rem' }}>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Licencje i uprawnienia USPA nie posiadają daty ważności</p>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
             <div className="form-group">
               <label className="label">Numer licencji</label>
               <input className="input" placeholder="np. D-12345" value={uspaNumber} onChange={e => setUspaNumber(e.target.value)} />
@@ -286,18 +268,17 @@ export default function Qualifications() {
               </select>
             </div>
           </div>
-          <DateField label="Data ważności licencji USPA" value={uspaExpiry} onChange={setUspaExpiry} />
         </div>
 
         {/* Uprawnienia USPA */}
         <div className="card" style={{ marginBottom:'1rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Uprawnienia USPA</h3>
           <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
-            <UspaPermission checked={uspaCoach}      onCheck={setUspaCoach}      label="Coach"            expiry={uspaCoachExpiry}      onExpiry={setUspaCoachExpiry} />
-            <UspaPermission checked={uspaInstructor} onCheck={setUspaInstructor} label="Instructor (I)"   expiry={uspaInstructorExpiry} onExpiry={setUspaInstructorExpiry} />
-            <UspaPermission checked={uspaExaminer}   onCheck={setUspaExaminer}   label="Examiner (IE)"   expiry={uspaExaminerExpiry}   onExpiry={setUspaExaminerExpiry} />
-            <UspaPermission checked={uspaJudge}      onCheck={setUspaJudge}      label="Judge"            expiry={uspaJudgeExpiry}      onExpiry={setUspaJudgeExpiry} />
-            <UspaPermission checked={uspaPro}        onCheck={setUspaPro}        label="PRO Rating"       expiry={uspaProExpiry}        onExpiry={setUspaProExpiry} />
+            <UspaPermission checked={uspaCoach}      onCheck={setUspaCoach}      label="Coach" />
+            <UspaPermission checked={uspaInstructor} onCheck={setUspaInstructor} label="Instructor (I)" />
+            <UspaPermission checked={uspaExaminer}   onCheck={setUspaExaminer}   label="Examiner (IE)" />
+            <UspaPermission checked={uspaJudge}      onCheck={setUspaJudge}      label="Judge" />
+            <UspaPermission checked={uspaPro}        onCheck={setUspaPro}        label="PRO Rating" />
           </div>
         </div>
 
