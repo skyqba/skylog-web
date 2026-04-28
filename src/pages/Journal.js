@@ -16,6 +16,7 @@ export default function Journal() {
   const [dismissedRigs, setDismissedRigs]   = useState(() => JSON.parse(sessionStorage.getItem('dismissedRigs') || '[]'))
   const [dismissedQuals, setDismissedQuals] = useState(() => JSON.parse(sessionStorage.getItem('dismissedQuals') || '[]'))
   const [confirmDismiss, setConfirmDismiss] = useState(null)
+  const [confirmDelete, setConfirmDelete]   = useState(null)
 
   useEffect(() => { fetchAll() }, [])
 
@@ -160,6 +161,20 @@ export default function Journal() {
       <Navbar />
       <div style={{ maxWidth:680, margin:'0 auto', padding:'1.5rem 1rem' }}>
 
+        {/* Modal potwierdzenia usunięcia skoku */}
+        {confirmDelete && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
+            <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.5rem', maxWidth:360, width:'100%' }}>
+              <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.75rem' }}>Usunąć skok #{confirmDelete.number}?</div>
+              <p style={{ fontSize:'0.88rem', color:'var(--muted)', marginBottom:'1.25rem' }}>Ta operacja jest nieodwracalna. Skok zostanie trwale usunięty z dziennika.</p>
+              <div style={{ display:'flex', gap:'0.75rem' }}>
+                <button className="btn ghost" style={{ flex:1 }} onClick={() => setConfirmDelete(null)}>Anuluj</button>
+                <button className="btn danger" style={{ flex:1 }} onClick={() => { deleteJump(confirmDelete.id); setConfirmDelete(null) }}>Usuń skok</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {confirmDismiss && (
           <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
             <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.5rem', maxWidth:360, width:'100%' }}>
@@ -300,7 +315,7 @@ export default function Journal() {
           ) : jumps
           return filtered.length === 0
             ? <p style={{ textAlign:'center', color:'var(--muted)', padding:'2rem' }}>Brak skoków pasujących do „{search}"</p>
-            : filtered.map(j => <JumpCard key={j.id} jump={j} onDelete={deleteJump} />)
+            : filtered.map(j => <JumpCard key={j.id} jump={j} onDelete={(id) => setConfirmDelete({ id, number: j.number })} />)
         })()}
       </div>
     </div>
