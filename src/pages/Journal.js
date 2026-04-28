@@ -249,15 +249,15 @@ export default function Journal() {
               {loading ? '—' : (jumps.length > 0 ? Math.max(...jumps.map(j => j.number || 0)) : 0)}
             </div>
           </div>
-          <div style={{ display:'flex', flexDirection:'column', gap:'0.4rem', alignItems:'flex-end' }}>
-            <Link to="/add" style={{ textDecoration:'none' }}>
-              <button className="btn small">+ Dodaj skok</button>
-            </Link>
+          <div style={{ display:'flex', flexDirection:'row', gap:'0.5rem', alignItems:'center' }}>
             {jumps.length > 0 && (
               <button className="btn ghost small" onClick={repeatLastJump} disabled={repeating} title="Dodaj skok z tymi samymi danymi co poprzedni">
                 {repeating ? '...' : '⟳ Powtórz ostatni'}
               </button>
             )}
+            <Link to="/add" style={{ textDecoration:'none' }}>
+              <button className="btn small">+ Dodaj skok</button>
+            </Link>
           </div>
         </div>
 
