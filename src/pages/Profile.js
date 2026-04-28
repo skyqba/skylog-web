@@ -16,7 +16,7 @@ export default function Profile() {
   const [rigs, setRigs]               = useState([])
   const [showAddRig, setShowAddRig]   = useState(false)
   const [editingRig, setEditingRig]   = useState(null)
-  const [newRig, setNewRig]           = useState({ name:'', main:'', reserve:'', container:'', aad:'', reserve_pack_date:'', reserve_expiry:'' })
+  const [newRig, setNewRig]           = useState({ name:'', main:'', reserve:'', container:'', aad:'', reserve_expiry:'' })
   const [savingRig, setSavingRig]     = useState(false)
   const fileRef  = useRef()
   const docRef   = useRef()
@@ -116,12 +116,11 @@ export default function Profile() {
       reserve: newRig.reserve.trim() || null,
       container: newRig.container.trim() || null,
       aad: newRig.aad.trim() || null,
-      reserve_pack_date: newRig.reserve_pack_date || null,
       reserve_expiry: newRig.reserve_expiry || null,
     }).select().single()
     if (data) {
       setRigs(r => [...r, data])
-      setNewRig({ name:'', main:'', reserve:'', container:'', aad:'', reserve_pack_date:'', reserve_expiry:'' })
+      setNewRig({ name:'', main:'', reserve:'', container:'', aad:'', reserve_expiry:'' })
       setShowAddRig(false)
     }
     setSavingRig(false)
@@ -136,7 +135,6 @@ export default function Profile() {
       reserve: editingRig.reserve?.trim() || null,
       container: editingRig.container?.trim() || null,
       aad: editingRig.aad?.trim() || null,
-      reserve_pack_date: editingRig.reserve_pack_date || null,
       reserve_expiry: editingRig.reserve_expiry || null,
     }).eq('id', editingRig.id).select().single()
     if (data) setRigs(r => r.map(x => x.id === data.id ? data : x))
@@ -254,9 +252,7 @@ export default function Profile() {
             const isEditing = editingRig?.id === rig.id
             return (
               <div key={rig.id} style={{ background:'var(--bg3)', borderRadius:'var(--r)', padding:'1rem', marginBottom:'0.75rem', border:`1px solid ${isEditing ? 'var(--accent)' : 'var(--border)'}` }}>
-
                 {isEditing ? (
-                  // Tryb edycji
                   <>
                     <div style={{ fontFamily:'var(--head)', fontSize:'0.9rem', fontWeight:800, marginBottom:'0.75rem', color:'var(--accent2)' }}>Edycja kompletu</div>
                     <div className="form-group">
@@ -280,12 +276,8 @@ export default function Profile() {
                         <label className="label">Automat (AAD)</label>
                         <input className="input" placeholder="np. Cypres 2" value={editingRig.aad || ''} onChange={e => setEditingRig(r => ({ ...r, aad: e.target.value }))} />
                       </div>
-                      <div className="form-group">
-                        <label className="label">Data ułożenia zapasu</label>
-                        <input className="input" type="date" value={editingRig.reserve_pack_date || ''} onChange={e => setEditingRig(r => ({ ...r, reserve_pack_date: e.target.value }))} />
-                      </div>
-                      <div className="form-group">
-                        <label className="label">Koniec ważności zapasu</label>
+                      <div className="form-group" style={{ gridColumn:'1 / -1' }}>
+                        <label className="label">Koniec ważności spadochronu zapasowego</label>
                         <input className="input" type="date" value={editingRig.reserve_expiry || ''} onChange={e => setEditingRig(r => ({ ...r, reserve_expiry: e.target.value }))} />
                       </div>
                     </div>
@@ -295,7 +287,6 @@ export default function Profile() {
                     </div>
                   </>
                 ) : (
-                  // Tryb podglądu
                   <>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.75rem' }}>
                       <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color:'var(--accent2)' }}>{rig.name}</div>
@@ -336,23 +327,13 @@ export default function Profile() {
                           <div style={{ fontWeight:600 }}>{rig.aad}</div>
                         </div>
                       )}
+                      {rig.reserve_expiry && (
+                        <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem', gridColumn:'1 / -1' }}>
+                          <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Koniec ważności spadochronu zapasowego</div>
+                          <div style={{ fontWeight:600 }}>{new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')}</div>
+                        </div>
+                      )}
                     </div>
-                    {(rig.reserve_pack_date || rig.reserve_expiry) && (
-                      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', fontSize:'0.82rem', marginTop:'0.5rem' }}>
-                        {rig.reserve_pack_date && (
-                          <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
-                            <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Data ułożenia</div>
-                            <div style={{ fontWeight:600 }}>{new Date(rig.reserve_pack_date).toLocaleDateString('pl-PL')}</div>
-                          </div>
-                        )}
-                        {rig.reserve_expiry && (
-                          <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}>
-                            <div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Koniec ważności</div>
-                            <div style={{ fontWeight:600 }}>{new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')}</div>
-                          </div>
-                        )}
-                      </div>
-                    )}
                     {status && (
                       <div style={{ marginTop:'0.75rem', padding:'0.6rem 0.9rem', borderRadius:'var(--r)', fontSize:'0.82rem', fontWeight:600, color:status.color, background:'rgba(255,255,255,0.04)', border:`1px solid ${status.color}` }}>
                         {status.label}
@@ -388,17 +369,13 @@ export default function Profile() {
                   <label className="label">Automat (AAD)</label>
                   <input className="input" placeholder="np. Cypres 2" value={newRig.aad} onChange={e => setNewRig(r => ({ ...r, aad: e.target.value }))} />
                 </div>
-                <div className="form-group">
-                  <label className="label">Data ułożenia zapasu</label>
-                  <input className="input" type="date" value={newRig.reserve_pack_date} onChange={e => setNewRig(r => ({ ...r, reserve_pack_date: e.target.value }))} />
-                </div>
-                <div className="form-group">
-                  <label className="label">Koniec ważności zapasu</label>
+                <div className="form-group" style={{ gridColumn:'1 / -1' }}>
+                  <label className="label">Koniec ważności spadochronu zapasowego</label>
                   <input className="input" type="date" value={newRig.reserve_expiry} onChange={e => setNewRig(r => ({ ...r, reserve_expiry: e.target.value }))} />
                 </div>
               </div>
               <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
-                <button className="btn ghost" style={{ flex:1 }} onClick={() => { setShowAddRig(false); setNewRig({ name:'', main:'', reserve:'', container:'', aad:'', reserve_pack_date:'', reserve_expiry:'' }) }}>Anuluj</button>
+                <button className="btn ghost" style={{ flex:1 }} onClick={() => { setShowAddRig(false); setNewRig({ name:'', main:'', reserve:'', container:'', aad:'', reserve_expiry:'' }) }}>Anuluj</button>
                 <button className="btn" style={{ flex:1 }} onClick={saveRig} disabled={savingRig || !newRig.name.trim()}>{savingRig ? 'Zapisywanie...' : 'Zapisz komplet'}</button>
               </div>
             </div>
@@ -435,7 +412,6 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Eksport / Import */}
         <Link to="/stats" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
           <button className="btn ghost" style={{ width:'100%' }}>📊 Statystyki skoków</button>
         </Link>
