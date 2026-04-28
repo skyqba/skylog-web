@@ -42,7 +42,7 @@ export default function AddJump() {
     city: '', parachute: '', altitude: '', delay: '', aircraft: '', notes: '', result: '',
     jump_type: '', custom_type: '',
   })
-  const [equipment, setEquipment]                     = useState([])
+  const [mainChutes, setMainChutes]                   = useState([])
   const [dropzones, setDropzones]                     = useState([])
   const [error, setError]                             = useState('')
   const [loading, setLoading]                         = useState(false)
@@ -52,12 +52,14 @@ export default function AddJump() {
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      const [{ data: eq }, { data: dz }, { data: lastJump }] = await Promise.all([
-        supabase.from('equipment').select('*').eq('user_id', user.id).order('created_at'),
+      const [{ data: rigs }, { data: dz }, { data: lastJump }] = await Promise.all([
+        supabase.from('rigs').select('main').eq('user_id', user.id).not('main', 'is', null),
         supabase.from('dropzones').select('*').eq('user_id', user.id).order('name'),
         supabase.from('jumps').select('number').eq('user_id', user.id).order('number', { ascending: false }).limit(1),
       ])
-      setEquipment(eq || [])
+      // Unikalne nazwy spadochronów głównych ze wszystkich kompletów
+      const uniqueChutes = [...new Set((rigs || []).map(r => r.main).filter(Boolean))]
+      setMainChutes(uniqueChutes)
       setDropzones(dz || [])
       const nextNum = lastJump && lastJump.length > 0 ? (lastJump[0].number + 1) : 1
       setForm(f => ({ ...f, number: String(nextNum) }))
@@ -203,16 +205,21 @@ export default function AddJump() {
               )}
             </div>
 
-            {/* Spadochron */}
+            {/* Spadochron główny */}
             <div className="form-group">
               <label className="label">Spadochron główny</label>
-              {equipment.length > 0 && (
+              {mainChutes.length > 0 && (
                 <select className="input" value={form.parachute} onChange={set('parachute')} style={{ marginBottom: '0.5rem' }}>
-                  <option value="">— wybierz z listy —</option>
-                  {equipment.map(eq => <option key={eq.id} value={eq.name}>{eq.name}</option>)}
+                  <option value="">— wybierz z kompletów —</option>
+                  {mainChutes.map(chute => <option key={chute} value={chute}>{chute}</option>)}
                 </select>
               )}
               <input className="input" placeholder="lub wpisz ręcznie..." maxLength={150} value={form.parachute} onChange={set('parachute')} />
+              {mainChutes.length === 0 && (
+                <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.35rem' }}>
+                  💡 Dodaj komplety spadochronowe w <span style={{ color: 'var(--accent2)' }}>Profilu</span>
+                </div>
+              )}
             </div>
 
             {/* Wysokość + Opóźnienie */}
