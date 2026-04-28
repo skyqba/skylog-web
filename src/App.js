@@ -1,30 +1,34 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabase'
-import Login         from './pages/Login'
-import Register      from './pages/Register'
-import Journal       from './pages/Journal'
-import AddJump       from './pages/AddJump'
-import Profile       from './pages/Profile'
-import Import        from './pages/Import'
-import Export        from './pages/Export'
-import EditJumps     from './pages/EditJumps'
-import Manual        from './pages/Manual'
-import Stats         from './pages/Stats'
+import Login          from './pages/Login'
+import Register       from './pages/Register'
+import Journal        from './pages/Journal'
+import AddJump        from './pages/AddJump'
+import Profile        from './pages/Profile'
+import Import         from './pages/Import'
+import Export         from './pages/Export'
+import EditJumps      from './pages/EditJumps'
+import Manual         from './pages/Manual'
+import Stats          from './pages/Stats'
 import Qualifications from './pages/Qualifications'
+import Settings       from './pages/Settings'
 
 function App() {
   const [session, setSession] = useState(undefined)
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
     return () => subscription.unsubscribe()
   }, [])
+
   if (session === undefined) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', color:'var(--muted)' }}>
       Ładowanie...
     </div>
   )
+
   return (
     <BrowserRouter>
       <Routes>
@@ -39,8 +43,10 @@ function App() {
         <Route path="/manual"         element={ session  ? <Manual />         : <Navigate to="/login" />} />
         <Route path="/stats"          element={ session  ? <Stats />          : <Navigate to="/login" />} />
         <Route path="/qualifications" element={ session  ? <Qualifications /> : <Navigate to="/login" />} />
+        <Route path="/settings"       element={ session  ? <Settings />       : <Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   )
 }
+
 export default App

@@ -18,10 +18,16 @@ export default function Journal() {
   const [confirmDismiss, setConfirmDismiss] = useState(null)
   const [confirmDelete, setConfirmDelete]   = useState(null)
 
+  const alertSettings = (() => {
+    try { return JSON.parse(localStorage.getItem('alertSettings') || '{}') } catch { return {} }
+  })()
+  const alertOn = (key) => alertSettings[key] !== false
+
   useEffect(() => { fetchAll() }, [])
 
   const fetchAll = async () => {
     const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
     const [{ data: j }, { data: prof }, { data: rigList }, { data: q }] = await Promise.all([
       supabase.from('jumps').select('*').order('number', { ascending: false }),
       supabase.from('profiles').select('insurance_expiry,medical_expiry').eq('id', user.id).single(),
@@ -99,30 +105,32 @@ export default function Journal() {
 
   const urgentDocs = docs.filter(d => d.days !== null && d.days <= 30)
 
-  const urgentRigs = rigs
-    .filter(r => r.reserve_expiry && !dismissedRigs.includes(r.id))
-    .map(r => ({ ...r, days: daysUntil(r.reserve_expiry) }))
-    .filter(r => r.days !== null && r.days <= 60)
-    .sort((a, b) => a.days - b.days)
+  const urgentRigs = alertOn('alert_rigs')
+    ? rigs
+        .filter(r => r.reserve_expiry && !dismissedRigs.includes(r.id))
+        .map(r => ({ ...r, days: daysUntil(r.reserve_expiry) }))
+        .filter(r => r.days !== null && r.days <= 60)
+        .sort((a, b) => a.days - b.days)
+    : []
 
   const profileAlerts = [
-    profile?.insurance_expiry ? { key:'insurance', label:'Ubezpieczenie',    days: daysUntil(profile.insurance_expiry), linkTo:'/profile' } : null,
-    profile?.medical_expiry   ? { key:'medical',   label:'Badania lotnicze', days: daysUntil(profile.medical_expiry),   linkTo:'/profile' } : null,
+    profile?.insurance_expiry && alertOn('alert_insurance') ? { key:'insurance', label:'Ubezpieczenie',    days: daysUntil(profile.insurance_expiry), linkTo:'/profile' } : null,
+    profile?.medical_expiry   && alertOn('alert_medical')   ? { key:'medical',   label:'Badania lotnicze', days: daysUntil(profile.medical_expiry),   linkTo:'/profile' } : null,
   ].filter(a => a !== null && a.days !== null && a.days <= 60 && !dismissedQuals.includes(a.key))
    .sort((a, b) => a.days - b.days)
 
   const qualAlerts = quals ? [
-    quals.cert_expiry            ? { key:'cert',       label:'Świadectwo kwalifikacji', days: daysUntil(quals.cert_expiry) } : null,
-    quals.has_tandem && quals.tandem_expiry         ? { key:'tandem',    label:'Uprawnienie Tandem', days: daysUntil(quals.tandem_expiry) } : null,
-    quals.has_ins && quals.ins_sl && quals.ins_sl_expiry   ? { key:'ins_sl',   label:'INS/SL',  days: daysUntil(quals.ins_sl_expiry) } : null,
-    quals.has_ins && quals.ins_aff && quals.ins_aff_expiry ? { key:'ins_aff',  label:'INS/AFF', days: daysUntil(quals.ins_aff_expiry) } : null,
-    quals.has_ins && quals.ins_t && quals.ins_t_expiry     ? { key:'ins_t',    label:'INS/T',   days: daysUntil(quals.ins_t_expiry) } : null,
-    quals.uspa_expiry            ? { key:'uspa',       label:'Licencja USPA',      days: daysUntil(quals.uspa_expiry) } : null,
-    quals.uspa_coach && quals.uspa_coach_expiry          ? { key:'uspa_coach', label:'USPA Coach',       days: daysUntil(quals.uspa_coach_expiry) } : null,
-    quals.uspa_instructor && quals.uspa_instructor_expiry ? { key:'uspa_ins',  label:'USPA Instructor',  days: daysUntil(quals.uspa_instructor_expiry) } : null,
-    quals.uspa_examiner && quals.uspa_examiner_expiry    ? { key:'uspa_exam', label:'USPA Examiner',    days: daysUntil(quals.uspa_examiner_expiry) } : null,
-    quals.uspa_judge && quals.uspa_judge_expiry          ? { key:'uspa_judge',label:'USPA Judge',       days: daysUntil(quals.uspa_judge_expiry) } : null,
-    quals.uspa_pro && quals.uspa_pro_expiry              ? { key:'uspa_pro',  label:'USPA PRO Rating',  days: daysUntil(quals.uspa_pro_expiry) } : null,
+    quals.cert_expiry && alertOn('alert_cert')                                                     ? { key:'cert',       label:'Świadectwo kwalifikacji', days: daysUntil(quals.cert_expiry) } : null,
+    quals.has_tandem && quals.tandem_expiry && alertOn('alert_tandem')                             ? { key:'tandem',     label:'Uprawnienie Tandem',      days: daysUntil(quals.tandem_expiry) } : null,
+    quals.has_ins && quals.ins_sl  && quals.ins_sl_expiry  && alertOn('alert_ins')                ? { key:'ins_sl',     label:'INS/SL',                  days: daysUntil(quals.ins_sl_expiry) } : null,
+    quals.has_ins && quals.ins_aff && quals.ins_aff_expiry && alertOn('alert_ins')                ? { key:'ins_aff',    label:'INS/AFF',                 days: daysUntil(quals.ins_aff_expiry) } : null,
+    quals.has_ins && quals.ins_t   && quals.ins_t_expiry   && alertOn('alert_ins')                ? { key:'ins_t',      label:'INS/T',                   days: daysUntil(quals.ins_t_expiry) } : null,
+    quals.uspa_expiry && alertOn('alert_uspa')                                                     ? { key:'uspa',       label:'Licencja USPA',           days: daysUntil(quals.uspa_expiry) } : null,
+    quals.uspa_coach && quals.uspa_coach_expiry && alertOn('alert_uspa')                           ? { key:'uspa_coach', label:'USPA Coach',              days: daysUntil(quals.uspa_coach_expiry) } : null,
+    quals.uspa_instructor && quals.uspa_instructor_expiry && alertOn('alert_uspa')                 ? { key:'uspa_ins',   label:'USPA Instructor',         days: daysUntil(quals.uspa_instructor_expiry) } : null,
+    quals.uspa_examiner && quals.uspa_examiner_expiry && alertOn('alert_uspa')                     ? { key:'uspa_exam',  label:'USPA Examiner',           days: daysUntil(quals.uspa_examiner_expiry) } : null,
+    quals.uspa_judge && quals.uspa_judge_expiry && alertOn('alert_uspa')                           ? { key:'uspa_judge', label:'USPA Judge',              days: daysUntil(quals.uspa_judge_expiry) } : null,
+    quals.uspa_pro && quals.uspa_pro_expiry && alertOn('alert_uspa')                               ? { key:'uspa_pro',   label:'USPA PRO Rating',         days: daysUntil(quals.uspa_pro_expiry) } : null,
   ].filter(a => a !== null && a.days !== null && a.days <= 60 && !dismissedQuals.includes(a.key))
    .sort((a, b) => a.days - b.days) : []
 

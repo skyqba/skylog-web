@@ -58,9 +58,9 @@ export default function Profile() {
         const { data } = supabase.storage.from('avatars').getPublicUrl(path)
         await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', profileBase.uid)
         setPreview(data.publicUrl + '?t=' + Date.now())
-        showMsg('avatar', 'Zdjęcie zaktualizowane!')
+        showMsg('avatar', 'Zdjecie zaktualizowane!')
       }
-    } catch (e) { showMsg('avatar', 'Błąd uploadu.') }
+    } catch (e) { showMsg('avatar', 'Blad uploadu.') }
     setUploading(false)
   }
 
@@ -76,7 +76,7 @@ export default function Profile() {
       const { data: docList } = await supabase.storage.from('documents').list(profileBase.uid, { sortBy: { column: 'created_at', order: 'desc' } })
       setDocs(docList || [])
     } else {
-      showMsg('docs', 'Błąd: ' + error.message)
+      showMsg('docs', 'Blad: ' + error.message)
     }
     setUploadingDoc(false)
     e.target.value = ''
@@ -152,7 +152,7 @@ export default function Profile() {
     const days = Math.ceil((new Date(expiry) - new Date()) / (1000 * 60 * 60 * 24))
     if (days < 0)   return { color:'var(--danger)', label:`Zapas przeterminowany o ${Math.abs(days)} dni!` }
     if (days <= 30) return { color:'#FBBF24',       label:`Zapas wygasa za ${days} dni` }
-    return              { color:'var(--success)',   label:`Zapas ważny jeszcze ${days} dni` }
+    return              { color:'var(--success)',   label:`Zapas wazny jeszcze ${days} dni` }
   }
 
   const fileIcon = (name) => {
@@ -171,14 +171,13 @@ export default function Profile() {
 
   const cleanName = (name) => name.replace(/^\d+_/, '')
 
-  if (!profileBase) return <div><Navbar /><p style={{ textAlign:'center', padding:'4rem', color:'var(--muted)' }}>Ładowanie...</p></div>
+  if (!profileBase) return <div><Navbar /><p style={{ textAlign:'center', padding:'4rem', color:'var(--muted)' }}>Ladowanie...</p></div>
 
   return (
     <div>
       <Navbar />
       <div style={{ maxWidth:520, margin:'0 auto', padding:'1.5rem 1rem' }}>
 
-        {/* Avatar */}
         <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'2rem', textAlign:'center', marginBottom:'1rem' }}>
           <div onClick={() => !uploading && fileRef.current.click()} style={{ position:'relative', display:'inline-block', cursor: uploading ? 'wait' : 'pointer', marginBottom:'1rem' }}>
             <div style={{ width:90, height:90, borderRadius:'50%', background:'var(--accent)', border:'3px solid rgba(108,99,255,0.4)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', fontWeight:700, overflow:'hidden', margin:'0 auto', position:'relative' }}>
@@ -191,16 +190,15 @@ export default function Profile() {
           {msgs['avatar'] && <div style={{ fontSize:'0.82rem', color:'var(--success)', marginBottom:'0.5rem' }}>{msgs['avatar']}</div>}
           <div style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>{profileBase.name} {profileBase.surname}</div>
           {profileBase.city && <div style={{ color:'var(--muted)', fontSize:'0.82rem', marginTop:4 }}>📍 {profileBase.city}</div>}
-          <div style={{ color:'var(--muted)', fontSize:'0.72rem', marginTop:6 }}>Kliknij zdjęcie aby zmienić</div>
+          <div style={{ color:'var(--muted)', fontSize:'0.72rem', marginTop:6 }}>Kliknij zdjecie aby zmienic</div>
         </div>
 
-        {/* Dokumenty */}
         <div className="card" style={{ marginBottom:'1rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>Dokumenty spadochronowe</h3>
-          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1.25rem' }}>Skany licencji, ubezpieczenia, badań lotniczych i innych dokumentów</p>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1.25rem' }}>Skany licencji, ubezpieczenia, badan lotniczych i innych dokumentow</p>
           {docs.length === 0 && (
             <div style={{ textAlign:'center', padding:'1.5rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>
-              Brak dokumentów — dodaj pierwszy poniżej
+              Brak dokumentow — dodaj pierwszy ponizej
             </div>
           )}
           {docs.map(doc => (
@@ -226,7 +224,7 @@ export default function Profile() {
             onMouseEnter={e => { if (!uploadingDoc) e.currentTarget.style.borderColor='var(--accent)' }}
             onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}
           >
-            {uploadingDoc ? '⏳ Przesyłanie...' : '+ Dodaj dokument (PDF, JPG, PNG)'}
+            {uploadingDoc ? '⏳ Przesylanie...' : '+ Dodaj dokument (PDF, JPG, PNG)'}
           </button>
           <input ref={docRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" onChange={uploadDoc} style={{ display:'none' }} />
         </div>
@@ -235,7 +233,6 @@ export default function Profile() {
         <InsuranceSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
         <MedicalSection profileBase={profileBase} saving={saving} setSaving={setSaving} msgs={msgs} showMsg={showMsg} />
 
-        {/* Moje uprawnienia */}
         <Link to="/qualifications" style={{ textDecoration:'none', display:'block', marginBottom:'1rem' }}>
           <div className="card" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', cursor:'pointer' }}
             onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
@@ -243,20 +240,19 @@ export default function Profile() {
           >
             <div>
               <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.15rem' }}>Moje uprawnienia</div>
-              <div style={{ fontSize:'0.82rem', color:'var(--muted)' }}>Świadectwo kwalifikacji, uprawnienia instruktorskie</div>
+              <div style={{ fontSize:'0.82rem', color:'var(--muted)' }}>Swiadectwo kwalifikacji, uprawnienia instruktorskie</div>
             </div>
             <span style={{ color:'var(--accent2)', fontSize:'1.2rem' }}>→</span>
           </div>
         </Link>
 
-        {/* Moje komplety spadochronowe */}
         <div className="card" style={{ marginBottom:'1rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>Moje komplety spadochronowe</h3>
-          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Sprzęt na którym skaczesz — spadochron główny, zapasowy, pokrowiec i automat</p>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Sprzet na ktorym skaczesz</p>
 
           {rigs.length === 0 && !showAddRig && (
             <div style={{ textAlign:'center', padding:'1.5rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>
-              Brak sprzętu — dodaj pierwszy komplet poniżej
+              Brak sprzetu — dodaj pierwszy komplet ponizej
             </div>
           )}
 
@@ -273,24 +269,12 @@ export default function Profile() {
                       <input className="input" value={editingRig.name} onChange={e => setEditingRig(r => ({ ...r, name: e.target.value }))} />
                     </div>
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
-                      <div className="form-group">
-                        <label className="label">Spadochron główny</label>
-                        <input className="input" placeholder="np. Pilot 168" value={editingRig.main || ''} onChange={e => setEditingRig(r => ({ ...r, main: e.target.value }))} />
-                      </div>
-                      <div className="form-group">
-                        <label className="label">Spadochron zapasowy</label>
-                        <input className="input" placeholder="np. Nano 160" value={editingRig.reserve || ''} onChange={e => setEditingRig(r => ({ ...r, reserve: e.target.value }))} />
-                      </div>
-                      <div className="form-group">
-                        <label className="label">Pokrowiec</label>
-                        <input className="input" placeholder="np. Javelin Odyssey" value={editingRig.container || ''} onChange={e => setEditingRig(r => ({ ...r, container: e.target.value }))} />
-                      </div>
-                      <div className="form-group">
-                        <label className="label">Automat (AAD)</label>
-                        <input className="input" placeholder="np. Cypres 2" value={editingRig.aad || ''} onChange={e => setEditingRig(r => ({ ...r, aad: e.target.value }))} />
-                      </div>
+                      <div className="form-group"><label className="label">Spadochron glowny</label><input className="input" placeholder="np. Pilot 168" value={editingRig.main || ''} onChange={e => setEditingRig(r => ({ ...r, main: e.target.value }))} /></div>
+                      <div className="form-group"><label className="label">Spadochron zapasowy</label><input className="input" placeholder="np. Nano 160" value={editingRig.reserve || ''} onChange={e => setEditingRig(r => ({ ...r, reserve: e.target.value }))} /></div>
+                      <div className="form-group"><label className="label">Pokrowiec</label><input className="input" placeholder="np. Javelin Odyssey" value={editingRig.container || ''} onChange={e => setEditingRig(r => ({ ...r, container: e.target.value }))} /></div>
+                      <div className="form-group"><label className="label">Automat (AAD)</label><input className="input" placeholder="np. Cypres 2" value={editingRig.aad || ''} onChange={e => setEditingRig(r => ({ ...r, aad: e.target.value }))} /></div>
                       <div className="form-group" style={{ gridColumn:'1 / -1' }}>
-                        <label className="label">Koniec ważności spadochronu zapasowego</label>
+                        <label className="label">Koniec waznosci spadochronu zapasowego</label>
                         <input className="input" type="date" value={editingRig.reserve_expiry || ''} onChange={e => setEditingRig(r => ({ ...r, reserve_expiry: e.target.value }))} />
                       </div>
                     </div>
@@ -315,11 +299,11 @@ export default function Profile() {
                       </div>
                     </div>
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', fontSize:'0.82rem' }}>
-                      {rig.main && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Główny</div><div style={{ fontWeight:600 }}>{rig.main}</div></div>}
+                      {rig.main && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Glowny</div><div style={{ fontWeight:600 }}>{rig.main}</div></div>}
                       {rig.reserve && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Zapasowy</div><div style={{ fontWeight:600 }}>{rig.reserve}</div></div>}
                       {rig.container && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Pokrowiec</div><div style={{ fontWeight:600 }}>{rig.container}</div></div>}
                       {rig.aad && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Automat</div><div style={{ fontWeight:600 }}>{rig.aad}</div></div>}
-                      {rig.reserve_expiry && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem', gridColumn:'1 / -1' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Koniec ważności zapasowego</div><div style={{ fontWeight:600 }}>{new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')}</div></div>}
+                      {rig.reserve_expiry && <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.5rem 0.75rem', gridColumn:'1 / -1' }}><div style={{ color:'var(--muted)', fontSize:'0.65rem', fontFamily:'var(--mono)', letterSpacing:1, textTransform:'uppercase', marginBottom:2 }}>Koniec waznosci zapasowego</div><div style={{ fontWeight:600 }}>{new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')}</div></div>}
                     </div>
                     {status && <div style={{ marginTop:'0.75rem', padding:'0.6rem 0.9rem', borderRadius:'var(--r)', fontSize:'0.82rem', fontWeight:600, color:status.color, background:'rgba(255,255,255,0.04)', border:`1px solid ${status.color}` }}>{status.label}</div>}
                   </>
@@ -333,14 +317,14 @@ export default function Profile() {
               <div style={{ fontFamily:'var(--head)', fontSize:'0.9rem', fontWeight:800, marginBottom:'0.75rem', color:'var(--accent2)' }}>Nowy komplet</div>
               <div className="form-group">
                 <label className="label">Nazwa kompletu *</label>
-                <input className="input" placeholder="np. Mój główny zestaw" value={newRig.name} onChange={e => setNewRig(r => ({ ...r, name: e.target.value }))} />
+                <input className="input" placeholder="np. Moj glowny zestaw" value={newRig.name} onChange={e => setNewRig(r => ({ ...r, name: e.target.value }))} />
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
-                <div className="form-group"><label className="label">Spadochron główny</label><input className="input" placeholder="np. Pilot 168" value={newRig.main} onChange={e => setNewRig(r => ({ ...r, main: e.target.value }))} /></div>
+                <div className="form-group"><label className="label">Spadochron glowny</label><input className="input" placeholder="np. Pilot 168" value={newRig.main} onChange={e => setNewRig(r => ({ ...r, main: e.target.value }))} /></div>
                 <div className="form-group"><label className="label">Spadochron zapasowy</label><input className="input" placeholder="np. Nano 160" value={newRig.reserve} onChange={e => setNewRig(r => ({ ...r, reserve: e.target.value }))} /></div>
                 <div className="form-group"><label className="label">Pokrowiec</label><input className="input" placeholder="np. Javelin Odyssey" value={newRig.container} onChange={e => setNewRig(r => ({ ...r, container: e.target.value }))} /></div>
                 <div className="form-group"><label className="label">Automat (AAD)</label><input className="input" placeholder="np. Cypres 2" value={newRig.aad} onChange={e => setNewRig(r => ({ ...r, aad: e.target.value }))} /></div>
-                <div className="form-group" style={{ gridColumn:'1 / -1' }}><label className="label">Koniec ważności spadochronu zapasowego</label><input className="input" type="date" value={newRig.reserve_expiry} onChange={e => setNewRig(r => ({ ...r, reserve_expiry: e.target.value }))} /></div>
+                <div className="form-group" style={{ gridColumn:'1 / -1' }}><label className="label">Koniec waznosci spadochronu zapasowego</label><input className="input" type="date" value={newRig.reserve_expiry} onChange={e => setNewRig(r => ({ ...r, reserve_expiry: e.target.value }))} /></div>
               </div>
               <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
                 <button className="btn ghost" style={{ flex:1 }} onClick={() => { setShowAddRig(false); setNewRig({ name:'', main:'', reserve:'', container:'', aad:'', reserve_expiry:'' }) }}>Anuluj</button>
@@ -358,10 +342,9 @@ export default function Profile() {
           )}
         </div>
 
-        {/* Strefy zrzutu */}
         <div className="card" style={{ marginBottom:'1rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>Strefy zrzutu</h3>
-          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Lista dostępna przy dodawaniu skoku</p>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Lista dostepna przy dodawaniu skoku</p>
           {dropzones.length === 0 && <div style={{ textAlign:'center', padding:'1rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>Brak stref</div>}
           {dropzones.map(dz => (
             <div key={dz.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.7rem 1rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'0.5rem', border:'1px solid var(--border)' }}>
@@ -372,13 +355,13 @@ export default function Profile() {
             </div>
           ))}
           <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
-            <input className="input" placeholder="np. Dęblin, Piotrków..." value={newDz} onChange={e => setNewDz(e.target.value)} onKeyDown={e => e.key==='Enter' && addDropzone()} style={{ flex:1 }} />
+            <input className="input" placeholder="np. Deblin, Piotrkow..." value={newDz} onChange={e => setNewDz(e.target.value)} onKeyDown={e => e.key==='Enter' && addDropzone()} style={{ flex:1 }} />
             <button onClick={addDropzone} disabled={!newDz.trim()} className="btn" style={{ width:'auto', padding:'0 1.25rem' }}>+ Dodaj</button>
           </div>
         </div>
 
         <Link to="/stats" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
-          <button className="btn ghost" style={{ width:'100%' }}>📊 Statystyki skoków</button>
+          <button className="btn ghost" style={{ width:'100%' }}>📊 Statystyki skokow</button>
         </Link>
         <Link to="/edit-jumps" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
           <button className="btn ghost" style={{ width:'100%' }}>✏ Edytuj skoki</button>
@@ -390,8 +373,12 @@ export default function Profile() {
           <button className="btn ghost" style={{ width:'100%' }}>↑ Importuj skoki z CSV</button>
         </Link>
 
+        <Link to="/settings" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
+          <button className="btn ghost" style={{ width:'100%' }}>⚙️ Ustawienia</button>
+        </Link>
+
         <button className="btn danger" onClick={async () => { await supabase.auth.signOut(); navigate('/login') }} style={{ marginBottom:'2rem' }}>
-          Wyloguj się
+          Wyloguj sie
         </button>
 
       </div>
@@ -415,10 +402,10 @@ function PersonalSection({ profileBase, saving, setSaving, msgs, showMsg }) {
       <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Dane osobowe</h3>
       <form onSubmit={save}>
         <div className="form-row">
-          <div className="form-group"><label className="label">Imię</label><input className="input" value={name} onChange={e => setName(e.target.value)} placeholder="Jan" /></div>
+          <div className="form-group"><label className="label">Imie</label><input className="input" value={name} onChange={e => setName(e.target.value)} placeholder="Jan" /></div>
           <div className="form-group"><label className="label">Nazwisko</label><input className="input" value={surname} onChange={e => setSurname(e.target.value)} placeholder="Kowalski" /></div>
         </div>
-        <div className="form-group"><label className="label">Miejscowość</label><input className="input" value={city} onChange={e => setCity(e.target.value)} placeholder="Warszawa" /></div>
+        <div className="form-group"><label className="label">Miejscowosc</label><input className="input" value={city} onChange={e => setCity(e.target.value)} placeholder="Warszawa" /></div>
         <div className="form-group"><label className="label">E-mail</label><input className="input" value={profileBase.email||''} disabled style={{ opacity:0.5, cursor:'not-allowed' }} readOnly /></div>
         {msgs['personal'] && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem' }}>{msgs['personal']}</p>}
         <button className="btn" type="submit" disabled={saving['personal']}>{saving['personal'] ? 'Zapisywanie...' : 'Zapisz'}</button>
@@ -445,7 +432,7 @@ function InsuranceSection({ profileBase, saving, setSaving, msgs, showMsg }) {
         <div className="form-group"><label className="label">Ubezpieczyciel</label><input className="input" value={company} onChange={e => setCompany(e.target.value)} placeholder="np. PZU, Warta..." /></div>
         <div className="form-row">
           <div className="form-group"><label className="label">Numer polisy</label><input className="input" value={number} onChange={e => setNumber(e.target.value)} placeholder="np. 123456789" /></div>
-          <div className="form-group"><label className="label">Data ważności</label><input className="input" type="date" value={expiry} onChange={e => setExpiry(e.target.value)} /></div>
+          <div className="form-group"><label className="label">Data waznosci</label><input className="input" type="date" value={expiry} onChange={e => setExpiry(e.target.value)} /></div>
         </div>
         {msgs['insurance'] && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem' }}>{msgs['insurance']}</p>}
         <button className="btn" type="submit" disabled={saving['insurance']}>{saving['insurance'] ? 'Zapisywanie...' : 'Zapisz'}</button>
@@ -467,7 +454,7 @@ function MedicalSection({ profileBase, saving, setSaving, msgs, showMsg }) {
     <div className="card" style={{ marginBottom:'1rem' }}>
       <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Badania lotnicze</h3>
       <form onSubmit={save}>
-        <div className="form-group"><label className="label">Data ważności badań</label><input className="input" type="date" value={expiry} onChange={e => setExpiry(e.target.value)} /></div>
+        <div className="form-group"><label className="label">Data waznosci badan</label><input className="input" type="date" value={expiry} onChange={e => setExpiry(e.target.value)} /></div>
         {msgs['medical'] && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem' }}>{msgs['medical']}</p>}
         <button className="btn" type="submit" disabled={saving['medical']}>{saving['medical'] ? 'Zapisywanie...' : 'Zapisz'}</button>
       </form>
