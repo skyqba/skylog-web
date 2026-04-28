@@ -20,7 +20,7 @@ export default function Journal() {
     const { data: { user } } = await supabase.auth.getUser()
     const [{ data: j }, { data: prof }, { data: rigList }, { data: q }] = await Promise.all([
       supabase.from('jumps').select('*').order('number', { ascending: false }),
-      supabase.from('profiles').select('license_expiry,insurance_expiry,medical_expiry').eq('id', user.id).single(),
+      supabase.from('profiles').select('insurance_expiry,medical_expiry').eq('id', user.id).single(),
       supabase.from('rigs').select('id,name,reserve_expiry').eq('user_id', user.id),
       supabase.from('qualifications').select('*').eq('user_id', user.id).single(),
     ])
@@ -72,11 +72,26 @@ export default function Journal() {
     return               { color:'var(--success)',  dot:'#34D399' }
   }
 
-  const docs = profile ? [
-    { label:'Licencja',         expiry: profile.license_expiry,   days: daysUntil(profile.license_expiry) },
-    { label:'Ubezpieczenie',    expiry: profile.insurance_expiry, days: daysUntil(profile.insurance_expiry) },
-    { label:'Badania lotnicze', expiry: profile.medical_expiry,   days: daysUntil(profile.medical_expiry) },
-  ].filter(d => d.expiry) : []
+  const docs = [
+    profile?.insurance_expiry ? { label:'Ubezpieczenie',           expiry: profile.insurance_expiry,       days: daysUntil(profile.insurance_expiry) } : null,
+    profile?.medical_expiry   ? { label:'Badania lotnicze',        expiry: profile.medical_expiry,         days: daysUntil(profile.medical_expiry) } : null,
+    quals?.cert_expiry        ? { label:'Świadectwo kwalifikacji', expiry: quals.cert_expiry,              days: daysUntil(quals.cert_expiry) } : null,
+    quals?.has_tandem && quals?.tandem_expiry         ? { label:'Uprawnienie Tandem', expiry: quals.tandem_expiry,  days: daysUntil(quals.tandem_expiry) } : null,
+    quals?.has_ins && quals?.ins_sl && quals?.ins_sl_expiry   ? { label:'INS/SL',  expiry: quals.ins_sl_expiry,  days: daysUntil(quals.ins_sl_expiry) } : null,
+    quals?.has_ins && quals?.ins_aff && quals?.ins_aff_expiry ? { label:'INS/AFF', expiry: quals.ins_aff_expiry, days: daysUntil(quals.ins_aff_expiry) } : null,
+    quals?.has_ins && quals?.ins_t && quals?.ins_t_expiry     ? { label:'INS/T',   expiry: quals.ins_t_expiry,   days: daysUntil(quals.ins_t_expiry) } : null,
+    quals?.uspa_expiry        ? { label:'Licencja USPA',           expiry: quals.uspa_expiry,              days: daysUntil(quals.uspa_expiry) } : null,
+    quals?.uspa_coach && quals?.uspa_coach_expiry          ? { label:'USPA Coach',       expiry: quals.uspa_coach_expiry,       days: daysUntil(quals.uspa_coach_expiry) } : null,
+    quals?.uspa_instructor && quals?.uspa_instructor_expiry ? { label:'USPA Instructor', expiry: quals.uspa_instructor_expiry,  days: daysUntil(quals.uspa_instructor_expiry) } : null,
+    quals?.uspa_examiner && quals?.uspa_examiner_expiry    ? { label:'USPA Examiner',   expiry: quals.uspa_examiner_expiry,    days: daysUntil(quals.uspa_examiner_expiry) } : null,
+    quals?.uspa_judge && quals?.uspa_judge_expiry          ? { label:'USPA Judge',      expiry: quals.uspa_judge_expiry,       days: daysUntil(quals.uspa_judge_expiry) } : null,
+    quals?.uspa_pro && quals?.uspa_pro_expiry              ? { label:'USPA PRO Rating', expiry: quals.uspa_pro_expiry,         days: daysUntil(quals.uspa_pro_expiry) } : null,
+    ...rigs.filter(r => r.reserve_expiry).map(r => ({
+      label: `Zapas — ${r.name}`,
+      expiry: r.reserve_expiry,
+      days: daysUntil(r.reserve_expiry)
+    })),
+  ].filter(Boolean)
 
   const urgentDocs = docs.filter(d => d.days !== null && d.days <= 30)
 
@@ -86,19 +101,18 @@ export default function Journal() {
     .filter(r => r.days !== null && r.days <= 60)
     .sort((a, b) => a.days - b.days)
 
-  // Alerty uprawnień z qualifications
   const qualAlerts = quals ? [
-    quals.cert_expiry            ? { label:'Świadectwo kwalifikacji',  days: daysUntil(quals.cert_expiry) } : null,
-    quals.has_tandem && quals.tandem_expiry         ? { label:'Uprawnienie Tandem',         days: daysUntil(quals.tandem_expiry) } : null,
-    quals.has_ins && quals.ins_sl && quals.ins_sl_expiry   ? { label:'INS/SL',                      days: daysUntil(quals.ins_sl_expiry) } : null,
-    quals.has_ins && quals.ins_aff && quals.ins_aff_expiry ? { label:'INS/AFF',                     days: daysUntil(quals.ins_aff_expiry) } : null,
-    quals.has_ins && quals.ins_t && quals.ins_t_expiry     ? { label:'INS/T',                       days: daysUntil(quals.ins_t_expiry) } : null,
-    quals.uspa_expiry            ? { label:'Licencja USPA',            days: daysUntil(quals.uspa_expiry) } : null,
-    quals.uspa_coach && quals.uspa_coach_expiry          ? { label:'USPA Coach',                  days: daysUntil(quals.uspa_coach_expiry) } : null,
-    quals.uspa_instructor && quals.uspa_instructor_expiry ? { label:'USPA Instructor',             days: daysUntil(quals.uspa_instructor_expiry) } : null,
-    quals.uspa_examiner && quals.uspa_examiner_expiry    ? { label:'USPA Examiner',               days: daysUntil(quals.uspa_examiner_expiry) } : null,
-    quals.uspa_judge && quals.uspa_judge_expiry          ? { label:'USPA Judge',                  days: daysUntil(quals.uspa_judge_expiry) } : null,
-    quals.uspa_pro && quals.uspa_pro_expiry              ? { label:'USPA PRO Rating',             days: daysUntil(quals.uspa_pro_expiry) } : null,
+    quals.cert_expiry            ? { label:'Świadectwo kwalifikacji', days: daysUntil(quals.cert_expiry) } : null,
+    quals.has_tandem && quals.tandem_expiry         ? { label:'Uprawnienie Tandem', days: daysUntil(quals.tandem_expiry) } : null,
+    quals.has_ins && quals.ins_sl && quals.ins_sl_expiry   ? { label:'INS/SL',  days: daysUntil(quals.ins_sl_expiry) } : null,
+    quals.has_ins && quals.ins_aff && quals.ins_aff_expiry ? { label:'INS/AFF', days: daysUntil(quals.ins_aff_expiry) } : null,
+    quals.has_ins && quals.ins_t && quals.ins_t_expiry     ? { label:'INS/T',   days: daysUntil(quals.ins_t_expiry) } : null,
+    quals.uspa_expiry            ? { label:'Licencja USPA',      days: daysUntil(quals.uspa_expiry) } : null,
+    quals.uspa_coach && quals.uspa_coach_expiry          ? { label:'USPA Coach',       days: daysUntil(quals.uspa_coach_expiry) } : null,
+    quals.uspa_instructor && quals.uspa_instructor_expiry ? { label:'USPA Instructor', days: daysUntil(quals.uspa_instructor_expiry) } : null,
+    quals.uspa_examiner && quals.uspa_examiner_expiry    ? { label:'USPA Examiner',   days: daysUntil(quals.uspa_examiner_expiry) } : null,
+    quals.uspa_judge && quals.uspa_judge_expiry          ? { label:'USPA Judge',      days: daysUntil(quals.uspa_judge_expiry) } : null,
+    quals.uspa_pro && quals.uspa_pro_expiry              ? { label:'USPA PRO Rating', days: daysUntil(quals.uspa_pro_expiry) } : null,
   ].filter(a => a !== null && a.days !== null && a.days <= 60).sort((a, b) => a.days - b.days) : []
 
   return (
@@ -106,7 +120,6 @@ export default function Journal() {
       <Navbar />
       <div style={{ maxWidth:680, margin:'0 auto', padding:'1.5rem 1rem' }}>
 
-        {/* Banery ważności zapasowych */}
         {urgentRigs.map(rig => {
           const expired = rig.days < 0
           return (
@@ -131,7 +144,6 @@ export default function Journal() {
           )
         })}
 
-        {/* Banery ważności uprawnień */}
         {qualAlerts.map((a, i) => {
           const expired = a.days < 0
           return (
@@ -152,7 +164,6 @@ export default function Journal() {
           )
         })}
 
-        {/* Dokumenty */}
         {docs.length > 0 && (
           <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'var(--r2)', marginBottom:'1rem', overflow:'hidden' }}>
             <button onClick={() => setShowDocs(d => !d)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 1.1rem', background:'transparent', border:'none', cursor:'pointer', color:'var(--text)', fontFamily:'var(--font)' }}>
@@ -190,7 +201,6 @@ export default function Journal() {
           </div>
         )}
 
-        {/* Baner liczby skoków */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.25rem 1.5rem', marginBottom:'1.5rem', borderTop:'2px solid rgba(108,99,255,0.5)' }}>
           <div>
             <div style={{ fontFamily:'var(--mono)', fontSize:'0.65rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:4 }}>Łączna liczba skoków</div>
