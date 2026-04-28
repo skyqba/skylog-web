@@ -90,12 +90,17 @@ export default function Journal() {
     quals?.has_ins && quals?.ins_sl && quals?.ins_sl_expiry   ? { label:'INS/SL',  expiry: quals.ins_sl_expiry,  days: daysUntil(quals.ins_sl_expiry) } : null,
     quals?.has_ins && quals?.ins_aff && quals?.ins_aff_expiry ? { label:'INS/AFF', expiry: quals.ins_aff_expiry, days: daysUntil(quals.ins_aff_expiry) } : null,
     quals?.has_ins && quals?.ins_t && quals?.ins_t_expiry     ? { label:'INS/T',   expiry: quals.ins_t_expiry,   days: daysUntil(quals.ins_t_expiry) } : null,
-    quals?.uspa_expiry        ? { label:'Licencja USPA',           expiry: quals.uspa_expiry,             days: daysUntil(quals.uspa_expiry) } : null,
-    quals?.uspa_coach && quals?.uspa_coach_expiry          ? { label:'USPA Coach',       expiry: quals.uspa_coach_expiry,      days: daysUntil(quals.uspa_coach_expiry) } : null,
-    quals?.uspa_instructor && quals?.uspa_instructor_expiry ? { label:'USPA Instructor', expiry: quals.uspa_instructor_expiry, days: daysUntil(quals.uspa_instructor_expiry) } : null,
-    quals?.uspa_examiner && quals?.uspa_examiner_expiry    ? { label:'USPA Examiner',   expiry: quals.uspa_examiner_expiry,   days: daysUntil(quals.uspa_examiner_expiry) } : null,
-    quals?.uspa_judge && quals?.uspa_judge_expiry          ? { label:'USPA Judge',      expiry: quals.uspa_judge_expiry,      days: daysUntil(quals.uspa_judge_expiry) } : null,
-    quals?.uspa_pro && quals?.uspa_pro_expiry              ? { label:'USPA PRO Rating', expiry: quals.uspa_pro_expiry,        days: daysUntil(quals.uspa_pro_expiry) } : null,
+    // Licencja USPA — bezterminowa
+    (quals?.uspa_number || quals?.uspa_class) ? {
+      label: `Licencja USPA${quals.uspa_class ? ` — klasa ${quals.uspa_class}` : ''}${quals.uspa_number ? ` (${quals.uspa_number})` : ''}`,
+      expiry: null, days: null, noExpiry: true
+    } : null,
+    // Uprawnienia USPA — bezterminowe
+    quals?.uspa_coach      ? { label:'USPA Coach',      expiry: null, days: null, noExpiry: true } : null,
+    quals?.uspa_instructor ? { label:'USPA Instructor', expiry: null, days: null, noExpiry: true } : null,
+    quals?.uspa_examiner   ? { label:'USPA Examiner',   expiry: null, days: null, noExpiry: true } : null,
+    quals?.uspa_judge      ? { label:'USPA Judge',      expiry: null, days: null, noExpiry: true } : null,
+    quals?.uspa_pro        ? { label:'USPA PRO Rating', expiry: null, days: null, noExpiry: true } : null,
     ...rigs.filter(r => r.reserve_expiry).map(r => ({
       label: `Zapas — ${r.name}`,
       expiry: r.reserve_expiry,
@@ -125,12 +130,6 @@ export default function Journal() {
     quals.has_ins && quals.ins_sl  && quals.ins_sl_expiry  && alertOn('alert_ins')                ? { key:'ins_sl',     label:'INS/SL',                  days: daysUntil(quals.ins_sl_expiry) } : null,
     quals.has_ins && quals.ins_aff && quals.ins_aff_expiry && alertOn('alert_ins')                ? { key:'ins_aff',    label:'INS/AFF',                 days: daysUntil(quals.ins_aff_expiry) } : null,
     quals.has_ins && quals.ins_t   && quals.ins_t_expiry   && alertOn('alert_ins')                ? { key:'ins_t',      label:'INS/T',                   days: daysUntil(quals.ins_t_expiry) } : null,
-    quals.uspa_expiry && alertOn('alert_uspa')                                                     ? { key:'uspa',       label:'Licencja USPA',           days: daysUntil(quals.uspa_expiry) } : null,
-    quals.uspa_coach && quals.uspa_coach_expiry && alertOn('alert_uspa')                           ? { key:'uspa_coach', label:'USPA Coach',              days: daysUntil(quals.uspa_coach_expiry) } : null,
-    quals.uspa_instructor && quals.uspa_instructor_expiry && alertOn('alert_uspa')                 ? { key:'uspa_ins',   label:'USPA Instructor',         days: daysUntil(quals.uspa_instructor_expiry) } : null,
-    quals.uspa_examiner && quals.uspa_examiner_expiry && alertOn('alert_uspa')                     ? { key:'uspa_exam',  label:'USPA Examiner',           days: daysUntil(quals.uspa_examiner_expiry) } : null,
-    quals.uspa_judge && quals.uspa_judge_expiry && alertOn('alert_uspa')                           ? { key:'uspa_judge', label:'USPA Judge',              days: daysUntil(quals.uspa_judge_expiry) } : null,
-    quals.uspa_pro && quals.uspa_pro_expiry && alertOn('alert_uspa')                               ? { key:'uspa_pro',   label:'USPA PRO Rating',         days: daysUntil(quals.uspa_pro_expiry) } : null,
   ].filter(a => a !== null && a.days !== null && a.days <= 60 && !dismissedQuals.includes(a.key))
    .sort((a, b) => a.days - b.days) : []
 
@@ -267,15 +266,15 @@ export default function Journal() {
               <div style={{ borderTop:'1px solid var(--border)', padding:'0.75rem 1.1rem', display:'flex', flexDirection:'column', gap:'0.6rem' }}>
                 {docs.map(doc => {
                   const c = docColor(doc.days)
-                  const fmt = new Date(doc.expiry).toLocaleDateString('pl-PL')
+                  const fmt = doc.expiry ? new Date(doc.expiry).toLocaleDateString('pl-PL') : ''
                   return (
                     <div key={doc.label} style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                       <div style={{ display:'flex', alignItems:'center', gap:'0.6rem' }}>
-                        <div style={{ width:7, height:7, borderRadius:'50%', background: c?.dot || 'var(--muted)', flexShrink:0 }} />
+                        <div style={{ width:7, height:7, borderRadius:'50%', background: doc.noExpiry ? '#34D399' : (c?.dot || 'var(--muted)'), flexShrink:0 }} />
                         <span style={{ fontSize:'0.85rem', color:'var(--muted)' }}>{doc.label}</span>
                       </div>
-                      <span style={{ fontFamily:'var(--mono)', fontSize:'0.78rem', color: c?.color || 'var(--muted)' }}>
-                        {doc.days < 0 ? `Nieważny od ${Math.abs(doc.days)} dni` : doc.days <= 30 ? `Wygasa za ${doc.days} dni` : `Ważny do ${fmt}`}
+                      <span style={{ fontFamily:'var(--mono)', fontSize:'0.78rem', color: doc.noExpiry ? 'var(--success)' : (c?.color || 'var(--muted)') }}>
+                        {doc.noExpiry ? '' : doc.days < 0 ? `Nieważny od ${Math.abs(doc.days)} dni` : doc.days <= 30 ? `Wygasa za ${doc.days} dni` : `Ważny do ${fmt}`}
                       </span>
                     </div>
                   )
