@@ -105,6 +105,12 @@ export default function Journal() {
     .filter(r => r.days !== null && r.days <= 60)
     .sort((a, b) => a.days - b.days)
 
+  const profileAlerts = [
+    profile?.insurance_expiry ? { key:'insurance', label:'Ubezpieczenie',    days: daysUntil(profile.insurance_expiry), linkTo:'/profile' } : null,
+    profile?.medical_expiry   ? { key:'medical',   label:'Badania lotnicze', days: daysUntil(profile.medical_expiry),   linkTo:'/profile' } : null,
+  ].filter(a => a !== null && a.days !== null && a.days <= 60 && !dismissedQuals.includes(a.key))
+   .sort((a, b) => a.days - b.days)
+
   const qualAlerts = quals ? [
     quals.cert_expiry            ? { key:'cert',       label:'Świadectwo kwalifikacji', days: daysUntil(quals.cert_expiry) } : null,
     quals.has_tandem && quals.tandem_expiry         ? { key:'tandem',    label:'Uprawnienie Tandem', days: daysUntil(quals.tandem_expiry) } : null,
@@ -161,7 +167,6 @@ export default function Journal() {
       <Navbar />
       <div style={{ maxWidth:680, margin:'0 auto', padding:'1.5rem 1rem' }}>
 
-        {/* Modal potwierdzenia usunięcia skoku */}
         {confirmDelete && (
           <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
             <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.5rem', maxWidth:360, width:'100%' }}>
@@ -200,6 +205,22 @@ export default function Journal() {
               subtitle={`${rig.name} — ${expired ? `Nieważne od ${Math.abs(rig.days)} dni. Ważność: ${new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')}` : `Koniec ważności: ${new Date(rig.reserve_expiry).toLocaleDateString('pl-PL')} · zostało ${rig.days} dni`}`}
               linkTo="/profile"
               onDismiss={() => requestDismiss('rig', rig.id)}
+            />
+          )
+        })}
+
+        {profileAlerts.map((a) => {
+          const expired = a.days < 0
+          const color = expired ? 'var(--danger)' : '#FBBF24'
+          return (
+            <AlertBanner
+              key={a.key}
+              expired={expired}
+              color={color}
+              title={expired ? `${a.label} — WYGASŁO!` : `Zbliża się koniec ważności — ${a.label}`}
+              subtitle={expired ? `Wygasło ${Math.abs(a.days)} dni temu` : `Zostało ${a.days} dni`}
+              linkTo={a.linkTo}
+              onDismiss={() => requestDismiss('qual', a.key)}
             />
           )
         })}
