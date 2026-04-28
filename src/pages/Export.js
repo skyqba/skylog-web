@@ -15,7 +15,7 @@ export default function Export() {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       const [{ data: j }, { data: prof }] = await Promise.all([
-        supabase.from('jumps').select('*').eq('user_id', user.id).order('number', { ascending: true }),
+        supabase.from('jumps').select('*').eq('user_id', user.id).order('number', { ascending: false }),
         supabase.from('profiles').select('name,surname,city,license_number').eq('id', user.id).single(),
       ])
       setJumps(j || [])
