@@ -6,6 +6,8 @@ export default function Navbar() {
   const { pathname } = useLocation()
 
   const logout = async () => {
+    sessionStorage.removeItem('dismissedRigs')
+    sessionStorage.removeItem('dismissedQuals')
     await supabase.auth.signOut()
     navigate('/login')
   }
@@ -26,10 +28,9 @@ export default function Navbar() {
           <span style={{ display:'block', fontFamily:'var(--font)', fontSize:'0.62rem', color:'var(--muted)', letterSpacing:'0.5px', marginTop:'-2px' }}>by SkyQba ver 1.0</span>
         </div>
       </Link>
-
       <div style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
-        <NavLink to="/"        label="Dziennik"   active={pathname === '/'} />
-        <NavLink to="/profile" label="Profil"     active={pathname === '/profile'} />
+        <NavLink to="/"        label="Dziennik" active={pathname === '/'} />
+        <NavLink to="/profile" label="Profil"   active={pathname === '/profile'} />
         <button onClick={logout} style={{
           padding:'0.4rem 0.9rem',
           background:'transparent',
