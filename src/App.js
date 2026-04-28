@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabase'
+import { syncQueue } from './offlineQueue'
 import Login          from './pages/Login'
 import Register       from './pages/Register'
 import Journal        from './pages/Journal'
@@ -16,11 +17,26 @@ import Settings       from './pages/Settings'
 
 function App() {
   const [session, setSession] = useState(undefined)
+  const [online, setOnline]   = useState(navigator.onLine)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
     return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setOnline(true)
+      syncQueue(supabase)
+    }
+    const handleOffline = () => setOnline(false)
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
   }, [])
 
   if (session === undefined) return (
@@ -31,6 +47,11 @@ function App() {
 
   return (
     <BrowserRouter>
+      {!online && (
+        <div style={{ background:'#FBBF24', color:'#000', textAlign:'center', padding:'0.4rem', fontSize:'0.82rem', fontWeight:600 }}>
+          ⚡ Tryb offline — zmiany zostaną zsynchronizowane po powrocie połączenia
+        </div>
+      )}
       <Routes>
         <Route path="/login"          element={!session ? <Login />          : <Navigate to="/" />} />
         <Route path="/register"       element={!session ? <Register />       : <Navigate to="/" />} />
