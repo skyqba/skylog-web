@@ -8,6 +8,7 @@ export default function Journal() {
   const [jumps, setJumps]       = useState([])
   const [profile, setProfile]   = useState(null)
   const [rigs, setRigs]         = useState([])
+  const [quals, setQuals]       = useState(null)
   const [loading, setLoading]   = useState(true)
   const [showDocs, setShowDocs] = useState(false)
   const [search, setSearch]     = useState('')
@@ -17,14 +18,16 @@ export default function Journal() {
 
   const fetchAll = async () => {
     const { data: { user } } = await supabase.auth.getUser()
-    const [{ data: j }, { data: prof }, { data: rigList }] = await Promise.all([
+    const [{ data: j }, { data: prof }, { data: rigList }, { data: q }] = await Promise.all([
       supabase.from('jumps').select('*').order('number', { ascending: false }),
       supabase.from('profiles').select('license_expiry,insurance_expiry,medical_expiry').eq('id', user.id).single(),
       supabase.from('rigs').select('id,name,reserve_expiry').eq('user_id', user.id),
+      supabase.from('qualifications').select('*').eq('user_id', user.id).single(),
     ])
     setJumps(j || [])
     setProfile(prof)
     setRigs(rigList || [])
+    setQuals(q || null)
     setLoading(false)
   }
 
@@ -53,9 +56,7 @@ export default function Journal() {
       notes:     null,
       result:    null,
     }).select().single()
-    if (!error && data) {
-      setJumps(j => [data, ...j])
-    }
+    if (!error && data) setJumps(j => [data, ...j])
     setRepeating(false)
   }
 
@@ -85,6 +86,21 @@ export default function Journal() {
     .filter(r => r.days !== null && r.days <= 60)
     .sort((a, b) => a.days - b.days)
 
+  // Alerty uprawnień z qualifications
+  const qualAlerts = quals ? [
+    quals.cert_expiry            ? { label:'Świadectwo kwalifikacji',  days: daysUntil(quals.cert_expiry) } : null,
+    quals.has_tandem && quals.tandem_expiry         ? { label:'Uprawnienie Tandem',         days: daysUntil(quals.tandem_expiry) } : null,
+    quals.has_ins && quals.ins_sl && quals.ins_sl_expiry   ? { label:'INS/SL',                      days: daysUntil(quals.ins_sl_expiry) } : null,
+    quals.has_ins && quals.ins_aff && quals.ins_aff_expiry ? { label:'INS/AFF',                     days: daysUntil(quals.ins_aff_expiry) } : null,
+    quals.has_ins && quals.ins_t && quals.ins_t_expiry     ? { label:'INS/T',                       days: daysUntil(quals.ins_t_expiry) } : null,
+    quals.uspa_expiry            ? { label:'Licencja USPA',            days: daysUntil(quals.uspa_expiry) } : null,
+    quals.uspa_coach && quals.uspa_coach_expiry          ? { label:'USPA Coach',                  days: daysUntil(quals.uspa_coach_expiry) } : null,
+    quals.uspa_instructor && quals.uspa_instructor_expiry ? { label:'USPA Instructor',             days: daysUntil(quals.uspa_instructor_expiry) } : null,
+    quals.uspa_examiner && quals.uspa_examiner_expiry    ? { label:'USPA Examiner',               days: daysUntil(quals.uspa_examiner_expiry) } : null,
+    quals.uspa_judge && quals.uspa_judge_expiry          ? { label:'USPA Judge',                  days: daysUntil(quals.uspa_judge_expiry) } : null,
+    quals.uspa_pro && quals.uspa_pro_expiry              ? { label:'USPA PRO Rating',             days: daysUntil(quals.uspa_pro_expiry) } : null,
+  ].filter(a => a !== null && a.days !== null && a.days <= 60).sort((a, b) => a.days - b.days) : []
+
   return (
     <div>
       <Navbar />
@@ -109,6 +125,27 @@ export default function Journal() {
                 </div>
               </div>
               <Link to="/profile" style={{ textDecoration:'none', flexShrink:0 }}>
+                <button style={{ background:'transparent', border:`1px solid ${expired ? 'var(--danger)' : '#FBBF24'}`, borderRadius:8, padding:'0.4rem 0.9rem', color: expired ? 'var(--danger)' : '#FBBF24', fontFamily:'var(--font)', fontSize:'0.8rem', cursor:'pointer', whiteSpace:'nowrap' }}>Aktualizuj →</button>
+              </Link>
+            </div>
+          )
+        })}
+
+        {/* Banery ważności uprawnień */}
+        {qualAlerts.map((a, i) => {
+          const expired = a.days < 0
+          return (
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:'1rem', padding:'1rem 1.25rem', borderRadius:'var(--r2)', marginBottom:'1rem', background: expired ? 'rgba(248,113,113,0.12)' : 'rgba(251,191,36,0.08)', border:`2px solid ${expired ? 'rgba(248,113,113,0.6)' : 'rgba(251,191,36,0.5)'}` }}>
+              <div style={{ fontSize:28, flexShrink:0 }}>{expired ? '🚨' : a.days <= 14 ? '⚠️' : '📅'}</div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontFamily:'var(--head)', fontSize:'0.95rem', fontWeight:800, color: expired ? 'var(--danger)' : '#FBBF24', marginBottom:2 }}>
+                  {expired ? `${a.label} — WYGASŁO!` : `Zbliża się koniec ważności — ${a.label}`}
+                </div>
+                <div style={{ fontSize:'0.82rem', color: expired ? 'var(--danger)' : '#FBBF24', opacity:0.9 }}>
+                  {expired ? `Wygasło ${Math.abs(a.days)} dni temu` : `Zostało ${a.days} dni`}
+                </div>
+              </div>
+              <Link to="/qualifications" style={{ textDecoration:'none', flexShrink:0 }}>
                 <button style={{ background:'transparent', border:`1px solid ${expired ? 'var(--danger)' : '#FBBF24'}`, borderRadius:8, padding:'0.4rem 0.9rem', color: expired ? 'var(--danger)' : '#FBBF24', fontFamily:'var(--font)', fontSize:'0.8rem', cursor:'pointer', whiteSpace:'nowrap' }}>Aktualizuj →</button>
               </Link>
             </div>
@@ -161,20 +198,15 @@ export default function Journal() {
               {loading ? '—' : (jumps.length > 0 ? Math.max(...jumps.map(j => j.number || 0)) : 0)}
             </div>
           </div>
-          <div style={{ display:'flex', gap:'0.5rem' }}>
-            {jumps.length > 0 && (
-              <button
-                className="btn ghost small"
-                onClick={repeatLastJump}
-                disabled={repeating}
-                title="Dodaj skok z tymi samymi danymi co poprzedni"
-              >
-                {repeating ? '...' : '⟳ Powtórz ostatni'}
-              </button>
-            )}
+          <div style={{ display:'flex', flexDirection:'column', gap:'0.4rem', alignItems:'flex-end' }}>
             <Link to="/add" style={{ textDecoration:'none' }}>
               <button className="btn small">+ Dodaj skok</button>
             </Link>
+            {jumps.length > 0 && (
+              <button className="btn ghost small" onClick={repeatLastJump} disabled={repeating} title="Dodaj skok z tymi samymi danymi co poprzedni">
+                {repeating ? '...' : '⟳ Powtórz ostatni'}
+              </button>
+            )}
           </div>
         </div>
 
