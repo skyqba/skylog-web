@@ -71,12 +71,17 @@ export default function Register() {
   return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', padding:'2rem 1rem' }}>
       <div style={{ width:'100%', maxWidth:460 }}>
+
+        {/* Logo */}
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
           <div style={{ marginBottom:'0.25rem' }}>
-            <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:800, color:'var(--text)' }}>Jump<span style={{ color:'var(--accent2)' }}>Log</span></span>
+            <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:900, color:'var(--text)' }}>
+              <span style={{ color:'var(--accent2)' }}>Jump</span>Log<span style={{ color:'var(--accent2)' }}>X</span>
+            </span>
           </div>
           <div style={{ fontFamily:'var(--font)', fontSize:'0.65rem', color:'var(--muted)' }}>by SkyQba ver 1.0</div>
         </div>
+
         <div className="card">
           <h2 style={{ fontFamily:'var(--head)', fontSize:'1.2rem', marginBottom:'1.5rem', fontWeight:800 }}>Rejestracja</h2>
           <form onSubmit={handleRegister}>
@@ -100,8 +105,14 @@ export default function Register() {
               <div className="form-group"><label className="label">Hasło * (min. 6)</label><input className="input" type="password" placeholder="••••••••" value={form.password} onChange={set('password')} /></div>
               <div className="form-group"><label className="label">Powtórz hasło *</label><input className="input" type="password" placeholder="••••••••" value={form.password2} onChange={set('password2')} /></div>
             </div>
-            {error && <div style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'var(--r)', padding:'0.65rem 0.9rem', color:'var(--danger)', fontSize:'0.85rem', marginBottom:'0.75rem' }}>{error}</div>}
-            <button className="btn" type="submit" disabled={loading} style={{ marginTop:'0.5rem' }}>{loading ? 'Tworzenie konta...' : 'Utwórz konto'}</button>
+            {error && (
+              <div style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'var(--r)', padding:'0.65rem 0.9rem', color:'var(--danger)', fontSize:'0.85rem', marginBottom:'0.75rem' }}>
+                {error}
+              </div>
+            )}
+            <button className="btn" type="submit" disabled={loading} style={{ marginTop:'0.5rem' }}>
+              {loading ? 'Tworzenie konta...' : 'Utwórz konto'}
+            </button>
           </form>
           <p style={{ textAlign:'center', marginTop:'1.25rem', fontSize:'0.85rem', color:'var(--muted)' }}>
             Masz już konto?{' '}<Link to="/login" style={{ color:'var(--accent2)', textDecoration:'none', fontWeight:500 }}>Zaloguj się</Link>
