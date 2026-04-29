@@ -380,7 +380,7 @@ export default function Journal() {
             <Link to="/add" style={{ color:'var(--accent2)', textDecoration:'none', fontWeight:500 }}>Dodaj pierwszy skok →</Link>
           </div>
         )}
-        {!loading && (() => {
+        {!loading && jumps.length > 0 && (() => {
           const s = search.toLowerCase()
           const filtered = s ? jumps.filter(j =>
             String(j.number).includes(s) ||
