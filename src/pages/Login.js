@@ -13,9 +13,9 @@ export default function Login() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const savedEmail    = localStorage.getItem('skyjumplog_email')
-    const savedPassword = localStorage.getItem('skyjumplog_password')
-    const savedRemember = localStorage.getItem('skyjumplog_remember')
+    const savedEmail    = localStorage.getItem('jumplogx_email')
+    const savedPassword = localStorage.getItem('jumplogx_password')
+    const savedRemember = localStorage.getItem('jumplogx_remember')
     if (savedRemember === 'true' && savedEmail && savedPassword) {
       setEmail(savedEmail)
       setPassword(savedPassword)
@@ -31,13 +31,13 @@ export default function Login() {
       setError(error.message)
     } else {
       if (remember) {
-        localStorage.setItem('skyjumplog_email', email)
-        localStorage.setItem('skyjumplog_password', password)
-        localStorage.setItem('skyjumplog_remember', 'true')
+        localStorage.setItem('jumplogx_email', email)
+        localStorage.setItem('jumplogx_password', password)
+        localStorage.setItem('jumplogx_remember', 'true')
       } else {
-        localStorage.removeItem('skyjumplog_email')
-        localStorage.removeItem('skyjumplog_password')
-        localStorage.removeItem('skyjumplog_remember')
+        localStorage.removeItem('jumplogx_email')
+        localStorage.removeItem('jumplogx_password')
+        localStorage.removeItem('jumplogx_remember')
       }
       navigate('/')
     }
@@ -61,7 +61,7 @@ export default function Login() {
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
           <div style={{ marginBottom:'0.25rem' }}>
             <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:900, color:'var(--text)' }}>
-              Sky Jump<span style={{ color:'var(--accent2)' }}>Log</span>
+              <span style={{ color:'var(--accent2)' }}>Jump</span>Log<span style={{ color:'var(--accent2)', }}>X</span>
             </span>
           </div>
           <div style={{ fontFamily:'var(--font)', fontSize:'0.65rem', color:'var(--muted)', marginBottom:'0.4rem' }}>
