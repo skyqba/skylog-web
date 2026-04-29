@@ -15,7 +15,26 @@ const ALERT_KEYS = [
 
 const DEFAULT_SETTINGS = Object.fromEntries(ALERT_KEYS.map(a => [a.key, true]))
 
-// deleteStep: null | 'confirm' | 'backup' | 'final'
+const pl = (str) => {
+  if (!str) return ''
+  return String(str)
+    .replace(/ą/g, 'a').replace(/Ą/g, 'A')
+    .replace(/ć/g, 'c').replace(/Ć/g, 'C')
+    .replace(/ę/g, 'e').replace(/Ę/g, 'E')
+    .replace(/ł/g, 'l').replace(/Ł/g, 'L')
+    .replace(/ń/g, 'n').replace(/Ń/g, 'N')
+    .replace(/ó/g, 'o').replace(/Ó/g, 'O')
+    .replace(/ś/g, 's').replace(/Ś/g, 'S')
+    .replace(/ź/g, 'z').replace(/Ź/g, 'Z')
+    .replace(/ż/g, 'z').replace(/Ż/g, 'Z')
+}
+
+const fmt = (d) => {
+  if (!d) return ''
+  const [y, m, day] = d.split('-')
+  return `${day}.${m}.${y}`
+}
+
 export default function Settings() {
   const navigate = useNavigate()
   const [settings, setSettings] = useState(() => {
@@ -28,12 +47,10 @@ export default function Settings() {
   const [deleteStep, setDeleteStep] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteError, setDeleteError] = useState('')
-  const [backupItems, setBackupItems] = useState({
-    jumps: true,
-    equipment: true,
-  })
+  const [backupFormat, setBackupFormat] = useState('csv') // 'csv' | 'pdf' | 'email'
   const [backupLoading, setBackupLoading] = useState(false)
   const [backupSent, setBackupSent] = useState(false)
+  const [emailStatus, setEmailStatus] = useState('') // '' | 'sending' | 'sent' | 'error'
 
   const toggle = (key) => {
     setSettings(s => ({ ...s, [key]: !s[key] }))
@@ -71,48 +88,179 @@ export default function Settings() {
     }
   }
 
-  const handleBackupAndDelete = async () => {
+  const fetchJumps = async (userId) => {
+    const { data } = await supabase
+      .from('jumps')
+      .select('*')
+      .eq('user_id', userId)
+      .order('number', { ascending: false }) // od najnowszych
+    return data || []
+  }
+
+  const fetchProfile = async (userId) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('name,surname')
+      .eq('id', userId)
+      .single()
+    return data
+  }
+
+  const downloadCSV = (jumps, profile) => {
+    const name = profile ? `${profile.name || ''} ${profile.surname || ''}`.trim() : ''
+    const today = new Date().toLocaleDateString('pl-PL')
+    const metaRows = [
+      `"Kopia zapasowa JumpLogX"`,
+      `"Skoczek:","${name}"`,
+      `"Data eksportu:","${today}"`,
+      `"Liczba skoków:","${jumps.length}"`,
+      `""`,
+    ]
+    const headers = ['Lp.', 'Nr skoku', 'Data', 'Miejscowosc', 'Spadochron', 'Wysokosc (m)', 'Opoznienie (s)', 'Samolot', 'Typ skoku', 'Wynik', 'Uwagi']
+    const rows = jumps.map((j, i) => [
+      i + 1, j.number, j.jump_date || '',
+      j.city || '', j.parachute || '',
+      j.altitude || '', j.delay || '',
+      j.aircraft || '', j.jump_type || '',
+      j.result || '', j.notes || ''
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+
+    const csv = [...metaRows, headers.join(','), ...rows].join('\n')
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `JumpLogX_kopia_zapasowa_${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const downloadPDF = async (jumps, profile) => {
+    const { default: jsPDF } = await import('jspdf')
+    const { default: autoTable } = await import('jspdf-autotable')
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
+    const name = profile ? pl(`${profile.name || ''} ${profile.surname || ''}`.trim()) : ''
+    const today = new Date().toLocaleDateString('pl-PL')
+
+    // Nagłówek
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(16)
+    doc.text('JumpLogX — Kopia zapasowa', 14, 16)
+
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    let y = 24
+    if (name) { doc.text(pl(`Skoczek: ${name}`), 14, y); y += 6 }
+    doc.text(pl(`Data eksportu: ${today}`), 14, y); y += 6
+    doc.text(pl(`Liczba skokow: ${jumps.length}`), 14, y); y += 6
+
+    autoTable(doc, {
+      startY: y + 4,
+      head: [['Lp.', 'Nr skoku', 'Data', 'Miejscowosc', 'Spadochron', 'Wys. (m)', 'Opoz. (s)', 'Samolot', 'Typ skoku', 'Wynik', 'Uwagi']],
+      body: jumps.map((j, i) => [
+        i + 1, j.number, fmt(j.jump_date),
+        pl(j.city) || '', pl(j.parachute) || '',
+        j.altitude || '', j.delay || '',
+        pl(j.aircraft) || '', pl(j.jump_type) || '',
+        pl(j.result) || '', pl(j.notes) || '',
+      ]),
+      styles: { fontSize: 7, cellPadding: 2, font: 'helvetica' },
+      headStyles: { fillColor: [108, 99, 255], textColor: 255, fontStyle: 'bold', fontSize: 7 },
+      alternateRowStyles: { fillColor: [245, 245, 250] },
+      columnStyles: {
+        0: { cellWidth: 8 }, 1: { cellWidth: 14 }, 2: { cellWidth: 20 },
+        3: { cellWidth: 30 }, 4: { cellWidth: 25 }, 5: { cellWidth: 16 },
+        6: { cellWidth: 16 }, 7: { cellWidth: 25 }, 8: { cellWidth: 22 },
+        9: { cellWidth: 18 }, 10: { cellWidth: 'auto' },
+      },
+      didDrawPage: (data) => {
+        doc.setFontSize(7)
+        doc.setTextColor(150)
+        doc.text(`Strona ${data.pageNumber} | JumpLogX — Kopia zapasowa`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 6, { align: 'center' })
+        doc.setTextColor(0)
+      }
+    })
+
+    doc.save(`JumpLogX_kopia_zapasowa_${new Date().toISOString().split('T')[0]}.pdf`)
+  }
+
+  const sendEmail = async (jumps, profile, userEmail) => {
+    setEmailStatus('sending')
+    const name = profile ? `${profile.name || ''} ${profile.surname || ''}`.trim() : ''
+    const today = new Date().toLocaleDateString('pl-PL')
+
+    const rows = jumps.map((j, i) => `
+      <tr style="background:${i % 2 === 0 ? '#f8f8fc' : '#fff'}">
+        <td style="padding:4px 8px">${i + 1}</td>
+        <td style="padding:4px 8px">${j.number}</td>
+        <td style="padding:4px 8px">${fmt(j.jump_date)}</td>
+        <td style="padding:4px 8px">${j.city || ''}</td>
+        <td style="padding:4px 8px">${j.parachute || ''}</td>
+        <td style="padding:4px 8px">${j.altitude ? j.altitude + ' m' : ''}</td>
+        <td style="padding:4px 8px">${j.delay ? j.delay + ' s' : ''}</td>
+        <td style="padding:4px 8px">${j.aircraft || ''}</td>
+        <td style="padding:4px 8px">${j.jump_type || ''}</td>
+        <td style="padding:4px 8px">${j.result || ''}</td>
+        <td style="padding:4px 8px">${j.notes || ''}</td>
+      </tr>`).join('')
+
+    const html = `
+      <h2 style="font-family:Arial,sans-serif;color:#6C63FF">JumpLogX — Kopia zapasowa</h2>
+      <p style="font-family:Arial,sans-serif;font-size:13px;color:#555">
+        ${name ? `Skoczek: <strong>${name}</strong><br>` : ''}
+        Data eksportu: <strong>${today}</strong><br>
+        Liczba skoków: <strong>${jumps.length}</strong>
+      </p>
+      <table style="border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:11px">
+        <thead>
+          <tr style="background:#6C63FF;color:#fff">
+            <th style="padding:6px 8px;text-align:left">Lp.</th>
+            <th style="padding:6px 8px;text-align:left">Nr</th>
+            <th style="padding:6px 8px;text-align:left">Data</th>
+            <th style="padding:6px 8px;text-align:left">Miejscowość</th>
+            <th style="padding:6px 8px;text-align:left">Spadochron</th>
+            <th style="padding:6px 8px;text-align:left">Wys.</th>
+            <th style="padding:6px 8px;text-align:left">Opóź.</th>
+            <th style="padding:6px 8px;text-align:left">Samolot</th>
+            <th style="padding:6px 8px;text-align:left">Typ</th>
+            <th style="padding:6px 8px;text-align:left">Wynik</th>
+            <th style="padding:6px 8px;text-align:left">Uwagi</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p style="font-family:Arial,sans-serif;font-size:11px;color:#888;margin-top:20px">
+        Wiadomość wysłana automatycznie przez JumpLogX · ${today}
+      </p>
+    `
+
+    // Otwórz klienta email z treścią
+    const subject = encodeURIComponent(`JumpLogX — Kopia zapasowa dziennika skoków (${today})`)
+    const body = encodeURIComponent(`Kopia zapasowa dziennika skoków JumpLogX\nSkoczek: ${name}\nData: ${today}\nLiczba skoków: ${jumps.length}\n\nAby otrzymać pełną kopię w formacie HTML, użyj opcji "Pobierz PDF" lub "Pobierz CSV" w aplikacji JumpLogX.`)
+    window.location.href = `mailto:${userEmail}?subject=${subject}&body=${body}`
+    setEmailStatus('sent')
+  }
+
+  const handleBackup = async () => {
     setBackupLoading(true)
+    setDeleteError('')
     try {
       const { data: { user } } = await supabase.auth.getUser()
+      const [jumps, profile] = await Promise.all([fetchJumps(user.id), fetchProfile(user.id)])
 
-      // Pobierz dane do CSV
-      if (backupItems.jumps) {
-        const { data: jumps } = await supabase.from('jumps').select('*').eq('user_id', user.id).order('number', { ascending: true })
-        if (jumps && jumps.length > 0) {
-          const headers = ['Lp.', 'Nr skoku', 'Data', 'Miejscowosc', 'Spadochron', 'Wysokosc (m)', 'Opoznienie (s)', 'Samolot', 'Typ skoku', 'Wynik', 'Uwagi']
-          const rows = jumps.map((j, i) => [
-            i + 1, j.number, j.jump_date || '',
-            j.city || '', j.parachute || '',
-            j.altitude || '', j.delay || '',
-            j.aircraft || '', j.jump_type || '',
-            j.result || '', j.notes || ''
-          ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
-          const csv = [headers.join(','), ...rows].join('\n')
-          const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = `JumpLogX_skoki_${new Date().toISOString().split('T')[0]}.csv`
-          a.click()
-          URL.revokeObjectURL(url)
-        }
+      if (jumps.length === 0) {
+        setDeleteError('Brak skoków do eksportu.')
+        setBackupLoading(false)
+        return
       }
 
-      if (backupItems.equipment) {
-        const { data: rigs } = await supabase.from('rigs').select('*').eq('user_id', user.id)
-        if (rigs && rigs.length > 0) {
-          const headers = ['Nazwa', 'Data ulozenia', 'Data waznosci']
-          const rows = rigs.map(r => [r.name || '', r.reserve_pack_date || '', r.reserve_expiry || ''].map(v => `"${v}"`).join(','))
-          const csv = [headers.join(','), ...rows].join('\n')
-          const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = `JumpLogX_sprzet_${new Date().toISOString().split('T')[0]}.csv`
-          a.click()
-          URL.revokeObjectURL(url)
-        }
+      if (backupFormat === 'csv') {
+        downloadCSV(jumps, profile)
+      } else if (backupFormat === 'pdf') {
+        await downloadPDF(jumps, profile)
+      } else if (backupFormat === 'email') {
+        await sendEmail(jumps, profile, user.email)
       }
 
       setBackupSent(true)
@@ -129,9 +277,16 @@ export default function Settings() {
     setDeleteError('')
     setBackupSent(false)
     setBackupLoading(false)
+    setEmailStatus('')
   }
 
   const activeCount = Object.values(settings).filter(Boolean).length
+
+  const formatOptions = [
+    { key: 'csv',   icon: '📊', label: 'Pobierz CSV',  desc: 'Plik .csv do Excela lub Numbers' },
+    { key: 'pdf',   icon: '📄', label: 'Pobierz PDF',  desc: 'Gotowy dokument do druku lub archiwum' },
+    { key: 'email', icon: '📧', label: 'Wyślij e-mail', desc: `Wyślij kopię na adres e-mail konta` },
+  ]
 
   return (
     <div>
@@ -155,23 +310,13 @@ export default function Settings() {
                     Zalecamy zrobienie kopii zapasowej. Możesz to zrobić w następnym kroku.
                   </p>
                   <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
-                    <button
-                      className="btn"
-                      onClick={() => setDeleteStep('backup')}
-                      style={{ width:'100%', padding:'0.75rem' }}
-                    >
+                    <button className="btn" onClick={() => setDeleteStep('backup')} style={{ width:'100%', padding:'0.75rem' }}>
                       📦 Utwórz kopię zapasową przed usunięciem
                     </button>
-                    <button
-                      onClick={() => setDeleteStep('final')}
-                      style={{ width:'100%', padding:'0.65rem', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.85rem', cursor:'pointer' }}
-                    >
+                    <button onClick={() => setDeleteStep('final')} style={{ width:'100%', padding:'0.65rem', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.85rem', cursor:'pointer' }}>
                       Usuń bez kopii zapasowej
                     </button>
-                    <button
-                      onClick={closeModal}
-                      style={{ width:'100%', padding:'0.5rem', background:'transparent', border:'none', color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.82rem', cursor:'pointer' }}
-                    >
+                    <button onClick={closeModal} style={{ width:'100%', padding:'0.5rem', background:'transparent', border:'none', color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.82rem', cursor:'pointer' }}>
                       Anuluj
                     </button>
                   </div>
@@ -185,27 +330,24 @@ export default function Settings() {
                   <div style={{ fontFamily:'var(--head)', fontSize:'1.1rem', fontWeight:800, marginBottom:'0.5rem', textAlign:'center' }}>
                     Zanim odejdziesz, zabezpiecz swoje dane
                   </div>
-                  <p style={{ fontSize:'0.82rem', color:'var(--muted)', marginBottom:'1.25rem', textAlign:'center' }}>
-                    Wybierz co chcesz pobrać jako plik .csv
+                  <p style={{ fontSize:'0.82rem', color:'var(--muted)', marginBottom:'1rem', textAlign:'center' }}>
+                    Dziennik skoków zostanie posortowany od najnowszych. Wybierz format:
                   </p>
 
                   <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem', marginBottom:'1.25rem' }}>
-                    {[
-                      { key:'jumps',     label:'Dziennik skoków',         desc:'Historia wszystkich skoków (.csv)', icon:'🪂' },
-                      { key:'equipment', label:'Dane sprzętu',            desc:'Specyfikacja i daty ważności (.csv)', icon:'🎒' },
-                    ].map(item => (
+                    {formatOptions.map(opt => (
                       <div
-                        key={item.key}
-                        onClick={() => setBackupItems(b => ({ ...b, [item.key]: !b[item.key] }))}
-                        style={{ display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.75rem 1rem', background: backupItems[item.key] ? 'rgba(108,99,255,0.08)' : 'var(--bg3)', border:`1px solid ${backupItems[item.key] ? 'rgba(108,99,255,0.35)' : 'var(--border)'}`, borderRadius:'var(--r)', cursor:'pointer' }}
+                        key={opt.key}
+                        onClick={() => setBackupFormat(opt.key)}
+                        style={{ display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.75rem 1rem', background: backupFormat === opt.key ? 'rgba(108,99,255,0.08)' : 'var(--bg3)', border:`1px solid ${backupFormat === opt.key ? 'rgba(108,99,255,0.35)' : 'var(--border)'}`, borderRadius:'var(--r)', cursor:'pointer', transition:'all 0.15s' }}
                       >
-                        <span style={{ fontSize:20 }}>{item.icon}</span>
+                        <span style={{ fontSize:20 }}>{opt.icon}</span>
                         <div style={{ flex:1 }}>
-                          <div style={{ fontSize:'0.88rem', fontWeight:600, color: backupItems[item.key] ? 'var(--text)' : 'var(--muted)' }}>{item.label}</div>
-                          <div style={{ fontSize:'0.72rem', color:'var(--muted)' }}>{item.desc}</div>
+                          <div style={{ fontSize:'0.88rem', fontWeight:600, color: backupFormat === opt.key ? 'var(--text)' : 'var(--muted)' }}>{opt.label}</div>
+                          <div style={{ fontSize:'0.72rem', color:'var(--muted)' }}>{opt.desc}</div>
                         </div>
-                        <div style={{ width:20, height:20, borderRadius:4, border:`2px solid ${backupItems[item.key] ? 'var(--accent)' : 'var(--border2)'}`, background: backupItems[item.key] ? 'var(--accent)' : 'transparent', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                          {backupItems[item.key] && <span style={{ color:'#fff', fontSize:12, lineHeight:1 }}>✓</span>}
+                        <div style={{ width:18, height:18, borderRadius:'50%', border:`2px solid ${backupFormat === opt.key ? 'var(--accent)' : 'var(--border2)'}`, background: backupFormat === opt.key ? 'var(--accent)' : 'transparent', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                          {backupFormat === opt.key && <div style={{ width:8, height:8, borderRadius:'50%', background:'#fff' }} />}
                         </div>
                       </div>
                     ))}
@@ -218,24 +360,13 @@ export default function Settings() {
                   )}
 
                   <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
-                    <button
-                      className="btn"
-                      onClick={handleBackupAndDelete}
-                      disabled={backupLoading || (!backupItems.jumps && !backupItems.equipment)}
-                      style={{ width:'100%', padding:'0.75rem', opacity: (!backupItems.jumps && !backupItems.equipment) ? 0.5 : 1 }}
-                    >
-                      {backupLoading ? '⏳ Pobieranie...' : '⬇️ Pobierz wybrane i przejdź dalej'}
+                    <button className="btn" onClick={handleBackup} disabled={backupLoading} style={{ width:'100%', padding:'0.75rem' }}>
+                      {backupLoading ? '⏳ Przygotowywanie...' : `${formatOptions.find(f => f.key === backupFormat)?.icon} ${formatOptions.find(f => f.key === backupFormat)?.label} i przejdź dalej`}
                     </button>
-                    <button
-                      onClick={() => setDeleteStep('final')}
-                      style={{ width:'100%', padding:'0.65rem', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.85rem', cursor:'pointer' }}
-                    >
+                    <button onClick={() => setDeleteStep('final')} style={{ width:'100%', padding:'0.65rem', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.85rem', cursor:'pointer' }}>
                       Kontynuuj usuwanie bez kopii
                     </button>
-                    <button
-                      onClick={closeModal}
-                      style={{ width:'100%', padding:'0.5rem', background:'transparent', border:'none', color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.82rem', cursor:'pointer' }}
-                    >
+                    <button onClick={closeModal} style={{ width:'100%', padding:'0.5rem', background:'transparent', border:'none', color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.82rem', cursor:'pointer' }}>
                       Anuluj
                     </button>
                   </div>
@@ -251,7 +382,7 @@ export default function Settings() {
                   </div>
                   {backupSent && (
                     <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.65rem', color:'var(--success)', fontSize:'0.82rem', marginBottom:'1rem', textAlign:'center' }}>
-                      ✓ Kopia zapasowa została pobrana
+                      ✓ Kopia zapasowa została {backupFormat === 'email' ? 'wysłana' : 'pobrana'}
                     </div>
                   )}
                   <p style={{ fontSize:'0.88rem', color:'var(--muted)', marginBottom:'1.25rem', textAlign:'center', lineHeight:1.6 }}>
@@ -263,19 +394,10 @@ export default function Settings() {
                     </div>
                   )}
                   <div style={{ display:'flex', gap:'0.75rem' }}>
-                    <button
-                      onClick={closeModal}
-                      style={{ flex:1, padding:'0.65rem', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.85rem', cursor:'pointer' }}
-                      disabled={deleteLoading}
-                    >
+                    <button onClick={closeModal} style={{ flex:1, padding:'0.65rem', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.85rem', cursor:'pointer' }} disabled={deleteLoading}>
                       Anuluj
                     </button>
-                    <button
-                      className="btn danger"
-                      style={{ flex:1 }}
-                      onClick={handleDeleteAccount}
-                      disabled={deleteLoading}
-                    >
+                    <button className="btn danger" style={{ flex:1 }} onClick={handleDeleteAccount} disabled={deleteLoading}>
                       {deleteLoading ? 'Usuwanie...' : 'Tak, usuń konto'}
                     </button>
                   </div>
