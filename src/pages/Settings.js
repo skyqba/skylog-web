@@ -47,10 +47,9 @@ export default function Settings() {
   const [deleteStep, setDeleteStep] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteError, setDeleteError] = useState('')
-  const [backupFormat, setBackupFormat] = useState('csv') // 'csv' | 'pdf' | 'email'
+  const [backupFormat, setBackupFormat] = useState('csv')
   const [backupLoading, setBackupLoading] = useState(false)
   const [backupSent, setBackupSent] = useState(false)
-  const [emailStatus, setEmailStatus] = useState('') // '' | 'sending' | 'sent' | 'error'
 
   const toggle = (key) => {
     setSettings(s => ({ ...s, [key]: !s[key] }))
@@ -93,7 +92,7 @@ export default function Settings() {
       .from('jumps')
       .select('*')
       .eq('user_id', userId)
-      .order('number', { ascending: false }) // od najnowszych
+      .order('number', { ascending: false })
     return data || []
   }
 
@@ -124,7 +123,6 @@ export default function Settings() {
       j.aircraft || '', j.jump_type || '',
       j.result || '', j.notes || ''
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
-
     const csv = [...metaRows, headers.join(','), ...rows].join('\n')
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -138,16 +136,13 @@ export default function Settings() {
   const downloadPDF = async (jumps, profile) => {
     const { default: jsPDF } = await import('jspdf')
     const { default: autoTable } = await import('jspdf-autotable')
-
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
     const name = profile ? pl(`${profile.name || ''} ${profile.surname || ''}`.trim()) : ''
     const today = new Date().toLocaleDateString('pl-PL')
 
-    // Nagłówek
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(16)
     doc.text('JumpLogX — Kopia zapasowa', 14, 16)
-
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
     let y = 24
@@ -181,65 +176,21 @@ export default function Settings() {
         doc.setTextColor(0)
       }
     })
-
     doc.save(`JumpLogX_kopia_zapasowa_${new Date().toISOString().split('T')[0]}.pdf`)
   }
 
-  const sendEmail = async (jumps, profile, userEmail) => {
-    setEmailStatus('sending')
+  const sendEmail = (jumps, profile, userEmail) => {
     const name = profile ? `${profile.name || ''} ${profile.surname || ''}`.trim() : ''
     const today = new Date().toLocaleDateString('pl-PL')
-
-    const rows = jumps.map((j, i) => `
-      <tr style="background:${i % 2 === 0 ? '#f8f8fc' : '#fff'}">
-        <td style="padding:4px 8px">${i + 1}</td>
-        <td style="padding:4px 8px">${j.number}</td>
-        <td style="padding:4px 8px">${fmt(j.jump_date)}</td>
-        <td style="padding:4px 8px">${j.city || ''}</td>
-        <td style="padding:4px 8px">${j.parachute || ''}</td>
-        <td style="padding:4px 8px">${j.altitude ? j.altitude + ' m' : ''}</td>
-        <td style="padding:4px 8px">${j.delay ? j.delay + ' s' : ''}</td>
-        <td style="padding:4px 8px">${j.aircraft || ''}</td>
-        <td style="padding:4px 8px">${j.jump_type || ''}</td>
-        <td style="padding:4px 8px">${j.result || ''}</td>
-        <td style="padding:4px 8px">${j.notes || ''}</td>
-      </tr>`).join('')
-
-    const html = `
-      <h2 style="font-family:Arial,sans-serif;color:#6C63FF">JumpLogX — Kopia zapasowa</h2>
-      <p style="font-family:Arial,sans-serif;font-size:13px;color:#555">
-        ${name ? `Skoczek: <strong>${name}</strong><br>` : ''}
-        Data eksportu: <strong>${today}</strong><br>
-        Liczba skoków: <strong>${jumps.length}</strong>
-      </p>
-      <table style="border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:11px">
-        <thead>
-          <tr style="background:#6C63FF;color:#fff">
-            <th style="padding:6px 8px;text-align:left">Lp.</th>
-            <th style="padding:6px 8px;text-align:left">Nr</th>
-            <th style="padding:6px 8px;text-align:left">Data</th>
-            <th style="padding:6px 8px;text-align:left">Miejscowość</th>
-            <th style="padding:6px 8px;text-align:left">Spadochron</th>
-            <th style="padding:6px 8px;text-align:left">Wys.</th>
-            <th style="padding:6px 8px;text-align:left">Opóź.</th>
-            <th style="padding:6px 8px;text-align:left">Samolot</th>
-            <th style="padding:6px 8px;text-align:left">Typ</th>
-            <th style="padding:6px 8px;text-align:left">Wynik</th>
-            <th style="padding:6px 8px;text-align:left">Uwagi</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-      <p style="font-family:Arial,sans-serif;font-size:11px;color:#888;margin-top:20px">
-        Wiadomość wysłana automatycznie przez JumpLogX · ${today}
-      </p>
-    `
-
-    // Otwórz klienta email z treścią
     const subject = encodeURIComponent(`JumpLogX — Kopia zapasowa dziennika skoków (${today})`)
-    const body = encodeURIComponent(`Kopia zapasowa dziennika skoków JumpLogX\nSkoczek: ${name}\nData: ${today}\nLiczba skoków: ${jumps.length}\n\nAby otrzymać pełną kopię w formacie HTML, użyj opcji "Pobierz PDF" lub "Pobierz CSV" w aplikacji JumpLogX.`)
+    const body = encodeURIComponent(
+      `Kopia zapasowa dziennika skoków JumpLogX\n` +
+      `Skoczek: ${name}\n` +
+      `Data: ${today}\n` +
+      `Liczba skoków: ${jumps.length}\n\n` +
+      `Aby otrzymać pełną kopię w formacie PDF lub CSV, użyj opcji eksportu w aplikacji JumpLogX.`
+    )
     window.location.href = `mailto:${userEmail}?subject=${subject}&body=${body}`
-    setEmailStatus('sent')
   }
 
   const handleBackup = async () => {
@@ -260,7 +211,7 @@ export default function Settings() {
       } else if (backupFormat === 'pdf') {
         await downloadPDF(jumps, profile)
       } else if (backupFormat === 'email') {
-        await sendEmail(jumps, profile, user.email)
+        sendEmail(jumps, profile, user.email)
       }
 
       setBackupSent(true)
@@ -277,15 +228,14 @@ export default function Settings() {
     setDeleteError('')
     setBackupSent(false)
     setBackupLoading(false)
-    setEmailStatus('')
   }
 
   const activeCount = Object.values(settings).filter(Boolean).length
 
   const formatOptions = [
-    { key: 'csv',   icon: '📊', label: 'Pobierz CSV',  desc: 'Plik .csv do Excela lub Numbers' },
-    { key: 'pdf',   icon: '📄', label: 'Pobierz PDF',  desc: 'Gotowy dokument do druku lub archiwum' },
-    { key: 'email', icon: '📧', label: 'Wyślij e-mail', desc: `Wyślij kopię na adres e-mail konta` },
+    { key: 'csv',   icon: '📊', label: 'Pobierz CSV',   desc: 'Plik .csv do Excela lub Numbers' },
+    { key: 'pdf',   icon: '📄', label: 'Pobierz PDF',   desc: 'Gotowy dokument do druku lub archiwum' },
+    { key: 'email', icon: '📧', label: 'Wyślij e-mail', desc: 'Otwórz klienta email z kopią zapasową' },
   ]
 
   return (
@@ -298,13 +248,11 @@ export default function Settings() {
           <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
             <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.75rem', maxWidth:420, width:'100%' }}>
 
-              {/* KROK 1 — potwierdzenie */}
+              {/* KROK 1 */}
               {deleteStep === 'confirm' && (
                 <>
                   <div style={{ fontSize:'2rem', textAlign:'center', marginBottom:'0.75rem' }}>⚠️</div>
-                  <div style={{ fontFamily:'var(--head)', fontSize:'1.15rem', fontWeight:800, marginBottom:'0.75rem', textAlign:'center' }}>
-                    Usunąć konto?
-                  </div>
+                  <div style={{ fontFamily:'var(--head)', fontSize:'1.15rem', fontWeight:800, marginBottom:'0.75rem', textAlign:'center' }}>Usunąć konto?</div>
                   <p style={{ fontSize:'0.88rem', color:'var(--muted)', marginBottom:'1.25rem', textAlign:'center', lineHeight:1.6 }}>
                     Usunięcie konta jest <strong style={{ color:'var(--danger)' }}>nieodwracalne</strong>. Wszystkie Twoje dane — skoki, profil, dokumenty i uprawnienia — zostaną trwale usunięte.<br /><br />
                     Zalecamy zrobienie kopii zapasowej. Możesz to zrobić w następnym kroku.
@@ -323,7 +271,7 @@ export default function Settings() {
                 </>
               )}
 
-              {/* KROK 2 — kopia zapasowa */}
+              {/* KROK 2 */}
               {deleteStep === 'backup' && (
                 <>
                   <div style={{ fontSize:'2rem', textAlign:'center', marginBottom:'0.75rem' }}>📦</div>
@@ -331,9 +279,8 @@ export default function Settings() {
                     Zanim odejdziesz, zabezpiecz swoje dane
                   </div>
                   <p style={{ fontSize:'0.82rem', color:'var(--muted)', marginBottom:'1rem', textAlign:'center' }}>
-                    Dziennik skoków zostanie posortowany od najnowszych. Wybierz format:
+                    Dziennik skoków posortowany od najnowszych. Wybierz format:
                   </p>
-
                   <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem', marginBottom:'1.25rem' }}>
                     {formatOptions.map(opt => (
                       <div
@@ -352,13 +299,11 @@ export default function Settings() {
                       </div>
                     ))}
                   </div>
-
                   {deleteError && (
                     <div style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'var(--r)', padding:'0.65rem', color:'var(--danger)', fontSize:'0.82rem', marginBottom:'1rem' }}>
                       {deleteError}
                     </div>
                   )}
-
                   <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
                     <button className="btn" onClick={handleBackup} disabled={backupLoading} style={{ width:'100%', padding:'0.75rem' }}>
                       {backupLoading ? '⏳ Przygotowywanie...' : `${formatOptions.find(f => f.key === backupFormat)?.icon} ${formatOptions.find(f => f.key === backupFormat)?.label} i przejdź dalej`}
@@ -373,13 +318,11 @@ export default function Settings() {
                 </>
               )}
 
-              {/* KROK 3 — ostateczne potwierdzenie */}
+              {/* KROK 3 */}
               {deleteStep === 'final' && (
                 <>
                   <div style={{ fontSize:'2rem', textAlign:'center', marginBottom:'0.75rem' }}>🗑</div>
-                  <div style={{ fontFamily:'var(--head)', fontSize:'1.1rem', fontWeight:800, marginBottom:'0.75rem', textAlign:'center' }}>
-                    Ostatnia szansa
-                  </div>
+                  <div style={{ fontFamily:'var(--head)', fontSize:'1.1rem', fontWeight:800, marginBottom:'0.75rem', textAlign:'center' }}>Ostatnia szansa</div>
                   {backupSent && (
                     <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.65rem', color:'var(--success)', fontSize:'0.82rem', marginBottom:'1rem', textAlign:'center' }}>
                       ✓ Kopia zapasowa została {backupFormat === 'email' ? 'wysłana' : 'pobrana'}
