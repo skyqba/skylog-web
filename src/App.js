@@ -14,6 +14,7 @@ import Manual         from './pages/Manual'
 import Stats          from './pages/Stats'
 import Qualifications from './pages/Qualifications'
 import Settings       from './pages/Settings'
+import ResetPassword  from './pages/ResetPassword'
 
 function App() {
   const [session, setSession] = useState(undefined)
@@ -55,6 +56,7 @@ function App() {
       <Routes>
         <Route path="/login"          element={!session ? <Login />          : <Navigate to="/" />} />
         <Route path="/register"       element={!session ? <Register />       : <Navigate to="/" />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/"               element={ session  ? <Journal />        : <Navigate to="/login" />} />
         <Route path="/add"            element={ session  ? <AddJump />        : <Navigate to="/login" />} />
         <Route path="/profile"        element={ session  ? <Profile />        : <Navigate to="/login" />} />
