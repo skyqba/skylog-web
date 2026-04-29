@@ -23,11 +23,12 @@ export default function Navbar() {
       <Link to="/manual" style={{ display:'flex', alignItems:'center', gap:'0.5rem', textDecoration:'none' }}>
         <div>
           <span style={{ fontFamily:'var(--head)', fontSize:'1.35rem', fontWeight:900, color:'var(--text)', letterSpacing:'-0.5px' }}>
-            Sky Jump<span style={{ color:'var(--accent2)' }}>Log</span>
+            <span style={{ color:'var(--accent2)' }}>Jump</span>Log<span style={{ color:'var(--accent2)' }}>X</span>
           </span>
           <span style={{ display:'block', fontFamily:'var(--font)', fontSize:'0.62rem', color:'var(--muted)', letterSpacing:'0.5px', marginTop:'-2px' }}>by SkyQba ver 1.0</span>
         </div>
       </Link>
+
       <div style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
         <NavLink to="/"        label="Dziennik" active={pathname === '/'} />
         <NavLink to="/profile" label="Profil"   active={pathname === '/profile'} />

@@ -26,15 +26,15 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const handleOnline = () => {
+    const handleOnline = async () => {
       setOnline(true)
-      syncQueue(supabase)
+      await syncQueue(supabase)
     }
     const handleOffline = () => setOnline(false)
-    window.addEventListener('online', handleOnline)
+    window.addEventListener('online',  handleOnline)
     window.addEventListener('offline', handleOffline)
     return () => {
-      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('online',  handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
   }, [])
@@ -48,7 +48,7 @@ function App() {
   return (
     <BrowserRouter>
       {!online && (
-        <div style={{ background:'#FBBF24', color:'#000', textAlign:'center', padding:'0.4rem', fontSize:'0.82rem', fontWeight:600 }}>
+        <div style={{ background:'#FBBF24', color:'#000', textAlign:'center', padding:'0.4rem', fontSize:'0.82rem', fontWeight:600, position:'sticky', top:0, zIndex:999 }}>
           ⚡ Tryb offline — zmiany zostaną zsynchronizowane po powrocie połączenia
         </div>
       )}
