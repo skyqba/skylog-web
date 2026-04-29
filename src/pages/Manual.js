@@ -1,7 +1,7 @@
 import Navbar from '../components/Navbar'
 
-const Section = ({ title, children }) => (
-  <div style={{ marginBottom: '2rem' }}>
+const Section = ({ id, title, children }) => (
+  <div id={id} style={{ marginBottom: '2rem', scrollMarginTop: '80px' }}>
     <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.15rem', fontWeight: 800, color: 'var(--accent2)', marginBottom: '0.75rem', paddingBottom: '0.4rem', borderBottom: '1px solid var(--border)' }}>{title}</h2>
     {children}
   </div>
@@ -38,7 +38,7 @@ const FieldTable = ({ rows }) => (
   <div style={{ overflowX: 'auto', marginBottom: '0.75rem' }}>
     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
       <thead>
-        <tr style={{ background: 'var(--accent)', }}>
+        <tr style={{ background: 'var(--accent)' }}>
           <th style={{ padding: '0.5rem 0.75rem', textAlign: 'left', color: '#fff', fontFamily: 'var(--head)', fontSize: '0.78rem', width: '35%' }}>Pole</th>
           <th style={{ padding: '0.5rem 0.75rem', textAlign: 'left', color: '#fff', fontFamily: 'var(--head)', fontSize: '0.78rem' }}>Opis</th>
         </tr>
@@ -55,8 +55,23 @@ const FieldTable = ({ rows }) => (
   </div>
 )
 
-export default function Manual() {
+const tocItems = [
+  { label: '1. Czym jest JumpLogX?',                              id: 's1'  },
+  { label: '2. Pierwsze kroki — rejestracja i logowanie',         id: 's2'  },
+  { label: '3. Dziennik skoków',                                  id: 's3'  },
+  { label: '4. Dodawanie nowego skoku',                           id: 's4'  },
+  { label: '5. Edycja zapisanych skoków',                         id: 's5'  },
+  { label: '6. Profil użytkownika i dokumenty',                   id: 's6'  },
+  { label: '7. Eksport skoków — filtrowanie, sortowanie, PDF',    id: 's7'  },
+  { label: '8. Import skoków z pliku',                            id: 's8'  },
+  { label: '9. Statystyki',                                       id: 's9'  },
+  { label: '10. Ustawienia i powiadomienia',                      id: 's10' },
+  { label: '11. Tryb offline',                                    id: 's11' },
+  { label: '12. Bezpieczeństwo i prywatność',                     id: 's12' },
+  { label: '13. Przydatne wskazówki',                             id: 's13' },
+]
 
+export default function Manual() {
   return (
     <div>
       <Navbar />
@@ -65,7 +80,7 @@ export default function Manual() {
         {/* Nagłówek */}
         <div style={{ textAlign: 'center', marginBottom: '2.5rem', padding: '2rem', background: 'var(--bg2)', border: '1px solid var(--border2)', borderRadius: 'var(--r2)', borderTop: '3px solid var(--accent)' }}>
           <div style={{ fontFamily: 'var(--head)', fontSize: '2rem', fontWeight: 900, marginBottom: '0.25rem' }}>
-            Sky Jump<span style={{ color: 'var(--accent2)' }}>Log</span>
+            <span style={{ color: 'var(--accent2)' }}>Jump</span>Log<span style={{ color: 'var(--accent2)' }}>X</span>
           </div>
           <div style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '0.75rem' }}>by SkyQba ver 1.0</div>
           <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.25rem' }}>Instrukcja użytkownika</div>
@@ -75,44 +90,49 @@ export default function Manual() {
         {/* Spis treści */}
         <div className="card" style={{ marginBottom: '2rem' }}>
           <div style={{ fontFamily: 'var(--head)', fontWeight: 800, marginBottom: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.7rem' }}>Spis treści</div>
-          {[
-            '1. Czym jest JumpLog?',
-            '2. Pierwsze kroki — rejestracja i logowanie',
-            '3. Dziennik skoków',
-            '4. Dodawanie nowego skoku',
-            '5. Edycja zapisanych skoków',
-            '6. Profil użytkownika',
-            '7. Eksport skoków do PDF i druku',
-            '8. Import skoków z pliku',
-            '9. Bezpieczeństwo i prywatność',
-            '10. Przydatne wskazówki',
-          ].map((item, i) => (
-            <div key={i} style={{ fontSize: '0.85rem', color: 'var(--accent2)', padding: '0.25rem 0', borderBottom: i < 9 ? '1px solid var(--border)' : 'none' }}>{item}</div>
+          {tocItems.map((item, i) => (
+            <a
+              key={i}
+              href={`#${item.id}`}
+              style={{
+                display: 'block',
+                fontSize: '0.85rem',
+                color: 'var(--accent2)',
+                padding: '0.25rem 0',
+                borderBottom: i < tocItems.length - 1 ? '1px solid var(--border)' : 'none',
+                textDecoration: 'none',
+                transition: 'opacity 0.15s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >
+              {item.label}
+            </a>
           ))}
         </div>
 
         {/* 1 */}
-        <Section title="1. Czym jest JumpLog?">
-          <P>JumpLog to nowoczesna aplikacja webowa stworzona dla skoczków spadochronowych. Umożliwia prowadzenie elektronicznego dziennika skoków, przechowywanie skanów dokumentów, zarządzanie sprzętem i eksport danych do PDF.</P>
-          <P>Aplikacja działa w przeglądarce internetowej na każdym urządzeniu — komputerze, telefonie i tablecie. Dane są przechowywane w chmurze i dostępne z dowolnego miejsca na świecie.</P>
+        <Section id="s1" title="1. Czym jest JumpLogX?">
+          <P>JumpLogX to nowoczesna aplikacja webowa stworzona dla skoczków spadochronowych. Umożliwia prowadzenie elektronicznego dziennika skoków, przechowywanie dokumentów, zarządzanie sprzętem, eksport danych do PDF oraz śledzenie statystyk.</P>
+          <P>Aplikacja działa w przeglądarce internetowej na każdym urządzeniu — komputerze, telefonie i tablecie, zarówno na iOS jak i Android. Dane są przechowywane w chmurze i dostępne z dowolnego miejsca na świecie.</P>
         </Section>
 
         {/* 2 */}
-        <Section title="2. Pierwsze kroki">
+        <Section id="s2" title="2. Pierwsze kroki">
           <Sub title="2.1 Rejestracja">
-            <P>Aby korzystać z JumpLog, musisz założyć bezpłatne konto:</P>
+            <P>Aby korzystać z JumpLogX, musisz założyć bezpłatne konto:</P>
             <Ol items={[
               'Wejdź na adres aplikacji w przeglądarce',
               'Kliknij "Nie masz konta? Zarejestruj się"',
-              'Wpisz imię, nazwisko, adres e-mail i hasło',
-              'Opcjonalnie dodaj zdjęcie profilowe',
-              'Kliknij "Zarejestruj się"',
+              'Wpisz imię, nazwisko, adres e-mail i hasło (min. 6 znaków)',
+              'Opcjonalnie dodaj zdjęcie profilowe (JPG lub PNG)',
+              'Kliknij "Utwórz konto"',
             ]} />
           </Sub>
           <Sub title="2.2 Logowanie">
             <Ol items={[
-              'Wpisz swój adres e-mail',
-              'Wpisz hasło',
+              'Wpisz swój adres e-mail i hasło',
+              'Opcjonalnie zaznacz "Zapamiętaj moje dane" aby nie logować się za każdym razem',
               'Kliknij "Zaloguj się"',
             ]} />
             <P><strong style={{ color: 'var(--text)' }}>Zapomniałeś hasła?</strong> Kliknij "Zapomniałeś hasła?" i wpisz swój e-mail. Otrzymasz link do resetowania hasła.</P>
@@ -120,20 +140,44 @@ export default function Manual() {
         </Section>
 
         {/* 3 */}
-        <Section title="3. Dziennik skoków">
+        <Section id="s3" title="3. Dziennik skoków">
           <P>Dziennik to główna strona aplikacji. Widoczna jest tu lista wszystkich Twoich skoków posortowanych od najwyższego numeru.</P>
-          <Sub title="3.1 Licznik skoków">
-            <P>Na górze strony baner pokazuje Twój najwyższy numer skoku — odpowiadający łącznej liczbie wykonanych skoków.</P>
+          <Sub title="3.1 Licznik skoków i szybkie akcje">
+            <P>Na górze strony baner pokazuje Twój łączny numer skoku. Obok znajdziesz dwa przyciski:</P>
+            <Ul items={[
+              '"⟳ Powtórz ostatni" — dodaje nowy skok z takimi samymi danymi jak poprzedni (ta sama strefa, spadochron, samolot). Tylko data zmienia się na dzisiejszą. Przydatne gdy skaczysz kilka razy dziennie z tymi samymi ustawieniami.',
+              '"+ Dodaj skok" — otwiera formularz nowego skoku',
+            ]} />
           </Sub>
-          <Sub title="3.2 Wyszukiwanie">
-            <P>Pod banerem znajduje się pole wyszukiwania. Możesz szukać po:</P>
-            <Ul items={['Numerze skoku (np. "4235")', 'Dacie (np. "2024" lub "2024-06")', 'Miejscowości (np. "Gliwice")', 'Samolocie (np. "Cessna")', 'Spadochronie (np. "Para Foil")', 'Rodzaju skoku (np. "AFF")', 'Uwagach i wyniku']} />
+          <Sub title="3.2 Panel dokumentów">
+            <P>Pod licznikiem skoków widoczny jest panel "Moje dokumenty" pokazujący status ważności Twoich dokumentów. Kliknij aby rozwinąć listę z datami ważności i kolorowym wskaźnikiem (zielony — ważny, żółty — wygasa wkrótce, czerwony — nieważny).</P>
+          </Sub>
+          <Sub title="3.3 Alerty i powiadomienia">
+            <P>Aplikacja automatycznie wyświetla banery alertów gdy:</P>
+            <Ul items={[
+              'Zbliża się koniec ważności ułożenia spadochronu zapasowego (60 dni)',
+              'Zbliża się koniec ważności ubezpieczenia lub badań lotniczych (60 dni)',
+              'Wygasły uprawnienia lub dokumenty',
+            ]} />
+            <P>Alerty można zamknąć klikając "✕" — znikną do czasu wylogowania. Możesz zarządzać alertami w Ustawieniach.</P>
+          </Sub>
+          <Sub title="3.4 Wyszukiwanie">
+            <P>Pod listą skoków znajduje się pole wyszukiwania. Możesz szukać po:</P>
+            <Ul items={[
+              'Numerze skoku (np. "4235")',
+              'Dacie (np. "2024" lub "2024-06")',
+              'Miejscowości (np. "Krasocin")',
+              'Samolocie (np. "Cessna")',
+              'Spadochronie (np. "Para Foil")',
+              'Rodzaju skoku (np. "ACC")',
+              'Uwagach i wyniku',
+            ]} />
             <P>Kliknij "✕" aby wyczyścić wyszukiwanie.</P>
           </Sub>
         </Section>
 
         {/* 4 */}
-        <Section title="4. Dodawanie nowego skoku">
+        <Section id="s4" title="4. Dodawanie nowego skoku">
           <P>Kliknij przycisk "+ Dodaj skok" na stronie głównej. Formularz zawiera następujące pola:</P>
           <FieldTable rows={[
             ['Numer skoku', 'Wypełnia się automatycznie jako kolejny numer. Możesz go zmienić ręcznie.'],
@@ -151,7 +195,7 @@ export default function Manual() {
         </Section>
 
         {/* 5 */}
-        <Section title="5. Edycja zapisanych skoków">
+        <Section id="s5" title="5. Edycja zapisanych skoków">
           <P>Wejdź do Profilu i kliknij "✏ Edytuj skoki". Możesz:</P>
           <Ul items={[
             'Wyszukać skok po numerze, miejscowości, samolocie lub dacie',
@@ -160,42 +204,77 @@ export default function Manual() {
             'Zapisać zmiany przyciskiem "✓ Zapisz zmiany"',
             'Anulować edycję przyciskiem "Anuluj"',
           ]} />
+          <P>Możesz również usunąć skok klikając "✕" na karcie skoku w dzienniku. Aplikacja poprosi o potwierdzenie przed usunięciem.</P>
         </Section>
 
         {/* 6 */}
-        <Section title="6. Profil użytkownika">
-          <P>W profilu zarządzasz swoimi danymi, dokumentami i sprzętem. Kliknij ikonę osoby w prawym górnym rogu.</P>
-          <Sub title="6.1 Dokumenty spadochronowe">
+        <Section id="s6" title="6. Profil użytkownika i dokumenty">
+          <P>W profilu zarządzasz swoimi danymi osobowymi, dokumentami, uprawnieniami i sprzętem. Kliknij "Profil" w menu nawigacji.</P>
+          <Sub title="6.1 Dane osobowe">
+            <P>Uzupełnij imię, nazwisko, miejscowość, numer licencji i zdjęcie profilowe.</P>
+          </Sub>
+          <Sub title="6.2 Ubezpieczenie i badania lotnicze">
+            <P>Wpisz daty ważności ubezpieczenia i badań lotniczych. Aplikacja wyświetli ostrzeżenie gdy termin będzie się zbliżał (60 dni wcześniej) lub gdy dokument wygaśnie.</P>
+          </Sub>
+          <Sub title="6.3 Sprzęt — spadochron zapasowy">
+            <P>Dodaj swoje zestawy spadochronowe podając nazwę, datę ułożenia zapasowego i datę ważności. Aplikacja ostrzeże Cię 60 dni przed wygaśnięciem ułożenia.</P>
+          </Sub>
+          <Sub title="6.4 Uprawnienia i kwalifikacje">
+            <P>W sekcji Kwalifikacje możesz wpisać:</P>
+            <Ul items={[
+              'Świadectwo kwalifikacji (numer i datę ważności)',
+              'Uprawnienie Tandem',
+              'Uprawnienia instruktorskie INS/SL, INS/AFF, INS/T',
+              'Licencję USPA (klasa i numer)',
+              'Uprawnienia USPA: Coach, Instructor, Examiner, Judge, PRO Rating',
+            ]} />
+          </Sub>
+          <Sub title="6.5 Strefy zrzutu i sprzęt">
+            <P>Dodaj swoje ulubione strefy zrzutu i spadochrony — będą dostępne jako lista rozwijana przy dodawaniu skoku, co przyspiesza wprowadzanie danych.</P>
+          </Sub>
+          <Sub title="6.6 Dokumenty">
             <P>Przechowuj skany dokumentów w aplikacji. Dokumenty są prywatne i dostępne tylko dla Ciebie. Obsługiwane formaty: PDF, JPG, PNG.</P>
-            <P>Zalecane dokumenty:</P>
-            <Ul items={['Licencja skoczka', 'Polisa ubezpieczeniowa', 'Orzeczenie lotniczo-lekarskie', 'Świadectwo ułożenia spadochronu zapasowego']} />
-          </Sub>
-          <Sub title="6.2 Dane osobowe">
-            <P>Uzupełnij imię, nazwisko i miejscowość zamieszkania.</P>
-          </Sub>
-          <Sub title="6.3 Licencja, ubezpieczenie, badania">
-            <P>Wpisz numery i daty ważności. Aplikacja wyświetli ostrzeżenie gdy termin będzie się zbliżał.</P>
-          </Sub>
-          <Sub title="6.4 Spadochron zapasowy">
-            <P>Wpisz nazwę, datę ułożenia i datę ważności. Aplikacja ostrzeże Cię gdy termin będzie bliski.</P>
-          </Sub>
-          <Sub title="6.5 Sprzęt i strefy zrzutu">
-            <P>Dodaj swoje spadochrony i ulubione strefy zrzutu — będą dostępne jako lista przy dodawaniu skoku.</P>
+            <Ul items={[
+              'Licencja skoczka',
+              'Polisa ubezpieczeniowa',
+              'Orzeczenie lotniczo-lekarskie',
+              'Świadectwo ułożenia spadochronu zapasowego',
+            ]} />
           </Sub>
         </Section>
 
         {/* 7 */}
-        <Section title="7. Eksport skoków">
-          <P>Wejdź do Profilu i kliknij "↓ Eksportuj skoki (PDF / Druk)".</P>
-          <Ul items={[
-            'Zaznacz wybrane skoki lub kliknij "Zaznacz wszystkie"',
-            '"📄 Pobierz PDF" — zapisuje plik PDF na urządzeniu (format A4 poziomy)',
-            '"🖨 Drukuj" — otwiera okno drukowania przeglądarki',
-          ]} />
+        <Section id="s7" title="7. Eksport skoków">
+          <P>Wejdź do Profilu i kliknij "↓ Eksportuj skoki". Strona eksportu oferuje zaawansowane możliwości filtrowania i sortowania przed eksportem.</P>
+          <Sub title="7.1 Filtrowanie i sortowanie">
+            <P>Kliknij panel "🔍 Filtrowanie i sortowanie" aby go rozwinąć. Dostępne opcje:</P>
+            <Ul items={[
+              'Sortowanie według: numeru skoku, daty, wysokości lub opóźnienia (kliknij ponownie aby zmienić kierunek ↑↓)',
+              'Filtr daty od/do — wpisz ręcznie w formacie RRRR-MM-DD (np. 2024-06-01)',
+              'Filtr miejscowości — lista rozwijana z Twoich stref zrzutu',
+              'Filtr spadochronu — lista rozwijana z Twojego sprzętu',
+              'Filtr samolotu — lista rozwijana',
+              'Filtr typu skoku — lista rozwijana',
+            ]} />
+            <P>Liczba aktywnych filtrów jest widoczna w nagłówku panelu. Kliknij "✕ Resetuj filtry" aby wyczyścić wszystkie filtry.</P>
+          </Sub>
+          <Sub title="7.2 Zaznaczanie skoków">
+            <Ul items={[
+              '"Zaznacz wszystkie" — zaznacza wszystkie przefiltrowane skoki',
+              'Kliknij na wiersz lub checkbox aby zaznaczyć/odznaczyć pojedynczy skok',
+              'Licznik pokazuje ile skoków jest zaznaczonych z ilu przefiltrowanych',
+            ]} />
+          </Sub>
+          <Sub title="7.3 Eksport do PDF i druku">
+            <Ul items={[
+              '"📄 Pobierz PDF" — zapisuje plik PDF (format A4 poziomy) zawierający: imię i nazwisko skoczka, liczbę skoków, datę wydruku oraz tabelę z kolumnami: Lp., Nr skoku, Data, Miejscowość, Spadochron, Wysokość, Opóźnienie, Samolot, Typ skoku, Uwagi',
+              '"🖨 Drukuj" — otwiera okno drukowania przeglądarki',
+            ]} />
+          </Sub>
         </Section>
 
         {/* 8 */}
-        <Section title="8. Import skoków z pliku">
+        <Section id="s8" title="8. Import skoków z pliku">
           <P>Wejdź do Profilu i kliknij "↑ Importuj skoki z CSV".</P>
           <Sub title="8.1 Przygotowanie pliku">
             <Ul items={[
@@ -214,30 +293,74 @@ export default function Manual() {
         </Section>
 
         {/* 9 */}
-        <Section title="9. Bezpieczeństwo i prywatność">
+        <Section id="s9" title="9. Statystyki">
+          <P>Strona Statystyki pokazuje podsumowanie Twojej działalności skokowej:</P>
+          <Ul items={[
+            'Łączna liczba skoków',
+            'Podział skoków według typu (ACC, AFF, Tandem, FF itd.)',
+            'Najczęściej używane strefy zrzutu i samoloty',
+            'Aktywność skokowa w czasie — wykresy miesięczne i roczne',
+            'Najczęściej używany sprzęt',
+          ]} />
+        </Section>
+
+        {/* 10 */}
+        <Section id="s10" title="10. Ustawienia i powiadomienia">
+          <P>W Ustawieniach możesz włączyć lub wyłączyć powiadomienia dla:</P>
+          <Ul items={[
+            'Ułożenia zapasowego',
+            'Ubezpieczenia',
+            'Badań lotniczych',
+            'Świadectwa kwalifikacji',
+            'Uprawnienia Tandem',
+            'Uprawnień instruktorskich INS',
+          ]} />
+          <P>Domyślnie wszystkie alerty są włączone. Wyłączone alerty nie będą wyświetlane na stronie głównej.</P>
+        </Section>
+
+        {/* 11 */}
+        <Section id="s11" title="11. Tryb offline">
+          <P>JumpLogX działa również bez połączenia z internetem:</P>
+          <Ul items={[
+            'Przy braku połączenia aplikacja wyświetla dane z ostatniej synchronizacji',
+            'Informacja "⚡ Tryb offline" pojawia się na górze strony',
+            'Po powrocie do sieci dane są automatycznie synchronizowane',
+            'Operacje wykonane offline są kolejkowane i wysyłane po przywróceniu połączenia',
+          ]} />
+        </Section>
+
+        {/* 12 */}
+        <Section id="s12" title="12. Bezpieczeństwo i prywatność">
           <Ul items={[
             'Wszystkie dane są szyfrowane i przechowywane w chmurze',
             'Dokumenty są prywatne — dostępne tylko po zalogowaniu na Twoje konto',
             'Hasło jest szyfrowane i nieznane nikomu',
             'Możesz zresetować hasło w każdej chwili przez e-mail',
-            'Dane innych użytkowników są dla Ciebie niedostępne',
+            'Dane innych użytkowników są dla Ciebie całkowicie niedostępne',
+            'Opcja "Zapamiętaj moje dane" przechowuje dane logowania lokalnie na urządzeniu',
           ]} />
         </Section>
 
-        {/* 10 */}
-        <Section title="10. Przydatne wskazówki">
+        {/* 13 */}
+        <Section id="s13" title="13. Przydatne wskazówki">
           <Ul items={[
-            'Dodaj JumpLog do Docku lub ekranu głównego telefonu aby mieć szybki dostęp',
+            'Dodaj JumpLogX do ekranu głównego telefonu aby mieć szybki dostęp jak do aplikacji natywnej',
             'Uzupełnij profil przed pierwszym skokiem — strefy zrzutu i sprzęt przyspieszą dodawanie skoków',
+            'Użyj "⟳ Powtórz ostatni" gdy skaczysz kilka razy dziennie z tymi samymi ustawieniami',
             'Skanuj dokumenty na bieżąco i przechowuj je w aplikacji jako backup',
-            'Użyj wyszukiwarki aby szybko znaleźć skoki z konkretnej strefy lub na określonym samolocie',
+            'Użyj filtrów w eksporcie aby wyeksportować tylko skoki z wybranego roku lub na konkretnym sprzęcie',
             'Eksportuj PDF co sezon jako kopię zapasową dziennika',
+            'Kolumny w tabeli eksportu są klikalne — kliknij nagłówek aby posortować',
+            'Na telefonie użyj menu hamburgera (☰) aby przejść między sekcjami aplikacji',
           ]} />
         </Section>
 
         {/* Stopka */}
         <div style={{ textAlign: 'center', padding: '1.5rem', borderTop: '1px solid var(--border)', marginTop: '1rem' }}>
-          <div style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800, color: 'var(--accent)', marginBottom: '0.25rem' }}>Sky JumpLog by SkyQba</div>
+          <div style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 900, marginBottom: '0.25rem' }}>
+            <span style={{ color: 'var(--accent2)' }}>Jump</span>Log<span style={{ color: 'var(--accent2)' }}>X</span>
+            <span style={{ color: 'var(--muted)', fontWeight: 400, fontSize: '0.82rem' }}> by SkyQba</span>
+          </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Elektroniczny Dziennik Skoków Spadochronowych · ver 1.0</div>
         </div>
 
