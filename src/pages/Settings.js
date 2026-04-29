@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 
 const ALERT_KEYS = [
@@ -23,6 +24,9 @@ export default function Settings() {
     } catch { return DEFAULT_SETTINGS }
   })
   const [saved, setSaved] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   const toggle = (key) => {
     setSettings(s => ({ ...s, [key]: !s[key] }))
@@ -41,12 +45,72 @@ export default function Settings() {
     setSaved(false)
   }
 
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true)
+    setDeleteError('')
+    try {
+      const { error } = await supabase.rpc('delete_user')
+      if (error) {
+        setDeleteError('Błąd usuwania konta: ' + error.message)
+        setDeleteLoading(false)
+        return
+      }
+      await supabase.auth.signOut()
+      localStorage.clear()
+      navigate('/login')
+    } catch (e) {
+      setDeleteError('Wystąpił błąd. Spróbuj ponownie.')
+      setDeleteLoading(false)
+    }
+  }
+
   const activeCount = Object.values(settings).filter(Boolean).length
 
   return (
     <div>
       <Navbar />
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '1.5rem 1rem' }}>
+
+        {/* Modal potwierdzenia usunięcia konta */}
+        {showDeleteConfirm && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
+            <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.5rem', maxWidth:380, width:'100%' }}>
+              <div style={{ fontSize:'2rem', textAlign:'center', marginBottom:'0.75rem' }}>⚠️</div>
+              <div style={{ fontFamily:'var(--head)', fontSize:'1.1rem', fontWeight:800, marginBottom:'0.75rem', textAlign:'center' }}>
+                Usunąć konto?
+              </div>
+              <p style={{ fontSize:'0.88rem', color:'var(--muted)', marginBottom:'0.5rem', textAlign:'center' }}>
+                Ta operacja jest <strong style={{ color:'var(--danger)' }}>nieodwracalna</strong>.
+              </p>
+              <p style={{ fontSize:'0.88rem', color:'var(--muted)', marginBottom:'1.25rem', textAlign:'center' }}>
+                Wszystkie Twoje dane zostaną trwale usunięte — skoki, profil, dokumenty, uprawnienia.
+              </p>
+              {deleteError && (
+                <div style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'var(--r)', padding:'0.65rem', color:'var(--danger)', fontSize:'0.82rem', marginBottom:'1rem' }}>
+                  {deleteError}
+                </div>
+              )}
+              <div style={{ display:'flex', gap:'0.75rem' }}>
+                <button
+                  className="btn ghost"
+                  style={{ flex:1 }}
+                  onClick={() => { setShowDeleteConfirm(false); setDeleteError('') }}
+                  disabled={deleteLoading}
+                >
+                  Anuluj
+                </button>
+                <button
+                  className="btn danger"
+                  style={{ flex:1 }}
+                  onClick={handleDeleteAccount}
+                  disabled={deleteLoading}
+                >
+                  {deleteLoading ? 'Usuwanie...' : 'Tak, usuń konto'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
           <button onClick={() => navigate('/profile')} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', padding: '0.4rem 0.75rem', cursor: 'pointer', fontFamily: 'var(--font)', fontSize: '0.82rem' }}>Wróć</button>
@@ -104,9 +168,27 @@ export default function Settings() {
           </div>
         </div>
 
-        <button onClick={save} className="btn" style={{ width: '100%', fontSize: '0.95rem', padding: '0.75rem' }}>
+        <button onClick={save} className="btn" style={{ width: '100%', fontSize: '0.95rem', padding: '0.75rem', marginBottom: '1rem' }}>
           {saved ? 'Zapisano!' : 'Zapisz ustawienia'}
         </button>
+
+        {/* Strefa niebezpieczna */}
+        <div style={{ background:'rgba(248,113,113,0.05)', border:'1px solid rgba(248,113,113,0.25)', borderRadius:'var(--r2)', padding:'1.25rem' }}>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color:'var(--danger)', marginBottom:'0.5rem' }}>
+            Strefa niebezpieczna
+          </h3>
+          <p style={{ fontSize:'0.82rem', color:'var(--muted)', marginBottom:'1rem' }}>
+            Usunięcie konta jest nieodwracalne. Wszystkie Twoje dane — skoki, profil, dokumenty i uprawnienia — zostaną trwale usunięte.
+          </p>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            style={{ background:'transparent', border:'1px solid var(--danger)', borderRadius:8, color:'var(--danger)', padding:'0.55rem 1.25rem', fontFamily:'var(--font)', fontSize:'0.88rem', cursor:'pointer', fontWeight:600, transition:'all 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(248,113,113,0.1)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+          >
+            🗑 Usuń konto
+          </button>
+        </div>
 
       </div>
     </div>
