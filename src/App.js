@@ -20,6 +20,14 @@ function App() {
   const [session, setSession] = useState(undefined)
   const [online, setOnline]   = useState(navigator.onLine)
 
+  // Obsługa Supabase hash redirect dla resetowania hasła
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash && hash.includes('type=recovery')) {
+      window.location.replace('/reset-password' + hash)
+    }
+  }, [])
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
