@@ -180,17 +180,25 @@ export default function Settings() {
   }
 
   const sendEmail = (jumps, profile, userEmail) => {
+    // Krok 1: pobierz CSV automatycznie
+    downloadCSV(jumps, profile)
+
+    // Krok 2: po chwili otwórz klienta email z gotową wiadomością
     const name = profile ? `${profile.name || ''} ${profile.surname || ''}`.trim() : ''
     const today = new Date().toLocaleDateString('pl-PL')
+    const fileName = `JumpLogX_kopia_zapasowa_${new Date().toISOString().split('T')[0]}.csv`
     const subject = encodeURIComponent(`JumpLogX — Kopia zapasowa dziennika skoków (${today})`)
     const body = encodeURIComponent(
       `Kopia zapasowa dziennika skoków JumpLogX\n` +
       `Skoczek: ${name}\n` +
       `Data: ${today}\n` +
       `Liczba skoków: ${jumps.length}\n\n` +
-      `Aby otrzymać pełną kopię w formacie PDF lub CSV, użyj opcji eksportu w aplikacji JumpLogX.`
+      `Plik CSV "${fileName}" został automatycznie pobrany na Twoje urządzenie.\n` +
+      `Załącz go do tej wiadomości przed wysłaniem.`
     )
-    window.location.href = `mailto:${userEmail}?subject=${subject}&body=${body}`
+    setTimeout(() => {
+      window.location.href = `mailto:${userEmail}?subject=${subject}&body=${body}`
+    }, 1500)
   }
 
   const handleBackup = async () => {
@@ -235,7 +243,7 @@ export default function Settings() {
   const formatOptions = [
     { key: 'csv',   icon: '📊', label: 'Pobierz CSV',   desc: 'Plik .csv do Excela lub Numbers' },
     { key: 'pdf',   icon: '📄', label: 'Pobierz PDF',   desc: 'Gotowy dokument do druku lub archiwum' },
-    { key: 'email', icon: '📧', label: 'Wyślij e-mail', desc: 'Otwórz klienta email z kopią zapasową' },
+    { key: 'email', icon: '📧', label: 'Wyślij e-mail', desc: 'Pobiera CSV i otwiera klienta email z gotową wiadomością do załączenia' },
   ]
 
   return (
@@ -325,7 +333,7 @@ export default function Settings() {
                   <div style={{ fontFamily:'var(--head)', fontSize:'1.1rem', fontWeight:800, marginBottom:'0.75rem', textAlign:'center' }}>Ostatnia szansa</div>
                   {backupSent && (
                     <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.65rem', color:'var(--success)', fontSize:'0.82rem', marginBottom:'1rem', textAlign:'center' }}>
-                      ✓ Kopia zapasowa została {backupFormat === 'email' ? 'wysłana' : 'pobrana'}
+                      ✓ Kopia zapasowa została {backupFormat === 'email' ? 'pobrana — załącz plik do emaila' : 'pobrana'}
                     </div>
                   )}
                   <p style={{ fontSize:'0.88rem', color:'var(--muted)', marginBottom:'1.25rem', textAlign:'center', lineHeight:1.6 }}>
