@@ -194,7 +194,7 @@ export default function Journal() {
   const AlertBanner = ({ expired, color, title, subtitle, linkTo, onDismiss }) => (
     <div style={{ display:'flex', alignItems:'center', gap:'1rem', padding:'1rem 1.25rem', borderRadius:'var(--r2)', marginBottom:'1rem', background: expired ? 'rgba(248,113,113,0.12)' : 'rgba(251,191,36,0.08)', border:`2px solid ${expired ? 'rgba(248,113,113,0.6)' : 'rgba(251,191,36,0.5)'}` }}>
       <div style={{ fontSize:28, flexShrink:0 }}>{expired ? '🚨' : '⚠️'}</div>
-      <div style={{ flex:1 }}>
+      <div style={{ flex:1, minWidth:0 }}>
         <div style={{ fontFamily:'var(--head)', fontSize:'0.95rem', fontWeight:800, color, marginBottom:2 }}>{title}</div>
         <div style={{ fontSize:'0.82rem', color, opacity:0.9 }}>{subtitle}</div>
       </div>
@@ -333,22 +333,25 @@ export default function Journal() {
           </div>
         )}
 
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.25rem 1.5rem', marginBottom:'1.5rem', borderTop:'2px solid rgba(108,99,255,0.5)' }}>
-          <div>
-            <div style={{ fontFamily:'var(--mono)', fontSize:'0.65rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:4 }}>Łączna liczba skoków</div>
+        {/* === KAFELEK ZE SKOKAMI I PRZYCISKAMI — POPRAWIONY DLA MOBILE === */}
+        <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.25rem 1.5rem', marginBottom:'1.5rem', borderTop:'2px solid rgba(108,99,255,0.5)' }}>
+          <div style={{ fontFamily:'var(--mono)', fontSize:'0.65rem', color:'var(--muted)', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:8 }}>
+            Łączna liczba skoków
+          </div>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'1rem', flexWrap:'wrap' }}>
             <div style={{ fontFamily:'var(--head)', fontSize:'3rem', fontWeight:900, letterSpacing:'-2px', lineHeight:1, color:'var(--text)' }}>
               {loading ? '—' : (jumps.length > 0 ? Math.max(...jumps.map(j => j.number || 0)) : 0)}
             </div>
-          </div>
-          <div style={{ display:'flex', flexDirection:'row', gap:'0.5rem', alignItems:'center' }}>
-            {jumps.length > 0 && (
-              <button className="btn ghost small" onClick={repeatLastJump} disabled={repeating} title="Dodaj skok z tymi samymi danymi co poprzedni">
-                {repeating ? '...' : '⟳ Powtórz ostatni'}
-              </button>
-            )}
-            <Link to="/add" style={{ textDecoration:'none' }}>
-              <button className="btn small">+ Dodaj skok</button>
-            </Link>
+            <div style={{ display:'flex', flexDirection:'row', gap:'0.5rem', alignItems:'center', flexShrink:0 }}>
+              {jumps.length > 0 && (
+                <button className="btn ghost small" onClick={repeatLastJump} disabled={repeating} title="Dodaj skok z tymi samymi danymi co poprzedni">
+                  {repeating ? '...' : '⟳ Powtórz ostatni'}
+                </button>
+              )}
+              <Link to="/add" style={{ textDecoration:'none' }}>
+                <button className="btn small">+ Dodaj skok</button>
+              </Link>
+            </div>
           </div>
         </div>
 
