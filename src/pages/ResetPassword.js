@@ -12,12 +12,21 @@ export default function ResetPassword() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Supabase automatycznie obsługuje token z URL i tworzy sesję
+    // Metoda 1: sprawdź czy sesja już istnieje (Supabase ustawił ją z hash)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setReady(true)
+        return
+      }
+    })
+
+    // Metoda 2: nasłuchuj na event PASSWORD_RECOVERY
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
+      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
         setReady(true)
       }
     })
+
     return () => subscription.unsubscribe()
   }, [])
 
@@ -38,6 +47,7 @@ export default function ResetPassword() {
       setError(error.message)
     } else {
       setSuccess(true)
+      await supabase.auth.signOut()
       setTimeout(() => navigate('/login'), 3000)
     }
     setLoading(false)
@@ -72,9 +82,18 @@ export default function ResetPassword() {
               ✓ Hasło zostało zmienione! Za chwilę zostaniesz przekierowany do logowania...
             </div>
           ) : !ready ? (
-            <div style={{ textAlign:'center', padding:'1rem', color:'var(--muted)', fontSize:'0.88rem' }}>
-              <div style={{ marginBottom:'0.75rem', fontSize:'1.5rem' }}>⏳</div>
-              Weryfikacja linku resetującego...
+            <div style={{ textAlign:'center', padding:'2rem 1rem' }}>
+              <div style={{ fontSize:'1.5rem', marginBottom:'0.75rem' }}>⏳</div>
+              <div style={{ color:'var(--muted)', fontSize:'0.88rem', marginBottom:'1.5rem' }}>
+                Weryfikacja linku resetującego...
+              </div>
+              {/* Przycisk awaryjny po 3 sekundach */}
+              <button
+                onClick={() => setReady(true)}
+                style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 0.9rem', fontFamily:'var(--font)', fontSize:'0.82rem', cursor:'pointer' }}
+              >
+                Kliknij tutaj jeśli strona się nie załadowała
+              </button>
             </div>
           ) : (
             <>
