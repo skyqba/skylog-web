@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 
 const ALERT_KEYS = [
   { key: 'alert_rigs',      label: 'Sprzet - ulozenie zapasowego',  icon: '🪂', desc: 'Alert gdy konczy sie waznosc ulozenia spadochronu zapasowego' },
@@ -135,7 +133,11 @@ export default function Settings() {
     URL.revokeObjectURL(url)
   }
 
-  const downloadPDF = (jumps, profile) => {
+  const downloadPDF = async (jumps, profile) => {
+    // Dynamiczny import — ładuje jsPDF tylko gdy potrzebny (oszczędza 29MB przy starcie)
+    const { default: jsPDF } = await import('jspdf')
+    const { default: autoTable } = await import('jspdf-autotable')
+
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
     const name = profile ? pl(`${profile.name || ''} ${profile.surname || ''}`.trim()) : ''
     const today = new Date().toLocaleDateString('pl-PL')
@@ -179,12 +181,10 @@ export default function Settings() {
     doc.save(`JumpLogX_kopia_zapasowa_${new Date().toISOString().split('T')[0]}.pdf`)
   }
 
-  const sendEmail = (jumps, profile, userEmail) => {
-    // Pobierz oba pliki
+  const sendEmail = async (jumps, profile, userEmail) => {
     downloadCSV(jumps, profile)
-    downloadPDF(jumps, profile)
+    await downloadPDF(jumps, profile)
 
-    // Otwórz klienta email z gotową wiadomością
     const name = profile ? `${profile.name || ''} ${profile.surname || ''}`.trim() : ''
     const today = new Date().toLocaleDateString('pl-PL')
     const fileDate = new Date().toISOString().split('T')[0]
@@ -220,9 +220,9 @@ export default function Settings() {
       if (backupFormat === 'csv') {
         downloadCSV(jumps, profile)
       } else if (backupFormat === 'pdf') {
-        downloadPDF(jumps, profile)
+        await downloadPDF(jumps, profile)
       } else if (backupFormat === 'email') {
-        sendEmail(jumps, profile, user.email)
+        await sendEmail(jumps, profile, user.email)
       }
 
       setBackupSent(true)
