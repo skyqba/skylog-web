@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 
 export default function Import() {
+  const { t } = useTranslation()
   const [step, setStep]         = useState('upload')
   const [rows, setRows]         = useState([])
   const [imported, setImported] = useState(0)
@@ -24,7 +26,6 @@ export default function Import() {
   }
 
   const detectFormat = (lines) => {
-    // Szukamy wiersza nagłówkowego
     for (let i = 0; i < Math.min(5, lines.length); i++) {
       const cols = lines[i]
       const joined = cols.join('').toLowerCase()
@@ -36,7 +37,6 @@ export default function Import() {
   }
 
   const detectColumns = (headers) => {
-    // Mapuj nagłówki na indeksy kolumn
     const map = {}
     headers.forEach((h, i) => {
       const lower = h.trim().toLowerCase()
@@ -56,17 +56,12 @@ export default function Import() {
     const allLines = text.split('\n').map(l => l.split('\t'))
     const { headerRow, format } = detectFormat(allLines)
     const colMap = typeof format === 'object' ? format : null
-
     const result = []
-
     for (let i = headerRow + 1; i < allLines.length; i++) {
       const cols = allLines[i]
       if (!cols || cols.every(c => !c.trim())) continue
-
       let num, city, date, chute, alt, delay, plane, notes
-
       if (colMap && Object.keys(colMap).length > 0) {
-        // Format z nagłówkami - używamy mapy kolumn
         num   = parseInt(cols[colMap.num])   || null
         city  = cols[colMap.city]?.trim()    || ''
         date  = parseDate(cols[colMap.date])
@@ -76,38 +71,21 @@ export default function Import() {
         plane = cols[colMap.plane]?.trim()   || ''
         notes = cols[colMap.notes]?.trim()   || ''
       } else {
-        // Fallback - próbuj oba formaty
-        // Format A: puste · numer · miejscowość · data · spadochron · wysokość · opóźnienie · samolot · uwagi
-        // Format B: lp · imię · miejscowość · data · skok_wojsk · numer · typ · nr · wysokość · opóźnienie · samolot · uwagi
         const isFormatB = cols.length > 9 && parseInt(cols[5]) > 0
-
         if (isFormatB) {
-          num   = parseInt(cols[5])   || null
-          city  = cols[2]?.trim()     || ''
-          date  = parseDate(cols[3])
-          chute = cols[6]?.trim()     || ''
-          alt   = parseInt(cols[8])   || null
-          delay = parseInt(cols[9])   || null
-          plane = cols[10]?.trim()    || ''
-          notes = cols[11]?.trim()    || ''
+          num = parseInt(cols[5]) || null; city = cols[2]?.trim() || ''; date = parseDate(cols[3])
+          chute = cols[6]?.trim() || ''; alt = parseInt(cols[8]) || null; delay = parseInt(cols[9]) || null
+          plane = cols[10]?.trim() || ''; notes = cols[11]?.trim() || ''
         } else {
-          num   = parseInt(cols[1])   || null
-          city  = cols[2]?.trim()     || ''
-          date  = parseDate(cols[3])
-          chute = cols[4]?.trim()     || ''
-          alt   = parseInt(cols[5])   || null
-          delay = parseInt(cols[6])   || null
-          plane = cols[7]?.trim()     || ''
-          notes = cols[8]?.trim()     || ''
+          num = parseInt(cols[1]) || null; city = cols[2]?.trim() || ''; date = parseDate(cols[3])
+          chute = cols[4]?.trim() || ''; alt = parseInt(cols[5]) || null; delay = parseInt(cols[6]) || null
+          plane = cols[7]?.trim() || ''; notes = cols[8]?.trim() || ''
         }
       }
-
       if (!num || num < 1) continue
       if (!date && !city && !chute && !plane) continue
-
       result.push({ num, city, date, chute, alt, delay, plane, notes })
     }
-
     return result
   }
 
@@ -135,8 +113,6 @@ export default function Import() {
     const { data: { user } } = await supabase.auth.getUser()
     let ok = 0, skip = 0
     const errs = []
-
-    // Importuj partiami po 50 skoków
     const batchSize = 50
     for (let b = 0; b < rows.length; b += batchSize) {
       const batch = rows.slice(b, b + batchSize).map(row => ({
@@ -150,18 +126,12 @@ export default function Import() {
         aircraft:  row.plane  || null,
         notes:     row.notes  || null,
       }))
-
       const { error } = await supabase.from('jumps').insert(batch)
-      if (error) {
-        skip += batch.length
-        errs.push(`Partia ${b}-${b+batchSize}: ${error.message}`)
-      } else {
-        ok += batch.length
-      }
+      if (error) { skip += batch.length; errs.push(`Partia ${b}-${b+batchSize}: ${error.message}`) }
+      else { ok += batch.length }
       setImported(ok)
       setSkipped(skip)
     }
-
     setErrors(errs)
     setStep('done')
   }
@@ -171,57 +141,44 @@ export default function Import() {
       <Navbar />
       <div style={{ maxWidth: 660, margin: '0 auto', padding: '1.5rem 1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-          <button onClick={() => navigate('/profile')} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', padding: '0.4rem 0.75rem', cursor: 'pointer', fontFamily: 'var(--font)', fontSize: '0.82rem' }}>← Wróć</button>
-          <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800 }}>Import skoków z pliku</h2>
+          <button onClick={() => navigate('/profile')} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', padding: '0.4rem 0.75rem', cursor: 'pointer', fontFamily: 'var(--font)', fontSize: '0.82rem' }}>{t('import.back')}</button>
+          <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800 }}>{t('import.title')}</h2>
         </div>
 
-        {/* UPLOAD */}
         {step === 'upload' && (
           <div className="card">
-            <h3 style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800, marginBottom: '0.5rem' }}>Wybierz plik</h3>
-            <p style={{ color: 'var(--muted)', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
-              Obsługiwane formaty pliku z książki skoków eksportowanego z Excela jako TSV (tabulatory).<br />
-              Automatycznie wykrywa format kolumn.
-            </p>
-
+            <h3 style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800, marginBottom: '0.5rem' }}>{t('import.select_file')}</h3>
+            <p style={{ color: 'var(--muted)', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>{t('import.desc')}</p>
             <div
               onDragOver={e => { e.preventDefault(); setDragOver(true) }}
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               onClick={() => document.getElementById('csv-file').click()}
-              style={{
-                border: `2px dashed ${dragOver ? 'var(--accent)' : 'var(--border2)'}`,
-                borderRadius: 'var(--r2)', padding: '3rem 1rem', textAlign: 'center',
-                cursor: 'pointer', background: dragOver ? 'rgba(108,99,255,0.08)' : 'var(--bg3)',
-                transition: 'all 0.2s',
-              }}
+              style={{ border: `2px dashed ${dragOver ? 'var(--accent)' : 'var(--border2)'}`, borderRadius: 'var(--r2)', padding: '3rem 1rem', textAlign: 'center', cursor: 'pointer', background: dragOver ? 'rgba(108,99,255,0.08)' : 'var(--bg3)', transition: 'all 0.2s' }}
             >
               <div style={{ fontSize: 36, marginBottom: '0.75rem', opacity: 0.5 }}>📂</div>
-              <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Kliknij lub przeciągnij plik</div>
-              <div style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>.txt · .tsv · .csv (format tabulatorowy z Excela)</div>
+              <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{t('import.drop_title')}</div>
+              <div style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>{t('import.drop_hint')}</div>
             </div>
             <input id="csv-file" type="file" accept=".csv,.tsv,.txt" onChange={e => handleFile(e.target.files[0])} style={{ display: 'none' }} />
-
             <div style={{ marginTop: '1.5rem', background: 'var(--bg3)', borderRadius: 'var(--r)', padding: '1rem', fontSize: '0.82rem', color: 'var(--muted)', lineHeight: 1.7 }}>
-              <strong style={{ color: 'var(--text)', display: 'block', marginBottom: '0.35rem' }}>Jak wyeksportować z Excela:</strong>
-              Plik → Zapisz jako → Inne formaty → Typ pliku: <strong style={{ color: 'var(--accent2)' }}>Tekst (rozdzielany tabulatorami) (*.txt)</strong>
+              <strong style={{ color: 'var(--text)', display: 'block', marginBottom: '0.35rem' }}>{t('import.excel_hint')}</strong>
+              {t('import.excel_steps')}
             </div>
           </div>
         )}
 
-        {/* PODGLĄD */}
         {step === 'preview' && (
           <div>
             <div style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 'var(--r)', padding: '0.85rem 1rem', marginBottom: '1rem', fontSize: '0.9rem', color: 'var(--success)', fontWeight: 600 }}>
-              ✓ Znaleziono {rows.length} skoków gotowych do importu
+              ✓ {t('import.found', { count: rows.length })}
             </div>
-
             <div className="card" style={{ marginBottom: '1rem', padding: '0' }}>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                      {['#', 'Data', 'Miejscowość', 'Spadochron', 'Wys.', 'Opoź.', 'Samolot'].map(h => (
+                      {[t('import.col_number'), t('import.col_date'), t('import.col_city'), t('import.col_parachute'), t('import.col_altitude'), t('import.col_delay'), t('import.col_aircraft')].map(h => (
                         <th key={h} style={{ padding: '0.75rem', textAlign: 'left', fontFamily: 'var(--mono)', fontSize: '0.65rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, whiteSpace: 'nowrap', background: 'var(--bg3)' }}>{h}</th>
                       ))}
                     </tr>
@@ -230,7 +187,7 @@ export default function Import() {
                     {rows.slice(0, 8).map((r, i) => (
                       <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
                         <td style={{ padding: '0.6rem 0.75rem', fontFamily: 'var(--mono)', color: 'var(--accent2)', fontWeight: 600 }}>{r.num}</td>
-                        <td style={{ padding: '0.6rem 0.75rem', whiteSpace: 'nowrap', color: r.date ? 'var(--text)' : 'var(--danger)' }}>{r.date || 'brak daty'}</td>
+                        <td style={{ padding: '0.6rem 0.75rem', whiteSpace: 'nowrap', color: r.date ? 'var(--text)' : 'var(--danger)' }}>{r.date || t('import.no_date')}</td>
                         <td style={{ padding: '0.6rem 0.75rem', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.city || '—'}</td>
                         <td style={{ padding: '0.6rem 0.75rem', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.chute || '—'}</td>
                         <td style={{ padding: '0.6rem 0.75rem', whiteSpace: 'nowrap' }}>{r.alt ? `${r.alt}m` : '—'}</td>
@@ -242,51 +199,46 @@ export default function Import() {
                 </table>
                 {rows.length > 8 && (
                   <div style={{ textAlign: 'center', padding: '0.75rem', color: 'var(--muted)', fontSize: '0.82rem', borderTop: '1px solid var(--border)' }}>
-                    ... i {rows.length - 8} więcej skoków
+                    {t('import.more_jumps', { count: rows.length - 8 })}
                   </div>
                 )}
               </div>
             </div>
-
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button className="btn ghost" onClick={() => { setStep('upload'); setRows([]) }}>← Wróć</button>
-              <button className="btn" onClick={doImport}>Importuj wszystkie {rows.length} skoków →</button>
+              <button className="btn ghost" onClick={() => { setStep('upload'); setRows([]) }}>{t('import.back_btn')}</button>
+              <button className="btn" onClick={doImport}>{t('import.import_btn', { count: rows.length })}</button>
             </div>
           </div>
         )}
 
-        {/* IMPORTOWANIE */}
         {step === 'importing' && (
           <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
             <div style={{ fontSize: 40, marginBottom: '1rem' }}>⏳</div>
-            <div style={{ fontFamily: 'var(--head)', fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem' }}>Importowanie...</div>
-            <div style={{ color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>{imported} z {rows.length} skoków</div>
+            <div style={{ fontFamily: 'var(--head)', fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem' }}>{t('import.importing')}</div>
+            <div style={{ color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>{t('import.importing_progress', { imported, total: rows.length })}</div>
             <div style={{ background: 'var(--bg3)', borderRadius: 8, height: 8, overflow: 'hidden' }}>
               <div style={{ height: '100%', background: 'var(--accent)', width: `${rows.length ? (imported / rows.length) * 100 : 0}%`, transition: 'width 0.3s', borderRadius: 8 }} />
             </div>
           </div>
         )}
 
-        {/* GOTOWE */}
         {step === 'done' && (
           <div>
             <div style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 'var(--r2)', padding: '1.5rem', marginBottom: '1rem', textAlign: 'center' }}>
               <div style={{ fontSize: 40, marginBottom: '0.75rem' }}>✅</div>
-              <div style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800, color: 'var(--success)', marginBottom: '0.5rem' }}>Import zakończony!</div>
+              <div style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800, color: 'var(--success)', marginBottom: '0.5rem' }}>{t('import.done_title')}</div>
               <div style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>
-                <span style={{ color: 'var(--success)', fontWeight: 600 }}>{imported} skoków zaimportowano</span>
-                {skipped > 0 && <span style={{ color: 'var(--danger)' }}> · {skipped} błędów</span>}
+                <span style={{ color: 'var(--success)', fontWeight: 600 }}>{t('import.done_imported', { count: imported })}</span>
+                {skipped > 0 && <span style={{ color: 'var(--danger)' }}> · {t('import.done_errors', { count: skipped })}</span>}
               </div>
             </div>
-
             {errors.length > 0 && (
               <div className="card" style={{ marginBottom: '1rem', background: 'rgba(248,113,113,0.05)', border: '1px solid rgba(248,113,113,0.2)' }}>
-                <div style={{ fontFamily: 'var(--mono)', fontSize: '0.72rem', color: 'var(--danger)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: 1 }}>Błędy</div>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: '0.72rem', color: 'var(--danger)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: 1 }}>{t('import.errors_title')}</div>
                 {errors.map((e, i) => <div key={i} style={{ fontSize: '0.8rem', color: 'var(--danger)', marginBottom: '0.25rem' }}>{e}</div>)}
               </div>
             )}
-
-            <button className="btn" onClick={() => navigate('/')}>Przejdź do dziennika →</button>
+            <button className="btn" onClick={() => navigate('/')}>{t('import.go_to_journal')} →</button>
           </div>
         )}
       </div>

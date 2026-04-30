@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 
@@ -10,6 +11,7 @@ const JUMP_TYPES = [
 ]
 
 export default function EditJumps() {
+  const { t } = useTranslation()
   const [jumps, setJumps]         = useState([])
   const [loading, setLoading]     = useState(true)
   const [editId, setEditId]       = useState(null)
@@ -53,7 +55,7 @@ export default function EditJumps() {
 
   const deleteSelected = async () => {
     if (selected.size === 0) return
-    if (!window.confirm(`Czy na pewno chcesz usunąć ${selected.size} skok(ów)? Tej operacji nie można cofnąć.`)) return
+    if (!window.confirm(t('edit_jumps.confirm_delete', { count: selected.size }))) return
     setDeleting(true)
     const ids = Array.from(selected)
     const { error } = await supabase.from('jumps').delete().in('id', ids)
@@ -122,23 +124,22 @@ export default function EditJumps() {
       <Navbar />
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '1.5rem 1rem' }}>
 
-        {/* Nagłówek */}
         <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', marginBottom:'1.5rem' }}>
-          <button onClick={() => navigate('/profile')} style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 0.75rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.82rem' }}>← Wróć</button>
-          <h2 style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>Edytuj skoki</h2>
+          <button onClick={() => navigate('/profile')} style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 0.75rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.82rem' }}>
+            {t('edit_jumps.back')}
+          </button>
+          <h2 style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>{t('edit_jumps.title')}</h2>
         </div>
 
-        {/* Wyszukiwarka */}
         <div className="form-group" style={{ marginBottom:'1rem' }}>
           <input
             className="input"
-            placeholder="Szukaj po numerze, miejscowości, samolocie, spadochronie..."
+            placeholder={t('edit_jumps.search_placeholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
 
-        {/* Pasek zaznaczania i usuwania */}
         {!loading && filtered.length > 0 && (
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r)', padding:'0.65rem 1rem', marginBottom:'1rem' }}>
             <label style={{ display:'flex', alignItems:'center', gap:'0.5rem', cursor:'pointer', fontSize:'0.88rem', fontWeight:500 }}>
@@ -148,9 +149,11 @@ export default function EditJumps() {
                 onChange={toggleAll}
                 style={{ width:15, height:15, accentColor:'var(--accent)', cursor:'pointer' }}
               />
-              Zaznacz wszystkie
+              {t('edit_jumps.select_all')}
               {selected.size > 0 && (
-                <span style={{ fontFamily:'var(--mono)', fontSize:'0.72rem', color:'var(--muted)' }}>({selected.size} zaznaczonych)</span>
+                <span style={{ fontFamily:'var(--mono)', fontSize:'0.72rem', color:'var(--muted)' }}>
+                  {t('edit_jumps.selected', { count: selected.size })}
+                </span>
               )}
             </label>
             {selected.size > 0 && (
@@ -159,22 +162,21 @@ export default function EditJumps() {
                 disabled={deleting}
                 style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.4)', borderRadius:7, color:'var(--danger)', cursor:'pointer', fontSize:'0.82rem', fontWeight:600, padding:'0.35rem 0.85rem', fontFamily:'var(--font)' }}
               >
-                {deleting ? 'Usuwanie...' : `Usuń (${selected.size})`}
+                {deleting ? t('edit_jumps.deleting') : t('edit_jumps.delete_selected', { count: selected.size })}
               </button>
             )}
           </div>
         )}
 
-        {loading && <p style={{ color:'var(--muted)', textAlign:'center', padding:'3rem' }}>Ładowanie...</p>}
+        {loading && <p style={{ color:'var(--muted)', textAlign:'center', padding:'3rem' }}>{t('edit_jumps.loading')}</p>}
 
         {!loading && filtered.length === 0 && (
-          <p style={{ color:'var(--muted)', textAlign:'center', padding:'2rem' }}>Brak skoków spełniających kryteria.</p>
+          <p style={{ color:'var(--muted)', textAlign:'center', padding:'2rem' }}>{t('edit_jumps.no_results')}</p>
         )}
 
         {filtered.map(jump => (
           <div key={jump.id} style={{ background:'var(--bg2)', border:`1px solid ${editId === jump.id ? 'var(--accent)' : 'var(--border2)'}`, borderRadius:'var(--r2)', marginBottom:'0.75rem', overflow:'hidden', transition:'border 0.2s' }}>
 
-            {/* Wiersz skoku */}
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 1.1rem', cursor: editId === jump.id ? 'default' : 'pointer' }}
               onClick={() => editId !== jump.id && startEdit(jump)}>
               <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
@@ -195,91 +197,91 @@ export default function EditJumps() {
               </div>
               <div style={{ display:'flex', gap:'0.5rem' }}>
                 {editId === jump.id ? (
-                  <span style={{ fontSize:'0.78rem', color:'var(--accent2)', fontWeight:600 }}>✏ Edytujesz</span>
+                  <span style={{ fontSize:'0.78rem', color:'var(--accent2)', fontWeight:600 }}>✏ {t('edit_jumps.editing')}</span>
                 ) : (
-                  <button onClick={e => { e.stopPropagation(); startEdit(jump) }} style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--muted)', cursor:'pointer', fontSize:'0.78rem', padding:'0.3rem 0.7rem', fontFamily:'var(--font)', transition:'all 0.2s' }}
+                  <button onClick={e => { e.stopPropagation(); startEdit(jump) }}
+                    style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--muted)', cursor:'pointer', fontSize:'0.78rem', padding:'0.3rem 0.7rem', fontFamily:'var(--font)', transition:'all 0.2s' }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor='var(--accent)'; e.currentTarget.style.color='var(--accent2)' }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border2)'; e.currentTarget.style.color='var(--muted)' }}>
-                    ✏ Edytuj
+                    ✏ {t('edit_jumps.edit_btn')}
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Formularz edycji */}
             {editId === jump.id && (
               <div style={{ borderTop:'1px solid var(--border)', padding:'1.1rem', background:'var(--bg3)' }}>
                 <div className="form-row" style={{ marginBottom:'0.75rem' }}>
                   <div className="form-group" style={{ marginBottom:0 }}>
-                    <label className="label">Numer skoku</label>
+                    <label className="label">{t('edit_jumps.jump_number')}</label>
                     <input className="input" type="number" value={editForm.number} onChange={set('number')} />
                   </div>
                   <div className="form-group" style={{ marginBottom:0 }}>
-                    <label className="label">Data skoku</label>
+                    <label className="label">{t('edit_jumps.jump_date')}</label>
                     <input className="input" type="date" value={editForm.jump_date} onChange={set('jump_date')} />
                   </div>
                 </div>
 
                 <div className="form-group" style={{ marginBottom:'0.75rem' }}>
-                  <label className="label">Miejscowość / Strefa zrzutu</label>
+                  <label className="label">{t('edit_jumps.city')}</label>
                   {dropzones.length > 0 && (
                     <select className="input" value={editForm.city} onChange={set('city')} style={{ marginBottom:'0.4rem' }}>
-                      <option value="">— wybierz strefę —</option>
+                      <option value="">{t('edit_jumps.city_select')}</option>
                       {dropzones.map(dz => <option key={dz.id} value={dz.name}>{dz.name}</option>)}
                     </select>
                   )}
-                  <input className="input" placeholder="lub wpisz ręcznie..." value={editForm.city} onChange={set('city')} />
+                  <input className="input" placeholder={t('edit_jumps.city_manual')} value={editForm.city} onChange={set('city')} />
                 </div>
 
                 <div className="form-group" style={{ marginBottom:'0.75rem' }}>
-                  <label className="label">Spadochron główny</label>
+                  <label className="label">{t('edit_jumps.parachute')}</label>
                   {equipment.length > 0 && (
                     <select className="input" value={editForm.parachute} onChange={set('parachute')} style={{ marginBottom:'0.4rem' }}>
-                      <option value="">— wybierz —</option>
+                      <option value="">{t('edit_jumps.parachute_select')}</option>
                       {equipment.map(eq => <option key={eq.id} value={eq.name}>{eq.name}</option>)}
                     </select>
                   )}
-                  <input className="input" placeholder="lub wpisz..." value={editForm.parachute} onChange={set('parachute')} />
+                  <input className="input" placeholder={t('edit_jumps.parachute_manual')} value={editForm.parachute} onChange={set('parachute')} />
                 </div>
 
                 <div className="form-group" style={{ marginBottom:'0.75rem' }}>
-                  <label className="label">Rodzaj skoku</label>
+                  <label className="label">{t('edit_jumps.jump_type')}</label>
                   <select className="input" value={editForm.jump_type} onChange={set('jump_type')}>
-                    <option value="">— wybierz rodzaj —</option>
-                    {JUMP_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                    <option value="">{t('edit_jumps.jump_type_select')}</option>
+                    {JUMP_TYPES.map(jt => <option key={jt} value={jt}>{jt}</option>)}
                   </select>
                 </div>
 
                 <div className="form-row" style={{ marginBottom:'0.75rem' }}>
                   <div className="form-group" style={{ marginBottom:0 }}>
-                    <label className="label">Wysokość (m)</label>
+                    <label className="label">{t('edit_jumps.altitude')}</label>
                     <input className="input" type="number" value={editForm.altitude} onChange={set('altitude')} placeholder="4000" />
                   </div>
                   <div className="form-group" style={{ marginBottom:0 }}>
-                    <label className="label">Opóźnienie (s)</label>
+                    <label className="label">{t('edit_jumps.delay')}</label>
                     <input className="input" type="number" value={editForm.delay} onChange={set('delay')} placeholder="60" />
                   </div>
                 </div>
 
                 <div className="form-group" style={{ marginBottom:'0.75rem' }}>
-                  <label className="label">Samolot</label>
+                  <label className="label">{t('edit_jumps.aircraft')}</label>
                   <input className="input" value={editForm.aircraft} onChange={set('aircraft')} placeholder="np. Cessna 182" />
                 </div>
 
                 <div className="form-group" style={{ marginBottom:'0.75rem' }}>
-                  <label className="label">Wynik</label>
-                  <input className="input" value={editForm.result} onChange={set('result')} placeholder="np. 0.05, 1 miejsce, zaliczony..." />
+                  <label className="label">{t('edit_jumps.result')}</label>
+                  <input className="input" value={editForm.result} onChange={set('result')} placeholder={t('edit_jumps.result_placeholder')} />
                 </div>
 
                 <div className="form-group" style={{ marginBottom:'0.75rem' }}>
-                  <label className="label">Uwagi</label>
-                  <textarea className="input" value={editForm.notes} onChange={set('notes')} rows={2} style={{ resize:'vertical', fontFamily:'var(--font)' }} placeholder="Uwagi..." />
+                  <label className="label">{t('edit_jumps.notes')}</label>
+                  <textarea className="input" value={editForm.notes} onChange={set('notes')} rows={2} style={{ resize:'vertical', fontFamily:'var(--font)' }} placeholder={t('edit_jumps.notes_placeholder')} />
                 </div>
 
                 <div style={{ display:'flex', gap:'0.75rem' }}>
-                  <button onClick={cancelEdit} className="btn ghost" style={{ flex:1 }}>Anuluj</button>
+                  <button onClick={cancelEdit} className="btn ghost" style={{ flex:1 }}>{t('edit_jumps.cancel')}</button>
                   <button onClick={saveEdit} disabled={saving} className="btn" style={{ flex:1 }}>
-                    {saving ? 'Zapisywanie...' : '✓ Zapisz zmiany'}
+                    {saving ? t('edit_jumps.saving') : t('edit_jumps.save')}
                   </button>
                 </div>
               </div>
