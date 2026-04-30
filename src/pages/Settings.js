@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
+import i18n from '../i18n'
 
 const ALERT_KEYS = [
   { key: 'alert_rigs',      label: 'Sprzet - ulozenie zapasowego',  icon: '🪂', desc: 'Alert gdy konczy sie waznosc ulozenia spadochronu zapasowego' },
@@ -15,7 +17,7 @@ const ALERT_KEYS = [
 
 const DEFAULT_SETTINGS = Object.fromEntries(ALERT_KEYS.map(a => [a.key, true]))
 
-const pl = (str) => {
+const plChar = (str) => {
   if (!str) return ''
   return String(str)
     .replace(/ą/g, 'a').replace(/Ą/g, 'A')
@@ -37,6 +39,9 @@ const fmt = (d) => {
 
 export default function Settings() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
+  const [currentLang, setCurrentLang] = useState(i18n.language?.startsWith('en') ? 'en' : 'pl')
+
   const [settings, setSettings] = useState(() => {
     try {
       const saved = localStorage.getItem('alertSettings')
@@ -50,6 +55,12 @@ export default function Settings() {
   const [backupFormat, setBackupFormat] = useState('csv')
   const [backupLoading, setBackupLoading] = useState(false)
   const [backupSent, setBackupSent] = useState(false)
+
+  const changeLanguage = (lang) => {
+    i18n.changeLanguage(lang)
+    setCurrentLang(lang)
+    localStorage.setItem('jumplogx_language', lang)
+  }
 
   const toggle = (key) => {
     setSettings(s => ({ ...s, [key]: !s[key] }))
@@ -134,12 +145,10 @@ export default function Settings() {
   }
 
   const downloadPDF = async (jumps, profile) => {
-    // Dynamiczny import — ładuje jsPDF tylko gdy potrzebny (oszczędza 29MB przy starcie)
     const { default: jsPDF } = await import('jspdf')
     const { default: autoTable } = await import('jspdf-autotable')
-
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
-    const name = profile ? pl(`${profile.name || ''} ${profile.surname || ''}`.trim()) : ''
+    const name = profile ? plChar(`${profile.name || ''} ${profile.surname || ''}`.trim()) : ''
     const today = new Date().toLocaleDateString('pl-PL')
 
     doc.setFont('helvetica', 'bold')
@@ -148,19 +157,19 @@ export default function Settings() {
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
     let y = 24
-    if (name) { doc.text(pl(`Skoczek: ${name}`), 14, y); y += 6 }
-    doc.text(pl(`Data eksportu: ${today}`), 14, y); y += 6
-    doc.text(pl(`Liczba skokow: ${jumps.length}`), 14, y); y += 6
+    if (name) { doc.text(plChar(`Skoczek: ${name}`), 14, y); y += 6 }
+    doc.text(plChar(`Data eksportu: ${today}`), 14, y); y += 6
+    doc.text(plChar(`Liczba skokow: ${jumps.length}`), 14, y); y += 6
 
     autoTable(doc, {
       startY: y + 4,
       head: [['Lp.', 'Nr skoku', 'Data', 'Miejscowosc', 'Spadochron', 'Wys. (m)', 'Opoz. (s)', 'Samolot', 'Typ skoku', 'Wynik', 'Uwagi']],
       body: jumps.map((j, i) => [
         i + 1, j.number, fmt(j.jump_date),
-        pl(j.city) || '', pl(j.parachute) || '',
+        plChar(j.city) || '', plChar(j.parachute) || '',
         j.altitude || '', j.delay || '',
-        pl(j.aircraft) || '', pl(j.jump_type) || '',
-        pl(j.result) || '', pl(j.notes) || '',
+        plChar(j.aircraft) || '', plChar(j.jump_type) || '',
+        plChar(j.result) || '', plChar(j.notes) || '',
       ]),
       styles: { fontSize: 7, cellPadding: 2, font: 'helvetica' },
       headStyles: { fillColor: [108, 99, 255], textColor: 255, fontStyle: 'bold', fontSize: 7 },
@@ -184,7 +193,6 @@ export default function Settings() {
   const sendEmail = async (jumps, profile, userEmail) => {
     downloadCSV(jumps, profile)
     await downloadPDF(jumps, profile)
-
     const name = profile ? `${profile.name || ''} ${profile.surname || ''}`.trim() : ''
     const today = new Date().toLocaleDateString('pl-PL')
     const fileDate = new Date().toISOString().split('T')[0]
@@ -210,13 +218,11 @@ export default function Settings() {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       const [jumps, profile] = await Promise.all([fetchJumps(user.id), fetchProfile(user.id)])
-
       if (jumps.length === 0) {
         setDeleteError('Brak skoków do eksportu.')
         setBackupLoading(false)
         return
       }
-
       if (backupFormat === 'csv') {
         downloadCSV(jumps, profile)
       } else if (backupFormat === 'pdf') {
@@ -224,7 +230,6 @@ export default function Settings() {
       } else if (backupFormat === 'email') {
         await sendEmail(jumps, profile, user.email)
       }
-
       setBackupSent(true)
       setBackupLoading(false)
       setDeleteStep('final')
@@ -259,7 +264,6 @@ export default function Settings() {
           <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
             <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.75rem', maxWidth:420, width:'100%' }}>
 
-              {/* KROK 1 */}
               {deleteStep === 'confirm' && (
                 <>
                   <div style={{ fontSize:'2rem', textAlign:'center', marginBottom:'0.75rem' }}>⚠️</div>
@@ -276,13 +280,12 @@ export default function Settings() {
                       Usuń bez kopii zapasowej
                     </button>
                     <button onClick={closeModal} style={{ width:'100%', padding:'0.5rem', background:'transparent', border:'none', color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.82rem', cursor:'pointer' }}>
-                      Anuluj
+                      {t('common.cancel')}
                     </button>
                   </div>
                 </>
               )}
 
-              {/* KROK 2 */}
               {deleteStep === 'backup' && (
                 <>
                   <div style={{ fontSize:'2rem', textAlign:'center', marginBottom:'0.75rem' }}>📦</div>
@@ -294,9 +297,7 @@ export default function Settings() {
                   </p>
                   <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem', marginBottom:'1.25rem' }}>
                     {formatOptions.map(opt => (
-                      <div
-                        key={opt.key}
-                        onClick={() => setBackupFormat(opt.key)}
+                      <div key={opt.key} onClick={() => setBackupFormat(opt.key)}
                         style={{ display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.75rem 1rem', background: backupFormat === opt.key ? 'rgba(108,99,255,0.08)' : 'var(--bg3)', border:`1px solid ${backupFormat === opt.key ? 'rgba(108,99,255,0.35)' : 'var(--border)'}`, borderRadius:'var(--r)', cursor:'pointer', transition:'all 0.15s' }}
                       >
                         <span style={{ fontSize:20 }}>{opt.icon}</span>
@@ -323,13 +324,12 @@ export default function Settings() {
                       Kontynuuj usuwanie bez kopii
                     </button>
                     <button onClick={closeModal} style={{ width:'100%', padding:'0.5rem', background:'transparent', border:'none', color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.82rem', cursor:'pointer' }}>
-                      Anuluj
+                      {t('common.cancel')}
                     </button>
                   </div>
                 </>
               )}
 
-              {/* KROK 3 */}
               {deleteStep === 'final' && (
                 <>
                   <div style={{ fontSize:'2rem', textAlign:'center', marginBottom:'0.75rem' }}>🗑</div>
@@ -349,7 +349,7 @@ export default function Settings() {
                   )}
                   <div style={{ display:'flex', gap:'0.75rem' }}>
                     <button onClick={closeModal} style={{ flex:1, padding:'0.65rem', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.85rem', cursor:'pointer' }} disabled={deleteLoading}>
-                      Anuluj
+                      {t('common.cancel')}
                     </button>
                     <button className="btn danger" style={{ flex:1 }} onClick={handleDeleteAccount} disabled={deleteLoading}>
                       {deleteLoading ? 'Usuwanie...' : 'Tak, usuń konto'}
@@ -364,27 +364,65 @@ export default function Settings() {
 
         {/* ===== NAGŁÓWEK ===== */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-          <button onClick={() => navigate('/profile')} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', padding: '0.4rem 0.75rem', cursor: 'pointer', fontFamily: 'var(--font)', fontSize: '0.82rem' }}>Wróć</button>
-          <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800 }}>Ustawienia</h2>
+          <button onClick={() => navigate('/profile')} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', padding: '0.4rem 0.75rem', cursor: 'pointer', fontFamily: 'var(--font)', fontSize: '0.82rem' }}>
+            {t('settings.back')}
+          </button>
+          <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800 }}>{t('settings.title')}</h2>
+        </div>
+
+        {/* ===== JĘZYK ===== */}
+        <div className="card" style={{ marginBottom: '1rem' }}>
+          <h3 style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800, marginBottom: '0.25rem' }}>
+            {t('settings.language')}
+          </h3>
+          <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1rem' }}>
+            {t('settings.language_desc')}
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            {[
+              { code: 'pl', label: '🇵🇱 Polski' },
+              { code: 'en', label: '🇬🇧 English' },
+            ].map(lang => (
+              <button
+                key={lang.code}
+                onClick={() => changeLanguage(lang.code)}
+                style={{
+                  flex: 1,
+                  padding: '0.65rem',
+                  background: currentLang === lang.code ? 'rgba(108,99,255,0.15)' : 'var(--bg3)',
+                  border: `1px solid ${currentLang === lang.code ? 'var(--accent)' : 'var(--border)'}`,
+                  borderRadius: 8,
+                  color: currentLang === lang.code ? 'var(--accent2)' : 'var(--muted)',
+                  fontFamily: 'var(--font)',
+                  fontSize: '0.88rem',
+                  fontWeight: currentLang === lang.code ? 600 : 400,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {lang.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ===== ALERTY ===== */}
         <div className="card" style={{ marginBottom: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-            <h3 style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800 }}>Powiadomienia i alerty</h3>
+            <h3 style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800 }}>{t('settings.notifications')}</h3>
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.7rem', color: 'var(--muted)', background: 'var(--bg3)', borderRadius: 20, padding: '0.15rem 0.6rem', border: '1px solid var(--border)' }}>
               {activeCount} / {ALERT_KEYS.length}
             </span>
           </div>
           <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.25rem' }}>
-            Zarządzaj alertami widocznymi na stronie głównej dziennika
+            {t('settings.manage_alerts')}
           </p>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
             <button onClick={() => resetAll(true)} style={{ flex: 1, padding: '0.4rem', background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--accent2)', fontFamily: 'var(--font)', fontSize: '0.78rem', cursor: 'pointer' }}>
-              Włącz wszystkie
+              {t('settings.enable_all')}
             </button>
             <button onClick={() => resetAll(false)} style={{ flex: 1, padding: '0.4rem', background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', fontFamily: 'var(--font)', fontSize: '0.78rem', cursor: 'pointer' }}>
-              Wyłącz wszystkie
+              {t('settings.disable_all')}
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -410,26 +448,26 @@ export default function Settings() {
 
         {/* ===== PRÓG OSTRZEŻEŃ ===== */}
         <div className="card" style={{ marginBottom: '1.5rem' }}>
-          <h3 style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800, marginBottom: '0.5rem' }}>Próg ostrzeżeń</h3>
+          <h3 style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 800, marginBottom: '0.5rem' }}>{t('settings.threshold')}</h3>
           <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '0.75rem' }}>
-            Alerty pojawiają się gdy do wygaśnięcia pozostało mniej niż 60 dni.
+            {t('settings.threshold_desc')}
           </p>
           <div style={{ background: 'var(--bg3)', borderRadius: 'var(--r)', padding: '0.75rem 1rem', border: '1px solid var(--border)', fontSize: '0.82rem', color: 'var(--muted)' }}>
-            Możliwość zmiany progu będzie dostępna w przyszłej wersji.
+            {t('settings.threshold_future')}
           </div>
         </div>
 
         <button onClick={save} className="btn" style={{ width: '100%', fontSize: '0.95rem', padding: '0.75rem', marginBottom: '1rem' }}>
-          {saved ? 'Zapisano!' : 'Zapisz ustawienia'}
+          {saved ? t('settings.saved') : t('settings.save')}
         </button>
 
         {/* ===== STREFA NIEBEZPIECZNA ===== */}
         <div style={{ background:'rgba(248,113,113,0.05)', border:'1px solid rgba(248,113,113,0.25)', borderRadius:'var(--r2)', padding:'1.25rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color:'var(--danger)', marginBottom:'0.5rem' }}>
-            Strefa niebezpieczna
+            {t('settings.danger_zone')}
           </h3>
           <p style={{ fontSize:'0.82rem', color:'var(--muted)', marginBottom:'1rem', lineHeight:1.6 }}>
-            Usunięcie konta jest nieodwracalne. Wszystkie Twoje dane — skoki, profil, dokumenty i uprawnienia — zostaną trwale usunięte. Zalecamy zrobienie kopii zapasowej — możesz to zrobić w następnym kroku.
+            {t('settings.danger_desc')}
           </p>
           <button
             onClick={() => setDeleteStep('confirm')}
@@ -437,7 +475,7 @@ export default function Settings() {
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(248,113,113,0.1)' }}
             onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
           >
-            🗑 Usuń konto
+            {t('settings.delete_account')}
           </button>
         </div>
 
