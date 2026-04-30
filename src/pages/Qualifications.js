@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 
@@ -7,6 +8,7 @@ const CERT_CLASSES = ['PJ B', 'PJ C', 'PJ D']
 const USPA_CLASSES = ['A', 'B', 'C', 'D']
 
 export default function Qualifications() {
+  const { t } = useTranslation()
   const [data, setData]     = useState(null)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg]       = useState('')
@@ -79,22 +81,22 @@ export default function Qualifications() {
 
   const statusText = (days) => {
     if (days === null) return ''
-    if (days < 0)   return `Wygasło ${Math.abs(days)} dni temu`
-    if (days <= 30) return `Wygasa za ${days} dni`
-    return `Ważne jeszcze ${days} dni`
+    if (days < 0)   return t('qualifications.expired_ago', { days: Math.abs(days) })
+    if (days <= 30) return t('qualifications.expires_in', { days })
+    return t('qualifications.valid_days', { days })
   }
 
   const expiryAlert = (date, label) => {
     const days = daysUntil(date)
     if (days === null) return null
-    if (days < 0)   return { color:'var(--danger)', label:`${label} — wygasło ${Math.abs(days)} dni temu!` }
-    if (days <= 30) return { color:'#FBBF24',       label:`${label} — wygasa za ${days} dni` }
+    if (days < 0)   return { color:'var(--danger)', label:`${label} — ${t('qualifications.expired_ago', { days: Math.abs(days) })}` }
+    if (days <= 30) return { color:'#FBBF24',       label:`${label} — ${t('qualifications.expires_in', { days })}` }
     return null
   }
 
   const alerts = [
-    expiryAlert(certExpiry,   'Świadectwo kwalifikacji'),
-    expiryAlert(tandemExpiry, 'Uprawnienie Tandem'),
+    expiryAlert(certExpiry,   t('qualifications.cert_title')),
+    expiryAlert(tandemExpiry, t('qualifications.tandem')),
     expiryAlert(insSlExpiry,  'INS/SL'),
     expiryAlert(insAffExpiry, 'INS/AFF'),
     expiryAlert(insTExpiry,   'INS/T'),
@@ -137,7 +139,7 @@ export default function Qualifications() {
       await supabase.from('qualifications').insert(payload)
       setData(payload)
     }
-    setMsg('Zapisano!')
+    setMsg(t('qualifications.saved'))
     setTimeout(() => setMsg(''), 2500)
     setSaving(false)
   }
@@ -174,8 +176,10 @@ export default function Qualifications() {
       <div style={{ maxWidth:520, margin:'0 auto', padding:'1.5rem 1rem' }}>
 
         <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', marginBottom:'1.5rem' }}>
-          <button onClick={() => navigate('/profile')} style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 0.75rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.82rem' }}>← Wróć</button>
-          <h2 style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>Moje uprawnienia</h2>
+          <button onClick={() => navigate('/profile')} style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 0.75rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.82rem' }}>
+            {t('qualifications.back')}
+          </button>
+          <h2 style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>{t('qualifications.title')}</h2>
         </div>
 
         {alerts.map((a, i) => (
@@ -187,64 +191,64 @@ export default function Qualifications() {
 
         {/* Świadectwo kwalifikacji */}
         <div className="card" style={{ marginBottom:'1rem' }}>
-          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Świadectwo kwalifikacji</h3>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>{t('qualifications.cert_title')}</h3>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
             <div className="form-group">
-              <label className="label">Numer świadectwa</label>
+              <label className="label">{t('qualifications.cert_number')}</label>
               <input className="input" placeholder="np. 1234/2024" value={certNumber} onChange={e => setCertNumber(e.target.value)} />
             </div>
             <div className="form-group">
-              <label className="label">Klasa</label>
+              <label className="label">{t('qualifications.cert_class')}</label>
               <select className="input" value={certClass} onChange={e => setCertClass(e.target.value)}>
-                <option value="">— wybierz —</option>
+                <option value="">{t('qualifications.cert_select')}</option>
                 {CERT_CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
           </div>
-          <DateField label="Data ważności świadectwa" value={certExpiry} onChange={setCertExpiry} />
+          <DateField label={t('qualifications.cert_expiry')} value={certExpiry} onChange={setCertExpiry} />
         </div>
 
         {/* Posiadane uprawnienia */}
         <div className="card" style={{ marginBottom:'1rem' }}>
-          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Posiadane uprawnienia</h3>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>{t('qualifications.permissions_title')}</h3>
 
           {/* Tandem */}
           <div style={{ background:'var(--bg3)', borderRadius:'var(--r)', padding:'1rem', marginBottom:'0.75rem', border:'1px solid var(--border)' }}>
             <label style={{ display:'flex', alignItems:'center', gap:'0.6rem', cursor:'pointer', marginBottom: hasTandem ? '0.75rem' : 0 }}>
               <input type="checkbox" checked={hasTandem} onChange={e => setHasTandem(e.target.checked)} style={checkboxStyle} />
-              <span style={{ fontWeight:600, fontSize:'0.92rem' }}>Tandem</span>
+              <span style={{ fontWeight:600, fontSize:'0.92rem' }}>{t('qualifications.tandem')}</span>
             </label>
-            {hasTandem && <DateField label="Data ważności uprawnień Tandem" value={tandemExpiry} onChange={setTandemExpiry} />}
+            {hasTandem && <DateField label={t('qualifications.tandem_expiry')} value={tandemExpiry} onChange={setTandemExpiry} />}
           </div>
 
           {/* INS */}
           <div style={{ background:'var(--bg3)', borderRadius:'var(--r)', padding:'1rem', border:'1px solid var(--border)' }}>
             <label style={{ display:'flex', alignItems:'center', gap:'0.6rem', cursor:'pointer', marginBottom: hasIns ? '0.75rem' : 0 }}>
               <input type="checkbox" checked={hasIns} onChange={e => { setHasIns(e.target.checked); if (!e.target.checked) { setInsSl(false); setInsAff(false); setInsT(false) } }} style={checkboxStyle} />
-              <span style={{ fontWeight:600, fontSize:'0.92rem' }}>INS — Instruktor</span>
+              <span style={{ fontWeight:600, fontSize:'0.92rem' }}>{t('qualifications.ins')}</span>
             </label>
             {hasIns && (
               <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
                 <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.75rem' }}>
                   <label style={{ display:'flex', alignItems:'center', gap:'0.6rem', cursor:'pointer', marginBottom: insSl ? '0.5rem' : 0 }}>
                     <input type="checkbox" checked={insSl} onChange={e => setInsSl(e.target.checked)} style={checkboxStyle} />
-                    <span style={{ fontSize:'0.88rem', fontWeight:500 }}>INS/SL — Instruktor Static Line</span>
+                    <span style={{ fontSize:'0.88rem', fontWeight:500 }}>{t('qualifications.ins_sl')}</span>
                   </label>
-                  {insSl && <DateField label="Data ważności INS/SL" value={insSlExpiry} onChange={setInsSlExpiry} />}
+                  {insSl && <DateField label={t('qualifications.ins_sl_expiry')} value={insSlExpiry} onChange={setInsSlExpiry} />}
                 </div>
                 <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.75rem' }}>
                   <label style={{ display:'flex', alignItems:'center', gap:'0.6rem', cursor:'pointer', marginBottom: insAff ? '0.5rem' : 0 }}>
                     <input type="checkbox" checked={insAff} onChange={e => setInsAff(e.target.checked)} style={checkboxStyle} />
-                    <span style={{ fontSize:'0.88rem', fontWeight:500 }}>INS/AFF — Instruktor AFF</span>
+                    <span style={{ fontSize:'0.88rem', fontWeight:500 }}>{t('qualifications.ins_aff')}</span>
                   </label>
-                  {insAff && <DateField label="Data ważności INS/AFF" value={insAffExpiry} onChange={setInsAffExpiry} />}
+                  {insAff && <DateField label={t('qualifications.ins_aff_expiry')} value={insAffExpiry} onChange={setInsAffExpiry} />}
                 </div>
                 <div style={{ background:'var(--bg2)', borderRadius:8, padding:'0.75rem' }}>
                   <label style={{ display:'flex', alignItems:'center', gap:'0.6rem', cursor:'pointer', marginBottom: insT ? '0.5rem' : 0 }}>
                     <input type="checkbox" checked={insT} onChange={e => setInsT(e.target.checked)} style={checkboxStyle} />
-                    <span style={{ fontSize:'0.88rem', fontWeight:500 }}>INS/T — Instruktor Tandemowy</span>
+                    <span style={{ fontSize:'0.88rem', fontWeight:500 }}>{t('qualifications.ins_t')}</span>
                   </label>
-                  {insT && <DateField label="Data ważności INS/T" value={insTExpiry} onChange={setInsTExpiry} />}
+                  {insT && <DateField label={t('qualifications.ins_t_expiry')} value={insTExpiry} onChange={setInsTExpiry} />}
                 </div>
               </div>
             )}
@@ -253,17 +257,17 @@ export default function Qualifications() {
 
         {/* Licencja USPA */}
         <div className="card" style={{ marginBottom:'1rem' }}>
-          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Licencja USPA</h3>
-          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Licencje i uprawnienia USPA nie posiadają daty ważności</p>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>{t('qualifications.uspa_license')}</h3>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>{t('qualifications.uspa_no_expiry')}</p>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
             <div className="form-group">
-              <label className="label">Numer licencji</label>
+              <label className="label">{t('qualifications.uspa_number')}</label>
               <input className="input" placeholder="np. D-12345" value={uspaNumber} onChange={e => setUspaNumber(e.target.value)} />
             </div>
             <div className="form-group">
-              <label className="label">Klasa</label>
+              <label className="label">{t('qualifications.uspa_class')}</label>
               <select className="input" value={uspaClass} onChange={e => setUspaClass(e.target.value)}>
-                <option value="">— wybierz —</option>
+                <option value="">{t('qualifications.cert_select')}</option>
                 {USPA_CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
@@ -272,7 +276,7 @@ export default function Qualifications() {
 
         {/* Uprawnienia USPA */}
         <div className="card" style={{ marginBottom:'1rem' }}>
-          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Uprawnienia USPA</h3>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>{t('qualifications.uspa_permissions')}</h3>
           <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
             <UspaPermission checked={uspaCoach}      onCheck={setUspaCoach}      label="Coach" />
             <UspaPermission checked={uspaInstructor} onCheck={setUspaInstructor} label="Instructor (I)" />
@@ -285,7 +289,7 @@ export default function Qualifications() {
         {msg && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem', textAlign:'center' }}>{msg}</p>}
 
         <button className="btn" onClick={save} disabled={saving} style={{ marginBottom:'2rem' }}>
-          {saving ? 'Zapisywanie...' : 'Zapisz uprawnienia'}
+          {saving ? t('qualifications.saving') : t('qualifications.save')}
         </button>
 
       </div>
