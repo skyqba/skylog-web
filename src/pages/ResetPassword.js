@@ -1,329 +1,108 @@
-{
-  "nav": {
-    "journal": "Journal",
-    "profile": "Profile",
-    "logout": "Logout"
-  },
-  "login": {
-    "title": "Login",
-    "email": "Email",
-    "password": "Password",
-    "remember": "Remember me",
-    "submit": "Sign in",
-    "forgot": "Forgot your password?",
-    "no_account": "Don't have an account? Sign up",
-    "reset_title": "Reset password",
-    "reset_send": "Send reset link",
-    "reset_sent": "Password reset link sent! Check your email.",
-    "back_to_login": "Back to login",
-    "loading": "Please wait...",
-    "tagline": "Skydiving jump log"
-  },
-  "register": {
-    "title": "Register",
-    "add_photo": "Add profile photo",
-    "photo_hint": "JPG or PNG - optional",
-    "first_name": "First name *",
-    "last_name": "Last name *",
-    "city": "City",
-    "email": "E-mail *",
-    "password": "Password * (min. 6)",
-    "password2": "Repeat password *",
-    "submit": "Create account",
-    "loading": "Creating account...",
-    "have_account": "Already have an account?",
-    "login": "Sign in",
-    "error_required": "Please fill in all required fields.",
-    "error_passwords": "Passwords do not match.",
-    "error_password_length": "Password must be at least 6 characters.",
-    "error_generic": "Registration error — please try again."
-  },
-  "reset_password": {
-    "title": "New password",
-    "tagline": "Skydiving jump log",
-    "new_password": "New password (min. 6 characters)",
-    "repeat_password": "Repeat new password",
-    "submit": "Set new password",
-    "saving": "Saving...",
-    "success": "Password changed! You will be redirected to login shortly...",
-    "verifying": "Verifying reset link...",
-    "click_if_stuck": "Click here if the page did not load",
-    "error_length": "Password must be at least 6 characters.",
-    "error_match": "Passwords do not match."
-  },
-  "journal": {
-    "title": "Jump log",
-    "total_jumps": "Total jumps",
-    "add_jump": "+ Add jump",
-    "repeat_last": "Repeat last",
-    "repeat_title": "Add a jump with the same data as the previous one",
-    "search_placeholder": "Search by number, date, city, aircraft...",
-    "no_jumps": "No jumps in the log.",
-    "add_first": "Add your first jump",
-    "no_results": "No jumps matching: {{search}}",
-    "loading": "Loading...",
-    "offline": "Offline mode",
-    "my_docs": "My documents",
-    "needs_attention": "needs attention",
-    "manage_docs": "Manage documents",
-    "valid_until": "Valid until {{date}}",
-    "expires_in": "Expires in {{days}} days",
-    "expired_since": "Expired {{days}} days ago",
-    "update": "Update",
-    "close_alert": "Close alert",
-    "delete_jump_title": "Delete jump #{{number}}?",
-    "delete_jump_desc": "This action is irreversible.",
-    "delete_jump_confirm": "Delete jump",
-    "dismiss_alert_title": "Close alert?",
-    "dismiss_alert_desc": "The alert will disappear until you log out.",
-    "dismiss_yes": "Yes, close",
-    "dismiss_no": "No",
-    "alert_reserve_expired": "RESERVE REPACK OVERDUE!",
-    "alert_reserve_expiring": "Reserve repack expiry approaching",
-    "alert_reserve_invalid": "Overdue by {{days}} days. Expiry: {{date}}",
-    "alert_reserve_valid": "Expiry: {{date}} — {{days}} days left",
-    "alert_expired": "{{label}} — EXPIRED!",
-    "alert_expiring": "Expiry approaching — {{label}}",
-    "alert_expired_ago": "Expired {{days}} days ago",
-    "alert_days_left": "{{days}} days left"
-  },
-  "add_jump": {
-    "title": "New jump",
-    "jump_number": "Jump number *",
-    "jump_date": "Jump date *",
-    "jump_type": "Jump type",
-    "jump_type_other": "Other...",
-    "jump_type_custom": "Enter jump type...",
-    "city": "City / Drop zone",
-    "city_select": "— select drop zone —",
-    "city_manual": "or type manually...",
-    "city_hint": "Add drop zones in Profile",
-    "parachute": "Main parachute",
-    "parachute_select": "— select from rigs —",
-    "parachute_manual": "or type manually...",
-    "parachute_hint": "Add parachute rigs in Profile",
-    "altitude": "Altitude (m)",
-    "delay": "Delay (s)",
-    "aircraft": "Aircraft",
-    "aircraft_placeholder": "e.g. Cessna 182...",
-    "result": "Result",
-    "result_placeholder": "e.g. 0.05, 1st place, passed...",
-    "notes": "Notes",
-    "notes_placeholder": "Additional notes...",
-    "error_required": "Jump number and date are required.",
-    "cancel": "Cancel",
-    "save": "Save jump",
-    "saving": "Saving..."
-  },
-  "edit_jumps": {
-    "title": "Edit jumps",
-    "back": "Back",
-    "search_placeholder": "Search by number, city, aircraft, parachute...",
-    "select_all": "Select all",
-    "selected": "({{count}} selected)",
-    "delete_selected": "Delete ({{count}})",
-    "deleting": "Deleting...",
-    "loading": "Loading...",
-    "no_results": "No jumps matching criteria.",
-    "editing": "Editing",
-    "edit_btn": "Edit",
-    "jump_number": "Jump number",
-    "jump_date": "Jump date",
-    "city": "City / Drop zone",
-    "city_select": "— select drop zone —",
-    "city_manual": "or type manually...",
-    "parachute": "Main parachute",
-    "parachute_select": "— select —",
-    "parachute_manual": "or type...",
-    "jump_type": "Jump type",
-    "jump_type_select": "— select type —",
-    "altitude": "Altitude (m)",
-    "delay": "Delay (s)",
-    "aircraft": "Aircraft",
-    "result": "Result",
-    "result_placeholder": "e.g. 0.05, 1st place, passed...",
-    "notes": "Notes",
-    "notes_placeholder": "Notes...",
-    "cancel": "Cancel",
-    "save": "Save changes",
-    "saving": "Saving...",
-    "confirm_delete": "Are you sure you want to delete {{count}} jump(s)?"
-  },
-  "export": {
-    "title": "Export jumps",
-    "back": "Back",
-    "loading": "Loading...",
-    "filter_title": "Filter and sort",
-    "active_filters": "{{count}} active",
-    "sort_by": "Sort by",
-    "sort_number": "Jump no.",
-    "sort_date": "Date",
-    "sort_altitude": "Altitude",
-    "sort_delay": "Delay",
-    "date_from": "Date from (YYYY-MM-DD)",
-    "date_to": "Date to (YYYY-MM-DD)",
-    "city": "City",
-    "parachute": "Parachute",
-    "aircraft": "Aircraft",
-    "jump_type": "Jump type",
-    "all": "All",
-    "reset_filters": "Reset filters",
-    "select_all": "Select all",
-    "jumps_count": "jumps",
-    "filter_active": "(filter active)",
-    "print": "Print",
-    "download_pdf": "Download PDF",
-    "generating": "Generating...",
-    "no_jumps": "No jumps matching filters",
-    "col_lp": "No.",
-    "col_number": "Jump#",
-    "col_date": "Date",
-    "col_city": "City",
-    "col_parachute": "Parachute",
-    "col_altitude": "Alt.",
-    "col_delay": "Delay",
-    "col_aircraft": "Aircraft",
-    "col_type": "Type",
-    "col_notes": "Notes"
-  },
-  "import": {
-    "title": "Import jumps from file",
-    "back": "Back",
-    "select_file": "Select file",
-    "desc": "Supported TSV formats from Excel.",
-    "drop_title": "Click or drag file here",
-    "drop_hint": ".txt · .tsv · .csv",
-    "excel_hint": "How to export from Excel:",
-    "excel_steps": "File → Save As → Text (Tab delimited) (*.txt)",
-    "found": "Found {{count}} jumps",
-    "col_number": "#",
-    "col_date": "Date",
-    "col_city": "City",
-    "col_parachute": "Parachute",
-    "col_altitude": "Alt.",
-    "col_delay": "Delay",
-    "col_aircraft": "Aircraft",
-    "no_date": "no date",
-    "more_jumps": "... and {{count}} more jumps",
-    "back_btn": "Back",
-    "import_btn": "Import all {{count}} jumps",
-    "importing": "Importing...",
-    "importing_progress": "{{imported}} of {{total}} jumps",
-    "done_title": "Import complete!",
-    "done_imported": "{{count}} jumps imported",
-    "done_errors": "{{count}} errors",
-    "errors_title": "Errors",
-    "go_to_journal": "Go to journal"
-  },
-  "qualifications": {
-    "title": "My qualifications",
-    "back": "Back",
-    "cert_title": "Qualification certificate",
-    "cert_number": "Certificate number",
-    "cert_class": "Class",
-    "cert_expiry": "Certificate expiry date",
-    "cert_select": "— select —",
-    "permissions_title": "Held qualifications",
-    "tandem": "Tandem",
-    "tandem_expiry": "Tandem rating expiry date",
-    "ins": "INS — Instructor",
-    "ins_sl": "INS/SL — Static Line Instructor",
-    "ins_aff": "INS/AFF — AFF Instructor",
-    "ins_t": "INS/T — Tandem Instructor",
-    "ins_sl_expiry": "INS/SL expiry date",
-    "ins_aff_expiry": "INS/AFF expiry date",
-    "ins_t_expiry": "INS/T expiry date",
-    "uspa_license": "USPA License",
-    "uspa_no_expiry": "USPA licenses and ratings do not have an expiry date",
-    "uspa_number": "License number",
-    "uspa_class": "Class",
-    "uspa_permissions": "USPA ratings",
-    "save": "Save qualifications",
-    "saving": "Saving...",
-    "saved": "Saved!",
-    "expired_ago": "Expired {{days}} days ago!",
-    "expires_in": "Expires in {{days}} days",
-    "valid_days": "Valid for {{days}} more days"
-  },
-  "settings": {
-    "title": "Settings",
-    "back": "Back",
-    "notifications": "Notifications & alerts",
-    "manage_alerts": "Manage alerts",
-    "enable_all": "Enable all",
-    "disable_all": "Disable all",
-    "threshold": "Alert threshold",
-    "threshold_desc": "Alerts appear when less than 60 days remain until expiry.",
-    "threshold_future": "Ability to change the threshold will be available in a future version.",
-    "save": "Save settings",
-    "saved": "Saved!",
-    "language": "App language",
-    "language_desc": "Choose interface language",
-    "danger_zone": "Danger zone",
-    "danger_desc": "Deleting your account is irreversible.",
-    "delete_account": "Delete account"
-  },
-  "common": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "loading": "Loading...",
-    "back": "Back",
-    "error": "An error occurred. Please try again."
-  },
-  "profile": {
-    "loading": "Loading...",
-    "click_to_change": "Click photo to change",
-    "docs_title": "Skydiving documents",
-    "docs_desc": "Scans of license and other documents",
-    "docs_empty": "No documents",
-    "docs_download": "Download",
-    "docs_add": "+ Add document (PDF, JPG, PNG)",
-    "docs_uploading": "Uploading...",
-    "qualifications": "My qualifications",
-    "qualifications_desc": "Qualification certificate, instructor ratings",
-    "rigs_title": "My parachute rigs",
-    "rigs_desc": "Equipment you jump with",
-    "rigs_empty": "No rigs",
-    "rigs_add": "+ Add parachute rig",
-    "rigs_new": "New rig",
-    "rigs_edit": "Edit rig",
-    "rigs_name": "Rig name *",
-    "rigs_main": "Main parachute",
-    "rigs_reserve": "Reserve parachute",
-    "rigs_container": "Container",
-    "rigs_aad": "AAD",
-    "rigs_expiry": "Reserve repack expiry date",
-    "rigs_save": "Save rig",
-    "rigs_save_changes": "Save changes",
-    "rigs_saving": "Saving...",
-    "rigs_edit_btn": "Edit",
-    "dropzones_title": "Drop zones",
-    "dropzones_desc": "List available when adding a jump",
-    "dropzones_empty": "No drop zones",
-    "dropzones_placeholder": "e.g. Elsinore, Perris...",
-    "dropzones_add": "+ Add",
-    "stats": "Jump statistics",
-    "edit_jumps": "Edit jumps",
-    "export": "Export jumps (PDF / Print)",
-    "import": "Import jumps from CSV",
-    "settings": "Settings",
-    "logout": "Logout",
-    "personal_title": "Personal data",
-    "first_name": "First name",
-    "last_name": "Last name",
-    "city": "City",
-    "email": "E-mail",
-    "save": "Save",
-    "saving": "Saving...",
-    "saved": "Saved!",
-    "insurance_title": "Insurance",
-    "insurance_company": "Insurance company",
-    "insurance_number": "Policy number",
-    "insurance_expiry": "Expiry date",
-    "medical_title": "Medical certificate",
-    "medical_expiry": "Medical expiry date",
-    "rig_expired": "Reserve overdue by {{days}} days!",
-    "rig_expiring": "Reserve expires in {{days}} days",
-    "rig_valid": "Reserve valid for {{days}} more days"
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { supabase } from '../supabase'
+
+export default function ResetPassword() {
+  const { t } = useTranslation()
+  const [password, setPassword]   = useState('')
+  const [password2, setPassword2] = useState('')
+  const [error, setError]         = useState('')
+  const [loading, setLoading]     = useState(false)
+  const [success, setSuccess]     = useState(false)
+  const [ready, setReady]         = useState(false)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) { setReady(true); return }
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
+        setReady(true)
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    if (password.length < 6) { setError(t('reset_password.error_length')); return }
+    if (password !== password2) { setError(t('reset_password.error_match')); return }
+    setLoading(true)
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) {
+      setError(error.message)
+    } else {
+      setSuccess(true)
+      await supabase.auth.signOut()
+      setTimeout(() => navigate('/login'), 3000)
+    }
+    setLoading(false)
   }
+
+  return (
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', padding:'2rem 1rem' }}>
+      <div style={{ width:'100%', maxWidth:420 }}>
+
+        <div style={{ textAlign:'center', marginBottom:'2rem' }}>
+          <div style={{ marginBottom:'0.25rem' }}>
+            <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:900, color:'var(--text)' }}>
+              <span style={{ color:'var(--accent2)' }}>Jump</span>Log<span style={{ color:'var(--accent2)' }}>X</span>
+            </span>
+          </div>
+          <div style={{ fontFamily:'var(--font)', fontSize:'0.65rem', color:'var(--muted)', marginBottom:'0.4rem' }}>
+            by SkyQba ver 1.0
+          </div>
+          <div style={{ fontFamily:'var(--mono)', fontSize:'0.7rem', letterSpacing:'2px', color:'var(--muted)', textTransform:'uppercase' }}>
+            {t('reset_password.tagline')}
+          </div>
+        </div>
+
+        <div className="card">
+          <h2 style={{ fontFamily:'var(--head)', fontSize:'1.2rem', fontWeight:800, marginBottom:'1.5rem' }}>
+            {t('reset_password.title')}
+          </h2>
+
+          {success ? (
+            <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.85rem 1rem', fontSize:'0.88rem', color:'var(--success)' }}>
+              ✓ {t('reset_password.success')}
+            </div>
+          ) : !ready ? (
+            <div style={{ textAlign:'center', padding:'2rem 1rem' }}>
+              <div style={{ fontSize:'1.5rem', marginBottom:'0.75rem' }}>⏳</div>
+              <div style={{ color:'var(--muted)', fontSize:'0.88rem', marginBottom:'1.5rem' }}>
+                {t('reset_password.verifying')}
+              </div>
+              <button onClick={() => setReady(true)} style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 0.9rem', fontFamily:'var(--font)', fontSize:'0.82rem', cursor:'pointer' }}>
+                {t('reset_password.click_if_stuck')}
+              </button>
+            </div>
+          ) : (
+            <>
+              {error && (
+                <div style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'var(--r)', padding:'0.85rem 1rem', marginBottom:'1rem', fontSize:'0.88rem', color:'var(--danger)' }}>
+                  {error}
+                </div>
+              )}
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label className="label">{t('reset_password.new_password')}</label>
+                  <input className="input" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+                </div>
+                <div className="form-group">
+                  <label className="label">{t('reset_password.repeat_password')}</label>
+                  <input className="input" type="password" value={password2} onChange={e => setPassword2(e.target.value)} placeholder="••••••••" required />
+                </div>
+                <button className="btn" type="submit" disabled={loading}>
+                  {loading ? t('reset_password.saving') : t('reset_password.submit')}
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }
