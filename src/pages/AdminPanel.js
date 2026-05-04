@@ -10,10 +10,6 @@ const PERMISSIONS = [
   { key: 'perm_language', label: 'Język',      icon: '🌐' },
 ]
 
-const ANNOUNCEMENT_TYPES = [
-  { key: 'danger', label: 'Ważne', color: 'rgba(248,113,113,0.1)', border: 'rgba(248,113,113,0.4)', textColor: 'var(--danger)', icon: '🚨' },
-]
-
 export default function AdminPanel() {
   const { isAdmin, loading } = useProfile()
   const [users, setUsers] = useState([])
@@ -21,7 +17,6 @@ export default function AdminPanel() {
   const [expanded, setExpanded] = useState(null)
   const [announcements, setAnnouncements] = useState([])
   const [newMsg, setNewMsg] = useState('')
-  const [newType, setNewType] = useState('danger')
   const [saving, setSaving] = useState(false)
   const [tab, setTab] = useState('users')
   const navigate = useNavigate()
@@ -57,7 +52,7 @@ export default function AdminPanel() {
     setSaving(true)
     const { data } = await supabase
       .from('announcements')
-      .insert({ message: newMsg.trim(), type: newType, active: true })
+      .insert({ message: newMsg.trim(), type: 'danger', active: true })
       .select().single()
     if (data) setAnnouncements(prev => [data, ...prev])
     setNewMsg('')
@@ -175,7 +170,7 @@ export default function AdminPanel() {
       {tab === 'announcements' && (
         <div>
           <div className="card" style={{ marginBottom:'1.5rem' }}>
-            <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1rem' }}>📢 Nowe powiadomienie</h3>
+            <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1rem' }}>🚨 Nowe powiadomienie</h3>
             <textarea
               value={newMsg}
               onChange={e => setNewMsg(e.target.value)}
@@ -184,7 +179,7 @@ export default function AdminPanel() {
               style={{ width:'100%', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--r)', color:'var(--text)', fontFamily:'var(--font)', fontSize:'0.88rem', padding:'0.75rem', outline:'none', resize:'vertical', boxSizing:'border-box', marginBottom:'0.75rem' }}
             />
             <button onClick={addAnnouncement} disabled={saving || !newMsg.trim()} className="btn" style={{ width:'auto', padding:'0.5rem 1.5rem' }}>
-              {saving ? 'Wysyłanie...' : '📢 Wyślij powiadomienie'}
+              {saving ? 'Wysyłanie...' : '🚨 Wyślij powiadomienie'}
             </button>
           </div>
 
