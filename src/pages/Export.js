@@ -124,6 +124,35 @@ export default function Export() {
 
   const selectedJumps = filteredJumps.filter(j => selected.has(j.id))
 
+  const generateCSV = () => {
+    if (selectedJumps.length === 0) return
+    const name = profile ? `${profile.name || ''} ${profile.surname || ''}`.trim() : ''
+    const today = new Date().toLocaleDateString('pl-PL')
+    const metaRows = [
+      `"JumpLogX — Eksport skoków"`,
+      `"Skoczek:","${name}"`,
+      `"Data eksportu:","${today}"`,
+      `"Liczba skoków:","${selectedJumps.length}"`,
+      `""`,
+    ]
+    const headers = ['Lp.', 'Nr skoku', 'Data', 'Miejscowosc', 'Spadochron', 'Wysokosc (m)', 'Opoznienie (s)', 'Samolot', 'Typ skoku', 'Wynik', 'Uwagi']
+    const rows = selectedJumps.map((j, i) => [
+      i + 1, j.number, j.jump_date || '',
+      j.city || '', j.parachute || '',
+      j.altitude || '', j.delay || '',
+      j.aircraft || '', j.jump_type || '',
+      j.result || '', j.notes || ''
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+    const csv = [...metaRows, headers.join(','), ...rows].join('\n')
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `JumpLogX_skoki_${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const generatePDF = async () => {
     if (selectedJumps.length === 0) return
     setGenerating(true)
@@ -291,9 +320,12 @@ export default function Export() {
                   {activeFiltersCount > 0 && <span style={{ color:'var(--accent2)', marginLeft:4 }}>{t('export.filter_active')}</span>}
                 </span>
               </div>
-              <div style={{ display:'flex', gap:'0.5rem' }}>
+              <div style={{ display:'flex', gap:'0.5rem', flexWrap:'wrap' }}>
                 <button onClick={printJumps} disabled={selectedJumps.length === 0} style={{ display:'flex', alignItems:'center', gap:'0.4rem', padding:'0.55rem 1rem', background:'transparent', border:'1px solid var(--border2)', borderRadius:'var(--r)', color: selectedJumps.length === 0 ? 'var(--muted)' : 'var(--text)', fontFamily:'var(--font)', fontSize:'0.85rem', cursor: selectedJumps.length === 0 ? 'not-allowed' : 'pointer', transition:'all 0.2s' }} onMouseEnter={e => { if (selectedJumps.length > 0) e.currentTarget.style.borderColor = 'var(--accent)' }} onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border2)'}>
                   🖨 {t('export.print')}
+                </button>
+                <button onClick={generateCSV} disabled={selectedJumps.length === 0} style={{ display:'flex', alignItems:'center', gap:'0.4rem', padding:'0.55rem 1rem', background:'transparent', border:'1px solid var(--border2)', borderRadius:'var(--r)', color: selectedJumps.length === 0 ? 'var(--muted)' : 'var(--text)', fontFamily:'var(--font)', fontSize:'0.85rem', cursor: selectedJumps.length === 0 ? 'not-allowed' : 'pointer', transition:'all 0.2s' }} onMouseEnter={e => { if (selectedJumps.length > 0) e.currentTarget.style.borderColor = 'var(--accent)' }} onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border2)'}>
+                  📊 Pobierz CSV
                 </button>
                 <button onClick={generatePDF} disabled={selectedJumps.length === 0 || generating} className="btn" style={{ width:'auto', padding:'0.55rem 1.25rem', display:'flex', alignItems:'center', gap:'0.4rem', opacity: selectedJumps.length === 0 ? 0.5 : 1 }}>
                   {generating ? `⏳ ${t('export.generating')}` : `📄 ${t('export.download_pdf')}`}
