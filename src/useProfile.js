@@ -12,7 +12,7 @@ export function useProfile() {
       if (!user) { if (!cancelled) setLoading(false); return }
       const { data } = await supabase
         .from('profiles')
-        .select('is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language')
+        .select('is_premium, is_admin')
         .eq('id', user.id)
         .single()
       if (!cancelled) {
@@ -27,11 +27,7 @@ export function useProfile() {
   return {
     profile,
     loading,
-    isPremium:    profile?.is_premium    ?? false,
-    isAdmin:      profile?.is_admin      ?? false,
-    canExport:    profile?.is_premium || profile?.perm_export   ?? false,
-    canImport:    profile?.is_premium || profile?.perm_import   ?? false,
-    canStats:     profile?.is_premium || profile?.perm_stats    ?? false,
-    canLanguage:  profile?.is_premium || profile?.perm_language ?? false,
+    isPremium: profile?.is_premium ?? false,
+    isAdmin: profile?.is_admin ?? false,
   }
 }
