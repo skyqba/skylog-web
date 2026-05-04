@@ -32,35 +32,69 @@ export default function AnnouncementPopup({ session }) {
   if (!visible || announcements.length === 0) return null
 
   return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
-      <div style={{ background:'#0f0f13', border:'2px solid rgba(248,113,113,0.5)', borderRadius:16, padding:'2rem', maxWidth:480, width:'100%', maxHeight:'80vh', overflowY:'auto', boxShadow:'0 25px 60px rgba(0,0,0,0.7)' }}>
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.88)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
+      <div style={{ background:'#0f0f13', border:'2px solid rgba(248,113,113,0.45)', borderRadius:16, padding:'2.25rem', maxWidth:500, width:'100%', maxHeight:'80vh', overflowY:'auto', boxShadow:'0 30px 80px rgba(0,0,0,0.8)' }}>
 
         {/* Nagłówek */}
-        <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', marginBottom:'1.5rem', paddingBottom:'1rem', borderBottom:'1px solid rgba(248,113,113,0.2)' }}>
-          <span style={{ fontSize:'1.75rem' }}>🚨</span>
+        <div style={{ display:'flex', alignItems:'center', gap:'1rem', marginBottom:'1.75rem', paddingBottom:'1.25rem', borderBottom:'1px solid rgba(248,113,113,0.15)' }}>
+          <span style={{ fontSize:'2rem', lineHeight:1 }}>🚨</span>
           <div>
-            <div style={{ fontFamily:'Georgia, "Times New Roman", serif', fontSize:'1.2rem', fontWeight:700, color:'#F87171', letterSpacing:'0.5px' }}>
+            <div style={{
+              fontFamily:'"Playfair Display", Georgia, "Times New Roman", serif',
+              fontSize:'1.35rem',
+              fontWeight:700,
+              color:'#F87171',
+              letterSpacing:'0.3px',
+              lineHeight:1.2,
+            }}>
               Komunikat Systemowy
             </div>
-            <div style={{ fontFamily:'Georgia, "Times New Roman", serif', fontSize:'0.72rem', color:'rgba(248,113,113,0.6)', letterSpacing:'2px', textTransform:'uppercase', marginTop:2 }}>
+            <div style={{
+              fontFamily:'"Courier New", Courier, monospace',
+              fontSize:'0.65rem',
+              color:'rgba(248,113,113,0.5)',
+              letterSpacing:'3px',
+              textTransform:'uppercase',
+              marginTop:4,
+            }}>
               JumpLogX · Administracja
             </div>
           </div>
         </div>
 
         {/* Treść powiadomień */}
-        <div style={{ display:'flex', flexDirection:'column', gap:'1rem', marginBottom:'1.5rem' }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem', marginBottom:'2rem' }}>
           {announcements.map((a, i) => (
-            <div key={a.id} style={{ borderLeft:'3px solid #F87171', paddingLeft:'1rem' }}>
+            <div key={a.id} style={{ borderLeft:'3px solid rgba(248,113,113,0.6)', paddingLeft:'1.25rem' }}>
               {announcements.length > 1 && (
-                <div style={{ fontFamily:'Georgia, "Times New Roman", serif', fontSize:'0.68rem', color:'rgba(248,113,113,0.6)', textTransform:'uppercase', letterSpacing:2, marginBottom:'0.4rem' }}>
+                <div style={{
+                  fontFamily:'"Courier New", Courier, monospace',
+                  fontSize:'0.62rem',
+                  color:'rgba(248,113,113,0.5)',
+                  textTransform:'uppercase',
+                  letterSpacing:3,
+                  marginBottom:'0.5rem',
+                }}>
                   {i + 1} / {announcements.length}
                 </div>
               )}
-              <div style={{ fontFamily:'Georgia, "Times New Roman", serif', fontSize:'0.95rem', color:'#e8e8e8', lineHeight:1.8, fontStyle:'italic' }}>
+              <div style={{
+                fontFamily:'"Playfair Display", Georgia, "Times New Roman", serif',
+                fontSize:'1.05rem',
+                color:'#ececec',
+                lineHeight:1.9,
+                fontStyle:'italic',
+                fontWeight:400,
+              }}>
                 „{a.message}"
               </div>
-              <div style={{ fontFamily:'var(--mono)', fontSize:'0.99rem', color:'rgba(255,255,255,0.25)', marginTop:'0.5rem' }}>
+              <div style={{
+                fontFamily:'"Courier New", Courier, monospace',
+                fontSize:'0.68rem',
+                color:'rgba(255,255,255,0.2)',
+                marginTop:'0.65rem',
+                letterSpacing:'0.5px',
+              }}>
                 {new Date(a.created_at).toLocaleDateString('pl-PL', { day:'numeric', month:'long', year:'numeric' })}
               </div>
             </div>
@@ -68,10 +102,26 @@ export default function AnnouncementPopup({ session }) {
         </div>
 
         {/* Przycisk */}
-        <button onClick={dismiss}
-          style={{ width:'100%', padding:'0.75rem', background:'rgba(248,113,113,0.15)', border:'1px solid rgba(248,113,113,0.4)', borderRadius:8, color:'#F87171', fontFamily:'Georgia, "Times New Roman", serif', fontSize:'0.9rem', fontWeight:600, cursor:'pointer', letterSpacing:'0.5px', transition:'all 0.2s' }}
-          onMouseEnter={e => { e.currentTarget.style.background='rgba(248,113,113,0.25)' }}
-          onMouseLeave={e => { e.currentTarget.style.background='rgba(248,113,113,0.15)' }}>
+        <button
+          onClick={dismiss}
+          style={{
+            width:'100%',
+            padding:'0.85rem',
+            background:'rgba(248,113,113,0.1)',
+            border:'1px solid rgba(248,113,113,0.35)',
+            borderRadius:8,
+            color:'#F87171',
+            fontFamily:'"Playfair Display", Georgia, "Times New Roman", serif',
+            fontSize:'1rem',
+            fontWeight:600,
+            cursor:'pointer',
+            letterSpacing:'0.5px',
+            transition:'all 0.2s',
+            fontStyle:'italic',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background='rgba(248,113,113,0.2)' }}
+          onMouseLeave={e => { e.currentTarget.style.background='rgba(248,113,113,0.1)' }}
+        >
           Przyjmuję do wiadomości
         </button>
       </div>
