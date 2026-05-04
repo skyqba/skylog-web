@@ -572,11 +572,11 @@ export default function Stats() {
                     </div>
                     {cnt > 0 && (
                       <button
-                        onClick={() => sendMonthReport(currentYear, mi)}
-                        style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--accent2)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.75rem', fontFamily:'var(--font)', transition:'all 0.2s', whiteSpace:'nowrap' }}
-                        onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
-                        onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}
-                      >✉ Wyślij raport</button>
+                      onClick={() => sendMonthReport(currentYear, mi)}
+                      style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--accent2)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.75rem', fontFamily:'var(--font)', transition:'all 0.2s', whiteSpace:'nowrap' }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
+                      onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}
+                    >✉ Wyślij raport</button>
                     )}
                   </div>
                 )
