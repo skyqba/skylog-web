@@ -11,10 +11,7 @@ const PERMISSIONS = [
 ]
 
 const ANNOUNCEMENT_TYPES = [
-  { key: 'info',    label: 'Info',        color: 'rgba(108,99,255,0.15)', border: 'rgba(108,99,255,0.4)', textColor: 'var(--accent2)', icon: 'ℹ️' },
-  { key: 'warning', label: 'Ostrzeżenie', color: 'rgba(251,191,36,0.1)',  border: 'rgba(251,191,36,0.4)', textColor: '#FBBF24',        icon: '⚠️' },
-  { key: 'danger',  label: 'Ważne',       color: 'rgba(248,113,113,0.1)', border: 'rgba(248,113,113,0.4)',textColor: 'var(--danger)',   icon: '🚨' },
-  { key: 'success', label: 'Sukces',      color: 'rgba(52,211,153,0.1)',  border: 'rgba(52,211,153,0.3)', textColor: 'var(--success)', icon: '✅' },
+  { key: 'danger', label: 'Ważne', color: 'rgba(248,113,113,0.1)', border: 'rgba(248,113,113,0.4)', textColor: 'var(--danger)', icon: '🚨' },
 ]
 
 export default function AdminPanel() {
@@ -24,7 +21,7 @@ export default function AdminPanel() {
   const [expanded, setExpanded] = useState(null)
   const [announcements, setAnnouncements] = useState([])
   const [newMsg, setNewMsg] = useState('')
-  const [newType, setNewType] = useState('info')
+  const [newType, setNewType] = useState('danger')
   const [saving, setSaving] = useState(false)
   const [tab, setTab] = useState('users')
   const navigate = useNavigate()
@@ -177,17 +174,8 @@ export default function AdminPanel() {
       {/* TAB: Powiadomienia */}
       {tab === 'announcements' && (
         <div>
-          {/* Formularz dodawania */}
           <div className="card" style={{ marginBottom:'1.5rem' }}>
             <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1rem' }}>📢 Nowe powiadomienie</h3>
-            <div style={{ display:'flex', gap:'0.5rem', marginBottom:'0.75rem', flexWrap:'wrap' }}>
-              {ANNOUNCEMENT_TYPES.map(type => (
-                <button key={type.key} onClick={() => setNewType(type.key)}
-                  style={{ padding:'0.35rem 0.85rem', background: newType === type.key ? type.color : 'transparent', border:`1px solid ${newType === type.key ? type.border : 'var(--border)'}`, borderRadius:8, color: newType === type.key ? type.textColor : 'var(--muted)', fontFamily:'var(--font)', fontSize:'0.8rem', cursor:'pointer', transition:'all 0.2s' }}>
-                  {type.icon} {type.label}
-                </button>
-              ))}
-            </div>
             <textarea
               value={newMsg}
               onChange={e => setNewMsg(e.target.value)}
@@ -200,42 +188,38 @@ export default function AdminPanel() {
             </button>
           </div>
 
-          {/* Lista powiadomień */}
           <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
             {announcements.length === 0 && (
               <div style={{ textAlign:'center', padding:'2rem', color:'var(--muted)', fontSize:'0.85rem' }}>Brak powiadomień</div>
             )}
-            {announcements.map(a => {
-              const type = ANNOUNCEMENT_TYPES.find(t => t.key === a.type) || ANNOUNCEMENT_TYPES[0]
-              return (
-                <div key={a.id} style={{ background: a.active ? type.color : 'var(--bg2)', border:`1px solid ${a.active ? type.border : 'var(--border)'}`, borderRadius:'var(--r2)', padding:'1rem', opacity: a.active ? 1 : 0.5 }}>
-                  <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'1rem' }}>
-                    <div style={{ flex:1 }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.4rem' }}>
-                        <span>{type.icon}</span>
-                        <span style={{ fontSize:'0.68rem', fontFamily:'var(--mono)', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1 }}>{type.label}</span>
-                        <span style={{ fontSize:'0.68rem', color:'var(--muted)' }}>· {new Date(a.created_at).toLocaleDateString('pl-PL')}</span>
-                        {a.active
-                          ? <span style={{ fontSize:'0.68rem', color:'var(--success)', fontWeight:600 }}>● Aktywne</span>
-                          : <span style={{ fontSize:'0.68rem', color:'var(--muted)' }}>○ Nieaktywne</span>
-                        }
-                      </div>
-                      <div style={{ fontSize:'0.88rem', color:'var(--text)', lineHeight:1.5 }}>{a.message}</div>
+            {announcements.map(a => (
+              <div key={a.id} style={{ background: a.active ? 'rgba(248,113,113,0.1)' : 'var(--bg2)', border:`1px solid ${a.active ? 'rgba(248,113,113,0.4)' : 'var(--border)'}`, borderRadius:'var(--r2)', padding:'1rem', opacity: a.active ? 1 : 0.5 }}>
+                <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'1rem' }}>
+                  <div style={{ flex:1 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.4rem' }}>
+                      <span>🚨</span>
+                      <span style={{ fontSize:'0.68rem', fontFamily:'var(--mono)', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1 }}>Ważne</span>
+                      <span style={{ fontSize:'0.68rem', color:'var(--muted)' }}>· {new Date(a.created_at).toLocaleDateString('pl-PL')}</span>
+                      {a.active
+                        ? <span style={{ fontSize:'0.68rem', color:'var(--success)', fontWeight:600 }}>● Aktywne</span>
+                        : <span style={{ fontSize:'0.68rem', color:'var(--muted)' }}>○ Nieaktywne</span>
+                      }
                     </div>
-                    <div style={{ display:'flex', gap:'0.4rem', flexShrink:0 }}>
-                      <button onClick={() => toggleAnnouncement(a.id, a.active)}
-                        style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:7, color:'var(--muted)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.65rem', fontFamily:'var(--font)' }}>
-                        {a.active ? 'Wyłącz' : 'Włącz'}
-                      </button>
-                      <button onClick={() => deleteAnnouncement(a.id)}
-                        style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem' }}
-                        onMouseEnter={e => e.target.style.color='var(--danger)'}
-                        onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>
-                    </div>
+                    <div style={{ fontSize:'0.88rem', color:'var(--text)', lineHeight:1.5 }}>{a.message}</div>
+                  </div>
+                  <div style={{ display:'flex', gap:'0.4rem', flexShrink:0 }}>
+                    <button onClick={() => toggleAnnouncement(a.id, a.active)}
+                      style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:7, color:'var(--muted)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.65rem', fontFamily:'var(--font)' }}>
+                      {a.active ? 'Wyłącz' : 'Włącz'}
+                    </button>
+                    <button onClick={() => deleteAnnouncement(a.id)}
+                      style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem' }}
+                      onMouseEnter={e => e.target.style.color='var(--danger)'}
+                      onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>
                   </div>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </div>
       )}
