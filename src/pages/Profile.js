@@ -3,9 +3,11 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
+import { useProfile } from '../useProfile'
 
 export default function Profile() {
   const { t } = useTranslation()
+  const { isPremium } = useProfile()
   const [profileBase, setProfileBase] = useState(null)
   const [preview, setPreview]         = useState(null)
   const [uploading, setUploading]     = useState(false)
@@ -270,10 +272,7 @@ export default function Profile() {
                 {isEditing ? (
                   <>
                     <div style={{ fontFamily:'var(--head)', fontSize:'0.9rem', fontWeight:800, marginBottom:'0.75rem', color:'var(--accent2)' }}>{t('profile.rigs_edit')}</div>
-                    <div className="form-group">
-                      <label className="label">{t('profile.rigs_name')}</label>
-                      <input className="input" value={editingRig.name} onChange={e => setEditingRig(r => ({ ...r, name: e.target.value }))} />
-                    </div>
+                    <div className="form-group"><label className="label">{t('profile.rigs_name')}</label><input className="input" value={editingRig.name} onChange={e => setEditingRig(r => ({ ...r, name: e.target.value }))} /></div>
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
                       <div className="form-group"><label className="label">{t('profile.rigs_main')}</label><input className="input" value={editingRig.main || ''} onChange={e => setEditingRig(r => ({ ...r, main: e.target.value }))} /></div>
                       <div className="form-group"><label className="label">{t('profile.rigs_reserve')}</label><input className="input" value={editingRig.reserve || ''} onChange={e => setEditingRig(r => ({ ...r, reserve: e.target.value }))} /></div>
@@ -364,18 +363,25 @@ export default function Profile() {
           </div>
         </div>
 
-        <Link to="/stats" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
-          <button className="btn ghost" style={{ width:'100%' }}>{t('profile.stats')}</button>
-        </Link>
+        {/* Przyciski nawigacyjne */}
+        {isPremium && (
+          <Link to="/stats" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
+            <button className="btn ghost" style={{ width:'100%' }}>{t('profile.stats')}</button>
+          </Link>
+        )}
         <Link to="/edit-jumps" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
           <button className="btn ghost" style={{ width:'100%' }}>{t('profile.edit_jumps')}</button>
         </Link>
-        <Link to="/export" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
-          <button className="btn ghost" style={{ width:'100%' }}>{t('profile.export')}</button>
-        </Link>
-        <Link to="/import" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
-          <button className="btn ghost" style={{ width:'100%' }}>{t('profile.import')}</button>
-        </Link>
+        {isPremium && (
+          <Link to="/export" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
+            <button className="btn ghost" style={{ width:'100%' }}>{t('profile.export')}</button>
+          </Link>
+        )}
+        {isPremium && (
+          <Link to="/import" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
+            <button className="btn ghost" style={{ width:'100%' }}>{t('profile.import')}</button>
+          </Link>
+        )}
         <Link to="/settings" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
           <button className="btn ghost" style={{ width:'100%' }}>{t('profile.settings')}</button>
         </Link>
