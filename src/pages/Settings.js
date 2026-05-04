@@ -326,11 +326,11 @@ export default function Settings() {
           <h2 style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>{t('settings.title')}</h2>
         </div>
 
-        {/* JĘZYK */}
-        <div className="card" style={{ marginBottom:'1rem' }}>
-          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>{t('settings.language')}</h3>
-          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>{t('settings.language_desc')}</p>
-          {isPremium ? (
+        {/* JĘZYK — tylko dla premium */}
+        {isPremium && (
+          <div className="card" style={{ marginBottom:'1rem' }}>
+            <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>{t('settings.language')}</h3>
+            <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>{t('settings.language_desc')}</p>
             <div style={{ display:'flex', gap:'0.75rem' }}>
               {[{ code:'pl', label:'🇵🇱 Polski' }, { code:'en', label:'🇬🇧 English' }].map(lang => (
                 <button key={lang.code} onClick={() => changeLanguage(lang.code)}
@@ -339,16 +339,8 @@ export default function Settings() {
                 </button>
               ))}
             </div>
-          ) : (
-            <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.85rem 1rem', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--r)' }}>
-              <span style={{ fontSize:'1.1rem' }}>⭐</span>
-              <div>
-                <div style={{ fontSize:'0.85rem', fontWeight:600, color:'var(--text)' }}>Funkcja Premium</div>
-                <div style={{ fontSize:'0.75rem', color:'var(--muted)' }}>Zmiana języka dostępna tylko dla użytkowników Premium</div>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* ALERTY */}
         <div className="card" style={{ marginBottom:'1rem' }}>
