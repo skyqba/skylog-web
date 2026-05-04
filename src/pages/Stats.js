@@ -277,7 +277,7 @@ export default function Stats() {
     avg: results.reduce((s,r) => s+r, 0) / results.length,
     count: results.length,
     results,
-  })).sort((a,b) => a.day.localeCompare(b.day))
+  })).sort((a,b) => b.day.localeCompare(a.day))
 
   const dayAvgsWithRolling = dayAvgs.map(d => ({
     ...d,
