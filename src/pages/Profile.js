@@ -194,7 +194,6 @@ export default function Profile() {
           <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={pickAvatar} style={{ display:'none' }} />
           {msgs['avatar'] && <div style={{ fontSize:'0.82rem', color:'var(--success)', marginBottom:'0.5rem' }}>{msgs['avatar']}</div>}
           <div style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>{profileBase.name} {profileBase.surname}</div>
-          {profileBase.city && <div style={{ color:'var(--muted)', fontSize:'0.82rem', marginTop:4 }}>📍 {profileBase.city}</div>}
           <div style={{ color:'var(--muted)', fontSize:'0.72rem', marginTop:6 }}>{t('profile.click_to_change')}</div>
         </div>
 
@@ -393,11 +392,10 @@ export default function Profile() {
 function PersonalSection({ profileBase, saving, setSaving, msgs, showMsg, t }) {
   const [name, setName]       = useState(profileBase.name || '')
   const [surname, setSurname] = useState(profileBase.surname || '')
-  const [city, setCity]       = useState(profileBase.city || '')
   const save = async (e) => {
     e.preventDefault()
     setSaving(s => ({ ...s, personal:true }))
-    await supabase.from('profiles').update({ name, surname, city }).eq('id', profileBase.id)
+    await supabase.from('profiles').update({ name, surname }).eq('id', profileBase.id)
     showMsg('personal', t('profile.saved'))
     setSaving(s => ({ ...s, personal:false }))
   }
@@ -409,7 +407,6 @@ function PersonalSection({ profileBase, saving, setSaving, msgs, showMsg, t }) {
           <div className="form-group"><label className="label">{t('profile.first_name')}</label><input className="input" value={name} onChange={e => setName(e.target.value)} placeholder="Jan" /></div>
           <div className="form-group"><label className="label">{t('profile.last_name')}</label><input className="input" value={surname} onChange={e => setSurname(e.target.value)} placeholder="Kowalski" /></div>
         </div>
-        <div className="form-group"><label className="label">{t('profile.city')}</label><input className="input" value={city} onChange={e => setCity(e.target.value)} placeholder="Warszawa" /></div>
         <div className="form-group"><label className="label">{t('profile.email')}</label><input className="input" value={profileBase.email||''} disabled style={{ opacity:0.5, cursor:'not-allowed' }} readOnly /></div>
         {msgs['personal'] && <p style={{ color:'var(--success)', fontSize:'0.85rem', marginBottom:'0.5rem' }}>{msgs['personal']}</p>}
         <button className="btn" type="submit" disabled={saving['personal']}>{saving['personal'] ? t('profile.saving') : t('profile.save')}</button>
