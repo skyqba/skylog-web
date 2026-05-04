@@ -571,7 +571,7 @@ export default function Stats() {
                       <span style={{ fontFamily:'var(--mono)', fontSize:'0.88rem', fontWeight:700, color: cnt > 0 ? 'var(--accent2)' : 'var(--muted)' }}>{cnt} skoków</span>
                     </div>
                     {cnt > 0 && (
-                      <button
+                     <button
                       onClick={() => sendMonthReport(currentYear, mi)}
                       style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--accent2)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.75rem', fontFamily:'var(--font)', transition:'all 0.2s', whiteSpace:'nowrap' }}
                       onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
