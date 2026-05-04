@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 
-const TYPES = {
-  info:    { color:'rgba(108,99,255,0.15)', border:'rgba(108,99,255,0.4)', textColor:'var(--accent2)', icon:'ℹ️', label:'Informacja' },
-  warning: { color:'rgba(251,191,36,0.1)',  border:'rgba(251,191,36,0.4)', textColor:'#FBBF24',        icon:'⚠️', label:'Ostrzeżenie' },
-  danger:  { color:'rgba(248,113,113,0.1)', border:'rgba(248,113,113,0.4)',textColor:'var(--danger)',   icon:'🚨', label:'Ważne' },
-  success: { color:'rgba(52,211,153,0.1)',  border:'rgba(52,211,153,0.3)', textColor:'var(--success)', icon:'✅', label:'Sukces' },
-}
-
 export default function AnnouncementPopup({ session }) {
   const [announcements, setAnnouncements] = useState([])
   const [visible, setVisible] = useState(false)
@@ -20,8 +13,7 @@ export default function AnnouncementPopup({ session }) {
       .select('*')
       .eq('active', true)
       .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
-        console.log('ANNOUNCEMENTS:', data, error)
+      .then(({ data }) => {
         const unseen = (data || []).filter(a => !seen.includes(a.id))
         if (unseen.length > 0) {
           setAnnouncements(unseen)
@@ -40,29 +32,47 @@ export default function AnnouncementPopup({ session }) {
   if (!visible || announcements.length === 0) return null
 
   return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
-      <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.75rem', maxWidth:480, width:'100%', maxHeight:'80vh', overflowY:'auto' }}>
-        <div style={{ fontFamily:'var(--head)', fontSize:'1.1rem', fontWeight:800, marginBottom:'1.25rem' }}>
-          📢 Powiadomienia
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
+      <div style={{ background:'#0f0f13', border:'2px solid rgba(248,113,113,0.5)', borderRadius:16, padding:'2rem', maxWidth:480, width:'100%', maxHeight:'80vh', overflowY:'auto', boxShadow:'0 25px 60px rgba(0,0,0,0.7)' }}>
+
+        {/* Nagłówek */}
+        <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', marginBottom:'1.5rem', paddingBottom:'1rem', borderBottom:'1px solid rgba(248,113,113,0.2)' }}>
+          <span style={{ fontSize:'1.75rem' }}>🚨</span>
+          <div>
+            <div style={{ fontFamily:'Georgia, "Times New Roman", serif', fontSize:'1.2rem', fontWeight:700, color:'#F87171', letterSpacing:'0.5px' }}>
+              Komunikat Systemowy
+            </div>
+            <div style={{ fontFamily:'Georgia, "Times New Roman", serif', fontSize:'0.72rem', color:'rgba(248,113,113,0.6)', letterSpacing:'2px', textTransform:'uppercase', marginTop:2 }}>
+              JumpLogX · Administracja
+            </div>
+          </div>
         </div>
-        <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem', marginBottom:'1.5rem' }}>
-          {announcements.map(a => {
-            const type = TYPES[a.type] || TYPES.info
-            return (
-              <div key={a.id} style={{ background:type.color, border:`1px solid ${type.border}`, borderRadius:'var(--r)', padding:'1rem' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.4rem' }}>
-                  <span>{type.icon}</span>
-                  <span style={{ fontSize:'0.75rem', fontWeight:700, color:type.textColor, fontFamily:'var(--mono)', textTransform:'uppercase', letterSpacing:1 }}>
-                    {type.label}
-                  </span>
+
+        {/* Treść powiadomień */}
+        <div style={{ display:'flex', flexDirection:'column', gap:'1rem', marginBottom:'1.5rem' }}>
+          {announcements.map((a, i) => (
+            <div key={a.id} style={{ borderLeft:'3px solid #F87171', paddingLeft:'1rem' }}>
+              {announcements.length > 1 && (
+                <div style={{ fontFamily:'Georgia, "Times New Roman", serif', fontSize:'0.68rem', color:'rgba(248,113,113,0.6)', textTransform:'uppercase', letterSpacing:2, marginBottom:'0.4rem' }}>
+                  {i + 1} / {announcements.length}
                 </div>
-                <div style={{ fontSize:'0.9rem', color:'var(--text)', lineHeight:1.6 }}>{a.message}</div>
+              )}
+              <div style={{ fontFamily:'Georgia, "Times New Roman", serif', fontSize:'0.95rem', color:'#e8e8e8', lineHeight:1.8, fontStyle:'italic' }}>
+                „{a.message}"
               </div>
-            )
-          })}
+              <div style={{ fontFamily:'var(--mono)', fontSize:'0.65rem', color:'rgba(255,255,255,0.25)', marginTop:'0.5rem' }}>
+                {new Date(a.created_at).toLocaleDateString('pl-PL', { day:'numeric', month:'long', year:'numeric' })}
+              </div>
+            </div>
+          ))}
         </div>
-        <button onClick={dismiss} className="btn" style={{ width:'100%' }}>
-          Rozumiem ✓
+
+        {/* Przycisk */}
+        <button onClick={dismiss}
+          style={{ width:'100%', padding:'0.75rem', background:'rgba(248,113,113,0.15)', border:'1px solid rgba(248,113,113,0.4)', borderRadius:8, color:'#F87171', fontFamily:'Georgia, "Times New Roman", serif', fontSize:'0.9rem', fontWeight:600, cursor:'pointer', letterSpacing:'0.5px', transition:'all 0.2s' }}
+          onMouseEnter={e => { e.currentTarget.style.background='rgba(248,113,113,0.25)' }}
+          onMouseLeave={e => { e.currentTarget.style.background='rgba(248,113,113,0.15)' }}>
+          Przyjmuję do wiadomości
         </button>
       </div>
     </div>
