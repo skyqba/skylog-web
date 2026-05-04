@@ -369,7 +369,7 @@ export default function Profile() {
         </Link>
         {canExport && (
           <Link to="/export" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
-            <button className="btn ghost" style={{ width:'100%' }}>{t('profile.export')}</button>
+            <button className="btn ghost" style={{ width:'100%' }}>Eksportuj skoki (PDF / CSV / Druk)</button>
           </Link>
         )}
         {canImport && (
