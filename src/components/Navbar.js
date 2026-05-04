@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
+import { useProfile } from '../useProfile'
 
 export default function Navbar() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { t } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
+  const { isAdmin } = useProfile()
 
   const logout = async () => {
     sessionStorage.removeItem('dismissedRigs')
@@ -38,6 +40,9 @@ export default function Navbar() {
         <div className="desktop-nav" style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
           <NavLink to="/"        label={t('nav.journal')} active={pathname === '/'} />
           <NavLink to="/profile" label={t('nav.profile')} active={pathname === '/profile'} />
+          {isAdmin && (
+            <NavLink to="/admin" label="🛡 Admin" active={pathname === '/admin'} />
+          )}
           <button onClick={logout} style={{
             padding:'0.4rem 0.9rem', background:'transparent',
             border:'1px solid var(--border)', borderRadius:8,
@@ -76,6 +81,9 @@ export default function Navbar() {
         }}>
           <MobileNavLink to="/"        label={t('nav.journal')} active={pathname === '/'}        onClick={() => setMenuOpen(false)} />
           <MobileNavLink to="/profile" label={t('nav.profile')} active={pathname === '/profile'} onClick={() => setMenuOpen(false)} />
+          {isAdmin && (
+            <MobileNavLink to="/admin" label="🛡 Admin" active={pathname === '/admin'} onClick={() => setMenuOpen(false)} />
+          )}
           <button onClick={() => { setMenuOpen(false); logout() }} style={{
             padding:'0.75rem 1rem', background:'transparent',
             border:'1px solid var(--danger)', borderRadius:8,

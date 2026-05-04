@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabase'
 import { syncQueue } from './offlineQueue'
-import { useProfile } from './useProfile'
 import Login          from './pages/Login'
 import Register       from './pages/Register'
 import Journal        from './pages/Journal'
@@ -17,36 +16,6 @@ import Qualifications from './pages/Qualifications'
 import Settings       from './pages/Settings'
 import ResetPassword  from './pages/ResetPassword'
 import AdminPanel     from './pages/AdminPanel'
-
-function AppRoutes({ session, online }) {
-  const { isAdmin } = useProfile()
-
-  return (
-    <>
-      {!online && (
-        <div style={{ background:'#FBBF24', color:'#000', textAlign:'center', padding:'0.4rem', fontSize:'0.82rem', fontWeight:600, position:'sticky', top:0, zIndex:999 }}>
-          ⚡ Tryb offline — zmiany zostaną zsynchronizowane po powrocie połączenia
-        </div>
-      )}
-      <Routes>
-        <Route path="/login"          element={!session ? <Login />          : <Navigate to="/" />} />
-        <Route path="/register"       element={!session ? <Register />       : <Navigate to="/" />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/"               element={ session  ? <Journal />        : <Navigate to="/login" />} />
-        <Route path="/add"            element={ session  ? <AddJump />        : <Navigate to="/login" />} />
-        <Route path="/profile"        element={ session  ? <Profile />        : <Navigate to="/login" />} />
-        <Route path="/import"         element={ session  ? <Import />         : <Navigate to="/login" />} />
-        <Route path="/export"         element={ session  ? <Export />         : <Navigate to="/login" />} />
-        <Route path="/edit-jumps"     element={ session  ? <EditJumps />      : <Navigate to="/login" />} />
-        <Route path="/manual"         element={ session  ? <Manual />         : <Navigate to="/login" />} />
-        <Route path="/stats"          element={ session  ? <Stats />          : <Navigate to="/login" />} />
-        <Route path="/qualifications" element={ session  ? <Qualifications /> : <Navigate to="/login" />} />
-        <Route path="/settings"       element={ session  ? <Settings />       : <Navigate to="/login" />} />
-        <Route path="/admin"          element={ session && isAdmin ? <AdminPanel /> : <Navigate to="/" />} />
-      </Routes>
-    </>
-  )
-}
 
 function App() {
   const [session, setSession] = useState(undefined)
@@ -87,7 +56,27 @@ function App() {
 
   return (
     <BrowserRouter>
-      <AppRoutes session={session} online={online} />
+      {!online && (
+        <div style={{ background:'#FBBF24', color:'#000', textAlign:'center', padding:'0.4rem', fontSize:'0.82rem', fontWeight:600, position:'sticky', top:0, zIndex:999 }}>
+          ⚡ Tryb offline — zmiany zostaną zsynchronizowane po powrocie połączenia
+        </div>
+      )}
+      <Routes>
+        <Route path="/login"          element={!session ? <Login />          : <Navigate to="/" />} />
+        <Route path="/register"       element={!session ? <Register />       : <Navigate to="/" />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/"               element={ session  ? <Journal />        : <Navigate to="/login" />} />
+        <Route path="/add"            element={ session  ? <AddJump />        : <Navigate to="/login" />} />
+        <Route path="/profile"        element={ session  ? <Profile />        : <Navigate to="/login" />} />
+        <Route path="/import"         element={ session  ? <Import />         : <Navigate to="/login" />} />
+        <Route path="/export"         element={ session  ? <Export />         : <Navigate to="/login" />} />
+        <Route path="/edit-jumps"     element={ session  ? <EditJumps />      : <Navigate to="/login" />} />
+        <Route path="/manual"         element={ session  ? <Manual />         : <Navigate to="/login" />} />
+        <Route path="/stats"          element={ session  ? <Stats />          : <Navigate to="/login" />} />
+        <Route path="/qualifications" element={ session  ? <Qualifications /> : <Navigate to="/login" />} />
+        <Route path="/settings"       element={ session  ? <Settings />       : <Navigate to="/login" />} />
+        <Route path="/admin"          element={ session  ? <AdminPanel />     : <Navigate to="/login" />} />
+      </Routes>
     </BrowserRouter>
   )
 }

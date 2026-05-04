@@ -6,16 +6,22 @@ export function useProfile() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) { setLoading(false); return }
+    let cancelled = false
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { if (!cancelled) setLoading(false); return }
       const { data } = await supabase
         .from('profiles')
         .select('is_premium, is_admin')
         .eq('id', user.id)
         .single()
-      setProfile(data)
-      setLoading(false)
-    })
+      if (!cancelled) {
+        setProfile(data)
+        setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
   }, [])
 
   return {
