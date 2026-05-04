@@ -565,19 +565,17 @@ export default function Stats() {
               {monthsFull.map((monthName, mi) => {
                 const cnt = perYearMonth[currentYear][mi] || 0
                 return (
-                  <div key={mi} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.65rem 1rem', background: cnt > 0 ? 'var(--bg3)' : 'var(--bg2)', borderRadius:'var(--r)', border:`1px solid ${cnt > 0 ? 'var(--border)' : 'var(--border)'}`, opacity: cnt > 0 ? 1 : 0.4 }}>
+                  <div key={mi} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.65rem 1rem', background: cnt > 0 ? 'var(--bg3)' : 'var(--bg2)', borderRadius:'var(--r)', border:'1px solid var(--border)', opacity: cnt > 0 ? 1 : 0.5 }}>
                     <div style={{ display:'flex', alignItems:'center', gap:'1rem' }}>
                       <span style={{ fontSize:'0.9rem', fontWeight:600, color:'var(--text)', minWidth:90 }}>{monthName}</span>
                       <span style={{ fontFamily:'var(--mono)', fontSize:'0.88rem', fontWeight:700, color: cnt > 0 ? 'var(--accent2)' : 'var(--muted)' }}>{cnt} skoków</span>
                     </div>
-                    {cnt > 0 && (
-                     <button
+                    <button
                       onClick={() => sendMonthReport(currentYear, mi)}
                       style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--accent2)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.75rem', fontFamily:'var(--font)', transition:'all 0.2s', whiteSpace:'nowrap' }}
                       onMouseEnter={e => e.currentTarget.style.borderColor='var(--accent)'}
                       onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}
                     >✉ Wyślij raport</button>
-                    )}
                   </div>
                 )
               })}
