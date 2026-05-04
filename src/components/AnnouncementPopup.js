@@ -60,7 +60,7 @@ export default function AnnouncementPopup({ session }) {
               <div style={{ fontFamily:'Georgia, "Times New Roman", serif', fontSize:'0.95rem', color:'#e8e8e8', lineHeight:1.8, fontStyle:'italic' }}>
                 „{a.message}"
               </div>
-              <div style={{ fontFamily:'var(--mono)', fontSize:'0.65rem', color:'rgba(255,255,255,0.25)', marginTop:'0.5rem' }}>
+              <div style={{ fontFamily:'var(--mono)', fontSize:'0.99rem', color:'rgba(255,255,255,0.25)', marginTop:'0.5rem' }}>
                 {new Date(a.created_at).toLocaleDateString('pl-PL', { day:'numeric', month:'long', year:'numeric' })}
               </div>
             </div>
