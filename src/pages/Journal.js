@@ -127,7 +127,8 @@ export default function Journal() {
   const docs = [
     profile?.insurance_expiry ? { label: t('profile.insurance_title'), expiry: profile.insurance_expiry, days: daysUntil(profile.insurance_expiry) } : null,
     profile?.medical_expiry   ? { label: t('profile.medical_title'),   expiry: profile.medical_expiry,   days: daysUntil(profile.medical_expiry) } : null,
-    quals?.cert_expiry        ? { label: 'Świadectwo kwalifikacji',    expiry: quals.cert_expiry,         days: daysUntil(quals.cert_expiry) } : null,
+    quals?.cert_number ? { label: `Świadectwo kwalifikacji${quals.cert_number ? ` ${quals.cert_number}` : ''}`, expiry: null, days: null, noExpiry: true } : null,
+    quals?.cert_expiry && quals?.cert_class ? { label: `Klasa ${quals.cert_class}`, expiry: quals.cert_expiry, days: daysUntil(quals.cert_expiry) } : null,
     quals?.has_tandem && quals?.tandem_expiry ? { label: 'Uprawnienie Tandem', expiry: quals.tandem_expiry, days: daysUntil(quals.tandem_expiry) } : null,
     quals?.has_ins && quals?.ins_sl  && quals?.ins_sl_expiry  ? { label: 'INS/SL',  expiry: quals.ins_sl_expiry,  days: daysUntil(quals.ins_sl_expiry) } : null,
     quals?.has_ins && quals?.ins_aff && quals?.ins_aff_expiry ? { label: 'INS/AFF', expiry: quals.ins_aff_expiry, days: daysUntil(quals.ins_aff_expiry) } : null,
@@ -165,7 +166,7 @@ export default function Journal() {
    .sort((a, b) => a.days - b.days)
 
   const qualAlerts = quals ? [
-    quals.cert_expiry && alertOn('alert_cert')                                     ? { key:'cert',    label: 'Świadectwo kwalifikacji', days: daysUntil(quals.cert_expiry) } : null,
+    quals.cert_expiry && quals.cert_class && alertOn('alert_cert') ? { key:'cert', label: `Klasa ${quals.cert_class}`, days: daysUntil(quals.cert_expiry) } : null,
     quals.has_tandem && quals.tandem_expiry && alertOn('alert_tandem')             ? { key:'tandem',  label: 'Uprawnienie Tandem',      days: daysUntil(quals.tandem_expiry) } : null,
     quals.has_ins && quals.ins_sl  && quals.ins_sl_expiry  && alertOn('alert_ins') ? { key:'ins_sl',  label: 'INS/SL',                  days: daysUntil(quals.ins_sl_expiry) } : null,
     quals.has_ins && quals.ins_aff && quals.ins_aff_expiry && alertOn('alert_ins') ? { key:'ins_aff', label: 'INS/AFF',                 days: daysUntil(quals.ins_aff_expiry) } : null,
