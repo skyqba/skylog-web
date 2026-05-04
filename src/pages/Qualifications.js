@@ -95,7 +95,7 @@ export default function Qualifications() {
   }
 
   const alerts = [
-    expiryAlert(certExpiry,   t('qualifications.cert_title')),
+    expiryAlert(certExpiry,   certClass ? `Klasa ${certClass}` : 'Klasa'),
     expiryAlert(tandemExpiry, t('qualifications.tandem')),
     expiryAlert(insSlExpiry,  'INS/SL'),
     expiryAlert(insAffExpiry, 'INS/AFF'),
@@ -191,21 +191,29 @@ export default function Qualifications() {
 
         {/* Świadectwo kwalifikacji */}
         <div className="card" style={{ marginBottom:'1rem' }}>
-          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>{t('qualifications.cert_title')}</h3>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
-            <div className="form-group">
-              <label className="label">{t('qualifications.cert_number')}</label>
-              <input className="input" placeholder="np. 1234/2024" value={certNumber} onChange={e => setCertNumber(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label className="label">{t('qualifications.cert_class')}</label>
-              <select className="input" value={certClass} onChange={e => setCertClass(e.target.value)}>
-                <option value="">{t('qualifications.cert_select')}</option>
-                {CERT_CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>{t('qualifications.cert_title')}</h3>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1.25rem' }}>Świadectwo kwalifikacji nie posiada daty ważności. Datę ważności posiada klasa (PJ B, PJ C, PJ D).</p>
+
+          <div className="form-group">
+            <label className="label">{t('qualifications.cert_number')}</label>
+            <input className="input" placeholder="np. PL-01.01" value={certNumber} onChange={e => setCertNumber(e.target.value)} />
           </div>
-          <DateField label={t('qualifications.cert_expiry')} value={certExpiry} onChange={setCertExpiry} />
+
+          <div className="form-group">
+            <label className="label">{t('qualifications.cert_class')}</label>
+            <select className="input" value={certClass} onChange={e => setCertClass(e.target.value)}>
+              <option value="">{t('qualifications.cert_select')}</option>
+              {CERT_CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
+          {certClass && (
+            <DateField
+              label={`Data ważności klasy ${certClass}`}
+              value={certExpiry}
+              onChange={setCertExpiry}
+            />
+          )}
         </div>
 
         {/* Posiadane uprawnienia */}
