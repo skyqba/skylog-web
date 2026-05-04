@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
+import { useProfile } from '../useProfile'
 
 export default function Import() {
   const { t } = useTranslation()
+  const { isPremium, loading: profileLoading } = useProfile()
   const [step, setStep]         = useState('upload')
   const [rows, setRows]         = useState([])
   const [imported, setImported] = useState(0)
@@ -134,6 +136,24 @@ export default function Import() {
     }
     setErrors(errs)
     setStep('done')
+  }
+
+  if (!profileLoading && !isPremium) {
+    return (
+      <div>
+        <Navbar />
+        <div style={{ maxWidth: 520, margin: '0 auto', padding: '3rem 1rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⭐</div>
+          <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.75rem' }}>Funkcja Premium</h2>
+          <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+            Import skoków dostępny jest tylko dla użytkowników Premium.<br />Skontaktuj się z administratorem aby uzyskać dostęp.
+          </p>
+          <button onClick={() => navigate('/')} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', padding: '0.55rem 1.25rem', fontFamily: 'var(--font)', fontSize: '0.88rem', cursor: 'pointer' }}>
+            ← Wróć do dziennika
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
