@@ -41,7 +41,7 @@ const fmt = (d) => {
 export default function Settings() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { isPremium } = useProfile()
+  const { canLanguage  } = useProfile()
   const [currentLang, setCurrentLang] = useState(i18n.language?.startsWith('en') ? 'en' : 'pl')
   const [settings, setSettings] = useState(() => {
     try {
@@ -327,7 +327,7 @@ export default function Settings() {
         </div>
 
         {/* JĘZYK — tylko dla premium */}
-        {isPremium && (
+        {canLanguage &&  (
           <div className="card" style={{ marginBottom:'1rem' }}>
             <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>{t('settings.language')}</h3>
             <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>{t('settings.language_desc')}</p>

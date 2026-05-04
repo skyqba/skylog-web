@@ -7,7 +7,7 @@ import { useProfile } from '../useProfile'
 
 export default function Import() {
   const { t } = useTranslation()
-  const { isPremium, loading: profileLoading } = useProfile()
+  const { canImport, loading: profileLoading } = useProfile()
   const [step, setStep]         = useState('upload')
   const [rows, setRows]         = useState([])
   const [imported, setImported] = useState(0)
@@ -138,7 +138,7 @@ export default function Import() {
     setStep('done')
   }
 
-  if (!profileLoading && !isPremium) {
+  if (!profileLoading && !canImport) {
     return (
       <div>
         <Navbar />

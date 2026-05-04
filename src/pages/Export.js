@@ -27,7 +27,7 @@ const fmt = (d) => {
 
 export default function Export() {
   const { t } = useTranslation()
-  const { isPremium, loading: profileLoading } = useProfile()
+  const { canExport, loading: profileLoading } = useProfile()
   const [jumps, setJumps]             = useState([])
   const [selected, setSelected]       = useState(new Set())
   const [loading, setLoading]         = useState(true)
@@ -199,7 +199,7 @@ export default function Export() {
     cursor: col ? 'pointer' : 'default', userSelect: 'none',
   })
 
-  if (!profileLoading && !isPremium) {
+  if (!profileLoading && !canExport) {
     return (
       <div>
         <Navbar />

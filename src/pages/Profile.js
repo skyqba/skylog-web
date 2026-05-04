@@ -7,7 +7,7 @@ import { useProfile } from '../useProfile'
 
 export default function Profile() {
   const { t } = useTranslation()
-  const { isPremium } = useProfile()
+  const { canExport, canImport, canStats } = useProfile()
   const [profileBase, setProfileBase] = useState(null)
   const [preview, setPreview]         = useState(null)
   const [uploading, setUploading]     = useState(false)
@@ -257,13 +257,11 @@ export default function Profile() {
         <div className="card" style={{ marginBottom:'1rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>{t('profile.rigs_title')}</h3>
           <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>{t('profile.rigs_desc')}</p>
-
           {rigs.length === 0 && !showAddRig && (
             <div style={{ textAlign:'center', padding:'1.5rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>
               {t('profile.rigs_empty')}
             </div>
           )}
-
           {rigs.map(rig => {
             const status = rigStatus(rig.reserve_expiry)
             const isEditing = editingRig?.id === rig.id
@@ -316,7 +314,6 @@ export default function Profile() {
               </div>
             )
           })}
-
           {showAddRig && (
             <div style={{ background:'var(--bg3)', borderRadius:'var(--r)', padding:'1rem', marginBottom:'0.75rem', border:'1px solid var(--border2)' }}>
               <div style={{ fontFamily:'var(--head)', fontSize:'0.9rem', fontWeight:800, marginBottom:'0.75rem', color:'var(--accent2)' }}>{t('profile.rigs_new')}</div>
@@ -334,7 +331,6 @@ export default function Profile() {
               </div>
             </div>
           )}
-
           {!showAddRig && !editingRig && (
             <button onClick={() => setShowAddRig(true)}
               style={{ width:'100%', padding:'0.65rem', background:'var(--bg3)', border:'2px dashed var(--border2)', borderRadius:'var(--r)', color:'var(--accent2)', fontFamily:'var(--font)', fontSize:'0.88rem', fontWeight:500, cursor:'pointer', transition:'all 0.2s' }}
@@ -364,7 +360,7 @@ export default function Profile() {
         </div>
 
         {/* Przyciski nawigacyjne */}
-        {isPremium && (
+        {canStats && (
           <Link to="/stats" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
             <button className="btn ghost" style={{ width:'100%' }}>{t('profile.stats')}</button>
           </Link>
@@ -372,12 +368,12 @@ export default function Profile() {
         <Link to="/edit-jumps" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
           <button className="btn ghost" style={{ width:'100%' }}>{t('profile.edit_jumps')}</button>
         </Link>
-        {isPremium && (
+        {canExport && (
           <Link to="/export" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
             <button className="btn ghost" style={{ width:'100%' }}>{t('profile.export')}</button>
           </Link>
         )}
-        {isPremium && (
+        {canImport && (
           <Link to="/import" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
             <button className="btn ghost" style={{ width:'100%' }}>{t('profile.import')}</button>
           </Link>
