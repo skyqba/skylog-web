@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 
 export default function Register() {
-  const [form, setForm] = useState({ name:'', surname:'', city:'', email:'', password:'', password2:'' })
+  const { t } = useTranslation()
+  const [form, setForm] = useState({ name:'', surname:'', email:'', password:'', password2:'' })
   const [preview, setPreview] = useState(null)
   const [avatarFile, setAvatarFile] = useState(null)
   const [error, setError]     = useState('')
@@ -24,13 +26,13 @@ export default function Register() {
     e.preventDefault()
     setError('')
     if (!form.name || !form.surname || !form.email || !form.password) {
-      setError('Wypełnij wszystkie wymagane pola.'); return
+      setError(t('register.error_required')); return
     }
     if (form.password !== form.password2) {
-      setError('Hasła nie są zgodne.'); return
+      setError(t('register.error_passwords')); return
     }
     if (form.password.length < 6) {
-      setError('Hasło musi mieć minimum 6 znaków.'); return
+      setError(t('register.error_password_length')); return
     }
     setLoading(true)
 
@@ -42,13 +44,12 @@ export default function Register() {
     if (authErr) { setError(authErr.message); setLoading(false); return }
 
     const userId = data?.user?.id
-    if (!userId) { setError('Błąd rejestracji — spróbuj ponownie.'); setLoading(false); return }
+    if (!userId) { setError(t('register.error_generic')); setLoading(false); return }
 
     await supabase.from('profiles').upsert({
       id: userId,
       name: form.name.trim(),
       surname: form.surname.trim(),
-      city: form.city.trim(),
       avatar_url: null,
     })
 
@@ -83,27 +84,26 @@ export default function Register() {
         </div>
 
         <div className="card">
-          <h2 style={{ fontFamily:'var(--head)', fontSize:'1.2rem', marginBottom:'1.5rem', fontWeight:800 }}>Rejestracja</h2>
+          <h2 style={{ fontFamily:'var(--head)', fontSize:'1.2rem', marginBottom:'1.5rem', fontWeight:800 }}>{t('register.title')}</h2>
           <form onSubmit={handleRegister}>
             <div onClick={() => fileRef.current.click()} style={{ display:'flex', alignItems:'center', gap:'1rem', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--r)', padding:'0.75rem 1rem', cursor:'pointer', marginBottom:'1rem' }}>
               <div style={{ width:56, height:56, borderRadius:'50%', flexShrink:0, overflow:'hidden', background:'rgba(108,99,255,0.15)', border:'2px solid var(--accent)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>
                 {preview ? <img src={preview} alt="avatar" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : ''}
               </div>
               <div>
-                <div style={{ color:'var(--accent2)', fontWeight:500, fontSize:'0.88rem' }}>Dodaj zdjęcie profilowe</div>
-                <div style={{ color:'var(--muted)', fontSize:'0.78rem', marginTop:2 }}>JPG lub PNG · opcjonalne</div>
+                <div style={{ color:'var(--accent2)', fontWeight:500, fontSize:'0.88rem' }}>{t('register.add_photo')}</div>
+                <div style={{ color:'var(--muted)', fontSize:'0.78rem', marginTop:2 }}>{t('register.photo_hint')}</div>
               </div>
             </div>
             <input ref={fileRef} type="file" accept="image/*" onChange={pickAvatar} style={{ display:'none' }} />
             <div className="form-row">
-              <div className="form-group"><label className="label">Imię *</label><input className="input" placeholder="Jan" value={form.name} onChange={set('name')} /></div>
-              <div className="form-group"><label className="label">Nazwisko *</label><input className="input" placeholder="Kowalski" value={form.surname} onChange={set('surname')} /></div>
+              <div className="form-group"><label className="label">{t('register.first_name')}</label><input className="input" placeholder="Jan" value={form.name} onChange={set('name')} /></div>
+              <div className="form-group"><label className="label">{t('register.last_name')}</label><input className="input" placeholder="Kowalski" value={form.surname} onChange={set('surname')} /></div>
             </div>
-            <div className="form-group"><label className="label">Miejscowość</label><input className="input" placeholder="Warszawa" value={form.city} onChange={set('city')} /></div>
-            <div className="form-group"><label className="label">E-mail *</label><input className="input" type="email" placeholder="pilot@skylog.pl" value={form.email} onChange={set('email')} /></div>
+            <div className="form-group"><label className="label">{t('register.email')}</label><input className="input" type="email" placeholder="pilot@skylog.pl" value={form.email} onChange={set('email')} /></div>
             <div className="form-row">
-              <div className="form-group"><label className="label">Hasło * (min. 6)</label><input className="input" type="password" placeholder="••••••••" value={form.password} onChange={set('password')} /></div>
-              <div className="form-group"><label className="label">Powtórz hasło *</label><input className="input" type="password" placeholder="••••••••" value={form.password2} onChange={set('password2')} /></div>
+              <div className="form-group"><label className="label">{t('register.password')}</label><input className="input" type="password" placeholder="••••••••" value={form.password} onChange={set('password')} /></div>
+              <div className="form-group"><label className="label">{t('register.password2')}</label><input className="input" type="password" placeholder="••••••••" value={form.password2} onChange={set('password2')} /></div>
             </div>
             {error && (
               <div style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'var(--r)', padding:'0.65rem 0.9rem', color:'var(--danger)', fontSize:'0.85rem', marginBottom:'0.75rem' }}>
@@ -111,11 +111,12 @@ export default function Register() {
               </div>
             )}
             <button className="btn" type="submit" disabled={loading} style={{ marginTop:'0.5rem' }}>
-              {loading ? 'Tworzenie konta...' : 'Utwórz konto'}
+              {loading ? t('register.loading') : t('register.submit')}
             </button>
           </form>
           <p style={{ textAlign:'center', marginTop:'1.25rem', fontSize:'0.85rem', color:'var(--muted)' }}>
-            Masz już konto?{' '}<Link to="/login" style={{ color:'var(--accent2)', textDecoration:'none', fontWeight:500 }}>Zaloguj się</Link>
+            {t('register.have_account')}{' '}
+            <Link to="/login" style={{ color:'var(--accent2)', textDecoration:'none', fontWeight:500 }}>{t('register.login')}</Link>
           </p>
         </div>
       </div>
