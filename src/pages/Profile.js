@@ -346,22 +346,24 @@ export default function Profile() {
           {dropzones.length === 0 && <div style={{ textAlign:'center', padding:'1rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>{t('profile.dropzones_empty')}</div>}
           {dropzones.length > 0 && (
             <div style={{ marginBottom:'1rem' }}>
-              <select className="input" style={{ width:'100%', marginBottom:'0.75rem' }} defaultValue="">
-                <option value="" disabled>— Twoje strefy zrzutu ({dropzones.length}) —</option>
-                {dropzones.map(dz => (
-                  <option key={dz.id} value={dz.id}>{dz.name}</option>
-                ))}
-              </select>
-              <div style={{ display:'flex', flexDirection:'column', gap:'0.4rem' }}>
-                {dropzones.map(dz => (
-                  <div key={dz.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.5rem 0.75rem', background:'var(--bg3)', borderRadius:'var(--r)', border:'1px solid var(--border)' }}>
-                    <span style={{ fontSize:'0.85rem', fontWeight:500 }}>📍 {dz.name}</span>
-                    <button onClick={() => deleteDz(dz.id)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'0.9rem', padding:'0.1rem 0.3rem' }}
-                      onMouseEnter={e => e.target.style.color='var(--danger)'}
-                      onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>
-                  </div>
-                ))}
-              </div>
+              <details style={{ background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--r)', overflow:'hidden' }}>
+                <summary style={{ padding:'0.7rem 1rem', cursor:'pointer', fontSize:'0.88rem', fontWeight:500, listStyle:'none', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                  <span>📍 Twoje strefy zrzutu ({dropzones.length})</span>
+                  <span style={{ color:'var(--muted)', fontSize:'0.75rem' }}>▼</span>
+                </summary>
+                <div style={{ borderTop:'1px solid var(--border)', padding:'0.5rem' }}>
+                  {dropzones.map(dz => (
+                    <div key={dz.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.5rem 0.75rem', borderRadius:'var(--r)', marginBottom:'0.25rem' }}
+                      onMouseEnter={e => e.currentTarget.style.background='var(--bg2)'}
+                      onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                      <span style={{ fontSize:'0.85rem' }}>📍 {dz.name}</span>
+                      <button onClick={() => deleteDz(dz.id)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'0.9rem', padding:'0.1rem 0.4rem', borderRadius:4 }}
+                        onMouseEnter={e => e.currentTarget.style.color='var(--danger)'}
+                        onMouseLeave={e => e.currentTarget.style.color='var(--muted)'}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              </details>
             </div>
           )}
           <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
