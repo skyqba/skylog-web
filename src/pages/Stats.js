@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
@@ -221,13 +221,15 @@ export default function Stats() {
 
   const perCity = {}
   jumps.filter(j => j.city).forEach(j => { const c = j.city.trim(); perCity[c] = (perCity[c] || 0) + 1 })
-  const topCities   = Object.entries(perCity).sort((a,b) => b[1]-a[1]).slice(0,8)
-  const maxCity     = topCities[0]?.[1] || 1
+  const allCities   = Object.entries(perCity).sort((a,b) => b[1]-a[1])
+  const topCities   = allCities.slice(0,8)
+  const maxCity     = allCities[0]?.[1] || 1
 
   const perAircraft = {}
   jumps.filter(j => j.aircraft).forEach(j => { const a = j.aircraft.trim(); perAircraft[a] = (perAircraft[a] || 0) + 1 })
-  const topAircraft = Object.entries(perAircraft).sort((a,b) => b[1]-a[1]).slice(0,6)
-  const maxAircraft = topAircraft[0]?.[1] || 1
+  const allAircraft = Object.entries(perAircraft).sort((a,b) => b[1]-a[1])
+  const topAircraft = allAircraft.slice(0,6)
+  const maxAircraft = allAircraft[0]?.[1] || 1
 
   const perChute = {}
   jumps.filter(j => j.parachute).forEach(j => { const p = j.parachute.trim(); perChute[p] = (perChute[p] || 0) + 1 })
@@ -584,19 +586,13 @@ export default function Stats() {
         )}
 
         {/* Top strefy */}
-        {topCities.length > 0 && (
-          <div className="card" style={{ marginBottom:'1.5rem' }}>
-            <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Najczęstsze strefy zrzutu</h3>
-            {topCities.map(([city, count]) => <Bar key={city} label={city} value={count} max={maxCity} color="var(--accent2)" />)}
-          </div>
+        {allCities.length > 0 && (
+          <CitiesSection allCities={allCities} maxCity={maxCity} />
         )}
 
         {/* Top samoloty */}
-        {topAircraft.length > 0 && (
-          <div className="card" style={{ marginBottom:'1.5rem' }}>
-            <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Najczęstsze samoloty</h3>
-            {topAircraft.map(([aircraft, count]) => <Bar key={aircraft} label={aircraft} value={count} max={maxAircraft} color="#FBBF24" />)}
-          </div>
+        {allAircraft.length > 0 && (
+          <AircraftSection allAircraft={allAircraft} maxAircraft={maxAircraft} />
         )}
 
         {/* Rodzaje skoków */}
@@ -616,6 +612,39 @@ export default function Stats() {
         )}
 
       </div>
+    </div>
+  )
+}
+function CitiesSection({ allCities, maxCity }) {
+  const [showAll, setShowAll] = React.useState(false)
+  const visible = showAll ? allCities : allCities.slice(0, 8)
+  return (
+    <div className="card" style={{ marginBottom:'1.5rem' }}>
+      <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Najczęstsze strefy zrzutu</h3>
+      {visible.map(([city, count]) => <Bar key={city} label={city} value={count} max={maxCity} color="var(--accent2)" />)}
+      {allCities.length > 8 && (
+        <button onClick={() => setShowAll(s => !s)}
+          style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 1rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.82rem', marginTop:'0.5rem', width:'100%' }}>
+          {showAll ? '▲ Pokaż mniej' : `▼ Pokaż wszystkie (${allCities.length})`}
+        </button>
+      )}
+    </div>
+  )
+}
+
+function AircraftSection({ allAircraft, maxAircraft }) {
+  const [showAll, setShowAll] = React.useState(false)
+  const visible = showAll ? allAircraft : allAircraft.slice(0, 6)
+  return (
+    <div className="card" style={{ marginBottom:'1.5rem' }}>
+      <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1.25rem' }}>Najczęstsze samoloty</h3>
+      {visible.map(([aircraft, count]) => <Bar key={aircraft} label={aircraft} value={count} max={maxAircraft} color="#FBBF24" />)}
+      {allAircraft.length > 6 && (
+        <button onClick={() => setShowAll(s => !s)}
+          style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', padding:'0.4rem 1rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.82rem', marginTop:'0.5rem', width:'100%' }}>
+          {showAll ? '▲ Pokaż mniej' : `▼ Pokaż wszystkie (${allAircraft.length})`}
+        </button>
+      )}
     </div>
   )
 }
