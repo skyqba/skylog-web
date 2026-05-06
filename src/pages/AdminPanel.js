@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 import { useProfile } from '../useProfile'
 import { useNavigate } from 'react-router-dom'
@@ -21,13 +21,6 @@ export default function AdminPanel() {
   const [tab, setTab] = useState('users')
   const navigate = useNavigate()
 
-  const reloadUsers = useCallback(() => {
-    supabase
-      .from('profiles_with_email')
-      .select('id, email, is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language')
-      .then(({ data }) => { if (data) setUsers(data) })
-  }, [])
-
   useEffect(() => {
     if (loading) return
     if (!isAdmin) { navigate('/'); return }
@@ -44,20 +37,14 @@ export default function AdminPanel() {
 
   const togglePremium = async (u) => {
     const next = !u.is_premium
-    const { error } = await supabase.from('profiles').update({ is_premium: next }).eq('id', u.id)
-    if (!error) {
-      setUsers(prev => prev.map(x => x.id === u.id ? { ...x, is_premium: next } : x))
-      setTimeout(reloadUsers, 500)
-    }
+    setUsers(prev => prev.map(x => x.id === u.id ? { ...x, is_premium: next } : x))
+    await supabase.from('profiles').update({ is_premium: next }).eq('id', u.id)
   }
 
   const togglePerm = async (u, key) => {
     const next = !u[key]
-    const { error } = await supabase.from('profiles').update({ [key]: next }).eq('id', u.id)
-    if (!error) {
-      setUsers(prev => prev.map(x => x.id === u.id ? { ...x, [key]: next } : x))
-      setTimeout(reloadUsers, 500)
-    }
+    setUsers(prev => prev.map(x => x.id === u.id ? { ...x, [key]: next } : x))
+    await supabase.from('profiles').update({ [key]: next }).eq('id', u.id)
   }
 
   const addAnnouncement = async () => {
@@ -90,7 +77,6 @@ export default function AdminPanel() {
 
   return (
     <div style={{ maxWidth: 700, margin: '0 auto', padding: '2rem 1rem' }}>
-
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1.5rem' }}>
         <div>
           <h2 style={{ fontFamily:'var(--head)', fontSize:'1.5rem', fontWeight:900, margin:0 }}>🛡 Panel Admina</h2>
@@ -100,7 +86,6 @@ export default function AdminPanel() {
           ← Wróć
         </button>
       </div>
-
       <div style={{ display:'flex', gap:'0.5rem', marginBottom:'1.5rem' }}>
         {[{ key:'users', label:'👥 Użytkownicy' }, { key:'announcements', label:'📢 Powiadomienia' }].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
@@ -109,7 +94,6 @@ export default function AdminPanel() {
           </button>
         ))}
       </div>
-
       {tab === 'users' && (
         <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
           {users.map(u => {
@@ -126,12 +110,8 @@ export default function AdminPanel() {
                       {u.is_admin && <span style={{ marginLeft:'0.5rem', fontSize:'0.65rem', fontFamily:'var(--mono)', color:'var(--accent2)', fontWeight:700, letterSpacing:1 }}>ADMIN</span>}
                     </div>
                     <div style={{ display:'flex', flexWrap:'wrap', gap:'0.3rem', marginTop:'0.35rem' }}>
-                      {u.is_premium && (
-                        <span style={{ display:'inline-flex', alignItems:'center', gap:'0.25rem', background:'rgba(108,99,255,0.15)', border:'1px solid rgba(108,99,255,0.4)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.68rem', color:'var(--accent2)', fontWeight:600 }}>⭐ Premium</span>
-                      )}
-                      {!u.is_premium && activePerm.length === 0 && !u.is_admin && (
-                        <span style={{ display:'inline-flex', alignItems:'center', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.68rem', color:'var(--muted)' }}>brak uprawnień</span>
-                      )}
+                      {u.is_premium && <span style={{ display:'inline-flex', alignItems:'center', gap:'0.25rem', background:'rgba(108,99,255,0.15)', border:'1px solid rgba(108,99,255,0.4)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.68rem', color:'var(--accent2)', fontWeight:600 }}>⭐ Premium</span>}
+                      {!u.is_premium && activePerm.length === 0 && !u.is_admin && <span style={{ display:'inline-flex', alignItems:'center', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.68rem', color:'var(--muted)' }}>brak uprawnień</span>}
                       {!u.is_premium && activePerm.map(p => (
                         <span key={p.key} style={{ display:'inline-flex', alignItems:'center', gap:'0.25rem', background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.68rem', color:'var(--success)', fontWeight:600 }}>
                           {p.icon} {p.label}
@@ -175,27 +155,18 @@ export default function AdminPanel() {
           })}
         </div>
       )}
-
       {tab === 'announcements' && (
         <div>
           <div className="card" style={{ marginBottom:'1.5rem' }}>
             <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'1rem' }}>🚨 Nowe powiadomienie</h3>
-            <textarea
-              value={newMsg}
-              onChange={e => setNewMsg(e.target.value)}
-              placeholder="Wpisz treść powiadomienia..."
-              rows={3}
-              style={{ width:'100%', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--r)', color:'var(--text)', fontFamily:'var(--font)', fontSize:'0.88rem', padding:'0.75rem', outline:'none', resize:'vertical', boxSizing:'border-box', marginBottom:'0.75rem' }}
-            />
+            <textarea value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Wpisz treść powiadomienia..." rows={3}
+              style={{ width:'100%', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--r)', color:'var(--text)', fontFamily:'var(--font)', fontSize:'0.88rem', padding:'0.75rem', outline:'none', resize:'vertical', boxSizing:'border-box', marginBottom:'0.75rem' }} />
             <button onClick={addAnnouncement} disabled={saving || !newMsg.trim()} className="btn" style={{ width:'auto', padding:'0.5rem 1.5rem' }}>
               {saving ? 'Wysyłanie...' : '🚨 Wyślij powiadomienie'}
             </button>
           </div>
-
           <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
-            {announcements.length === 0 && (
-              <div style={{ textAlign:'center', padding:'2rem', color:'var(--muted)', fontSize:'0.85rem' }}>Brak powiadomień</div>
-            )}
+            {announcements.length === 0 && <div style={{ textAlign:'center', padding:'2rem', color:'var(--muted)', fontSize:'0.85rem' }}>Brak powiadomień</div>}
             {announcements.map(a => (
               <div key={a.id} style={{ background: a.active ? 'rgba(248,113,113,0.1)' : 'var(--bg2)', border:`1px solid ${a.active ? 'rgba(248,113,113,0.4)' : 'var(--border)'}`, borderRadius:'var(--r2)', padding:'1rem', opacity: a.active ? 1 : 0.5 }}>
                 <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'1rem' }}>
@@ -204,10 +175,7 @@ export default function AdminPanel() {
                       <span>🚨</span>
                       <span style={{ fontSize:'0.68rem', fontFamily:'var(--mono)', color:'var(--muted)', textTransform:'uppercase', letterSpacing:1 }}>Ważne</span>
                       <span style={{ fontSize:'0.68rem', color:'var(--muted)' }}>· {new Date(a.created_at).toLocaleDateString('pl-PL')}</span>
-                      {a.active
-                        ? <span style={{ fontSize:'0.68rem', color:'var(--success)', fontWeight:600 }}>● Aktywne</span>
-                        : <span style={{ fontSize:'0.68rem', color:'var(--muted)' }}>○ Nieaktywne</span>
-                      }
+                      {a.active ? <span style={{ fontSize:'0.68rem', color:'var(--success)', fontWeight:600 }}>● Aktywne</span> : <span style={{ fontSize:'0.68rem', color:'var(--muted)' }}>○ Nieaktywne</span>}
                     </div>
                     <div style={{ fontSize:'0.88rem', color:'var(--text)', lineHeight:1.5 }}>{a.message}</div>
                   </div>
@@ -216,8 +184,7 @@ export default function AdminPanel() {
                       style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:7, color:'var(--muted)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.65rem', fontFamily:'var(--font)' }}>
                       {a.active ? 'Wyłącz' : 'Włącz'}
                     </button>
-                    <button onClick={() => deleteAnnouncement(a.id)}
-                      style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem' }}
+                    <button onClick={() => deleteAnnouncement(a.id)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem' }}
                       onMouseEnter={e => e.target.style.color='var(--danger)'}
                       onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>
                   </div>
