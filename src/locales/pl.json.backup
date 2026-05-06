@@ -40,7 +40,7 @@
   },
   "journal": {
     "title": "Dziennik skoków",
-    "total_jumps": "Laczna liczba skoków",
+    "total_jumps": "Łączna liczba skoków",
     "add_jump": "+ Dodaj skok",
     "repeat_last": "Powtórz ostatni",
     "repeat_title": "Dodaj skok z tymi samymi danymi co poprzedni",
