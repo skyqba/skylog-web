@@ -2,6 +2,7 @@
   "nav": {
     "journal": "Dziennik",
     "profile": "Profil",
+    "settings": "Ustawienia",
     "logout": "Wyloguj"
   },
   "login": {

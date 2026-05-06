@@ -40,6 +40,7 @@ export default function Navbar() {
         <div className="desktop-nav" style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
           <NavLink to="/"        label={t('nav.journal')} active={pathname === '/'} />
           <NavLink to="/profile" label={t('nav.profile')} active={pathname === '/profile'} />
+          <NavLink to="/settings" label={t('nav.settings')} active={pathname === '/settings'} />
           {isAdmin && (
             <NavLink to="/admin" label="🛡 Admin" active={pathname === '/admin'} />
           )}
@@ -81,6 +82,7 @@ export default function Navbar() {
         }}>
           <MobileNavLink to="/"        label={t('nav.journal')} active={pathname === '/'}        onClick={() => setMenuOpen(false)} />
           <MobileNavLink to="/profile" label={t('nav.profile')} active={pathname === '/profile'} onClick={() => setMenuOpen(false)} />
+          <MobileNavLink to="/settings" label={t('nav.settings')} active={pathname === '/settings'} onClick={() => setMenuOpen(false)} />
           {isAdmin && (
             <MobileNavLink to="/admin" label="🛡 Admin" active={pathname === '/admin'} onClick={() => setMenuOpen(false)} />
           )}
