@@ -391,9 +391,7 @@ export default function Profile() {
             <button className="btn ghost" style={{ width:'100%' }}>{t('profile.import')}</button>
           </Link>
         )}
-        <Link to="/settings" style={{ textDecoration:'none', display:'block', marginBottom:'0.75rem' }}>
-          <button className="btn ghost" style={{ width:'100%' }}>{t('profile.settings')}</button>
-        </Link>
+
         <button className="btn danger" onClick={async () => { await supabase.auth.signOut(); navigate('/login') }} style={{ marginBottom:'2rem' }}>
           {t('profile.logout')}
         </button>
