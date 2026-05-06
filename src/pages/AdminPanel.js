@@ -37,15 +37,13 @@ export default function AdminPanel() {
 
   const togglePremium = async (u) => {
     const next = !u.is_premium
-    const { data, error } = await supabase.from('profiles').update({ is_premium: next }).eq('id', u.id).select()
-    console.log('togglePremium:', { data, error, userId: u.id, next })
+    const { error } = await supabase.from('profiles').update({ is_premium: next }).eq('id', u.id)
     if (!error) setUsers(prev => prev.map(x => x.id === u.id ? { ...x, is_premium: next } : x))
   }
 
   const togglePerm = async (u, key) => {
     const next = !u[key]
-    const { data, error } = await supabase.from('profiles').update({ [key]: next }).eq('id', u.id).select()
-    console.log('togglePerm:', { data, error, userId: u.id, key, next })
+    const { error } = await supabase.from('profiles').update({ [key]: next }).eq('id', u.id)
     if (!error) setUsers(prev => prev.map(x => x.id === u.id ? { ...x, [key]: next } : x))
   }
 
