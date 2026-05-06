@@ -32,7 +32,7 @@ const JUMP_TYPES_EN = [
   { value: 'inny',                    label: 'Other...' },
 ]
 
-const AIRCRAFT_LIST = [
+const DEFAULT_AIRCRAFT = [
   'Cessna 182', 'Cessna 206', 'Cessna 208 Caravan', 'Cessna 208B Grand Caravan',
   'Pilatus PC-6 Porter', 'Antonov An-2', 'Antonov An-28', 'AN-28 Bryza',
   'Let L-410 Turbolet', 'PAC 750 XL', 'de Havilland DHC-6 Twin Otter',
@@ -50,6 +50,7 @@ export default function AddJump() {
   })
   const [mainChutes, setMainChutes]                   = useState([])
   const [dropzones, setDropzones]                     = useState([])
+  const [userAircraft, setUserAircraft]               = useState([])
   const [error, setError]                             = useState('')
   const [loading, setLoading]                         = useState(false)
   const [aircraftSuggestions, setAircraftSuggestions] = useState([])
@@ -58,14 +59,16 @@ export default function AddJump() {
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      const [{ data: rigs }, { data: dz }, { data: lastJump }] = await Promise.all([
+      const [{ data: rigs }, { data: dz }, { data: lastJump }, { data: ac }] = await Promise.all([
         supabase.from('rigs').select('main').eq('user_id', user.id).not('main', 'is', null),
         supabase.from('dropzones').select('*').eq('user_id', user.id).order('name'),
         supabase.from('jumps').select('number').eq('user_id', user.id).order('number', { ascending: false }).limit(1),
+        supabase.from('aircraft').select('*').eq('user_id', user.id).order('name'),
       ])
       const uniqueChutes = [...new Set((rigs || []).map(r => r.main).filter(Boolean))]
       setMainChutes(uniqueChutes)
       setDropzones(dz || [])
+      setUserAircraft(ac || [])
       const nextNum = lastJump && lastJump.length > 0 ? (lastJump[0].number + 1) : 1
       setForm(f => ({ ...f, number: String(nextNum) }))
     }
@@ -74,19 +77,33 @@ export default function AddJump() {
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
 
+  const allAircraftNames = [
+    ...userAircraft.map(a => a.name),
+    ...DEFAULT_AIRCRAFT.filter(d => !userAircraft.some(a => a.name === d))
+  ]
+
   const handleAircraftChange = (e) => {
     const val = e.target.value
     setForm(f => ({ ...f, aircraft: val }))
     if (val.length > 0) {
-      setAircraftSuggestions(AIRCRAFT_LIST.filter(a => a.toLowerCase().includes(val.toLowerCase())))
+      setAircraftSuggestions(allAircraftNames.filter(a => a.toLowerCase().includes(val.toLowerCase())))
     } else {
       setAircraftSuggestions([])
     }
   }
 
-  const handleAircraftSelect = (a) => {
+  const handleAircraftSelect = async (a) => {
     setForm(f => ({ ...f, aircraft: a }))
     setAircraftSuggestions([])
+    if (!userAircraft.some(ua => ua.name === a)) {
+      const { data: { user } } = await supabase.auth.getUser()
+      const { data } = await supabase.from('aircraft').insert({ user_id: user.id, name: a }).select().single()
+      if (data) setUserAircraft(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+    }
+  }
+
+  const handleAircraftBlur = () => {
+    setTimeout(() => setAircraftSuggestions([]), 150)
   }
 
   const handleSave = async (e) => {
@@ -230,33 +247,37 @@ export default function AddJump() {
                 value={form.aircraft}
                 maxLength={150}
                 onChange={handleAircraftChange}
-                onBlur={() => setTimeout(() => setAircraftSuggestions([]), 150)}
+                onBlur={handleAircraftBlur}
                 autoComplete="off"
               />
               {aircraftSuggestions.length > 0 && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 'var(--r)', overflow: 'hidden', marginTop: 2 }}>
+                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 'var(--r)', overflow: 'hidden', marginTop: 2, maxHeight: 220, overflowY: 'auto' }}>
                   {aircraftSuggestions.map(a => (
                     <div
                       key={a}
                       onMouseDown={() => handleAircraftSelect(a)}
-                      style={{ padding: '0.55rem 0.9rem', fontSize: '0.85rem', color: 'var(--text)', cursor: 'pointer', borderBottom: '1px solid var(--border)', transition: 'background 0.15s' }}
+                      style={{ padding: '0.55rem 0.9rem', fontSize: '0.85rem', color: 'var(--text)', cursor: 'pointer', borderBottom: '1px solid var(--border)', transition: 'background 0.15s', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                       onMouseEnter={e => e.currentTarget.style.background = 'var(--bg3)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
+                      {userAircraft.some(ua => ua.name === a) && <span style={{ fontSize: '0.65rem', color: 'var(--accent2)', fontWeight: 700 }}>★</span>}
                       {a}
                     </div>
                   ))}
                 </div>
               )}
+              <div style={{ fontSize: '0.72rem', color: 'var(--muted)', marginTop: '0.35rem' }}>
+                💡 Zarządzaj listą samolotów w Profilu.
+              </div>
             </div>
 
             {/* Wynik - tylko dla ACC */}
-            {form.jump_type === 'ACC (Celność lądowania)' || form.jump_type === 'ACC (Accuracy)' ? (
+            {(form.jump_type === 'ACC (Celność lądowania)' || form.jump_type === 'ACC (Accuracy)') && (
               <div className="form-group">
                 <label className="label">{t('add_jump.result')}</label>
                 <input className="input" placeholder={t('add_jump.result_placeholder')} value={form.result} maxLength={150} onChange={set('result')} />
               </div>
-            ) : null}
+            )}
 
             {/* Uwagi */}
             <div className="form-group">
