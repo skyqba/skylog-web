@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabase'
 import { useProfile } from '../useProfile'
 import { useNavigate } from 'react-router-dom'
@@ -21,6 +21,13 @@ export default function AdminPanel() {
   const [tab, setTab] = useState('users')
   const navigate = useNavigate()
 
+  const reloadUsers = useCallback(() => {
+    supabase
+      .from('profiles_with_email')
+      .select('id, email, is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language')
+      .then(({ data }) => setUsers(data || []))
+  }, [])
+
   useEffect(() => {
     if (loading) return
     if (!isAdmin) { navigate('/'); return }
@@ -38,13 +45,13 @@ export default function AdminPanel() {
   const togglePremium = async (u) => {
     const next = !u.is_premium
     const { error } = await supabase.from('profiles').update({ is_premium: next }).eq('id', u.id)
-    if (!error) setUsers(prev => prev.map(x => x.id === u.id ? { ...x, is_premium: next } : x))
+    if (!error) reloadUsers()
   }
 
   const togglePerm = async (u, key) => {
     const next = !u[key]
     const { error } = await supabase.from('profiles').update({ [key]: next }).eq('id', u.id)
-    if (!error) setUsers(prev => prev.map(x => x.id === u.id ? { ...x, [key]: next } : x))
+    if (!error) reloadUsers()
   }
 
   const addAnnouncement = async () => {
