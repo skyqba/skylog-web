@@ -97,10 +97,10 @@ export default function Register() {
             </div>
             <input ref={fileRef} type="file" accept="image/*" onChange={pickAvatar} style={{ display:'none' }} />
             <div className="form-row">
-              <div className="form-group"><label className="label">{t('register.first_name')}</label><input className="input" placeholder="Jan" value={form.name} onChange={set('name')} /></div>
-              <div className="form-group"><label className="label">{t('register.last_name')}</label><input className="input" placeholder="Kowalski" value={form.surname} onChange={set('surname')} /></div>
+              <div className="form-group"><label className="label">{t('register.first_name')}</label><input className="input" placeholder="Pinio" value={form.name} onChange={set('name')} /></div>
+              <div className="form-group"><label className="label">{t('register.last_name')}</label><input className="input" placeholder="Zajchoś" value={form.surname} onChange={set('surname')} /></div>
             </div>
-            <div className="form-group"><label className="label">{t('register.email')}</label><input className="input" type="email" placeholder="pilot@skylog.pl" value={form.email} onChange={set('email')} /></div>
+            <div className="form-group"><label className="label">{t('register.email')}</label><input className="input" type="email" placeholder="twój emial" value={form.email} onChange={set('email')} /></div>
             <div className="form-row">
               <div className="form-group"><label className="label">{t('register.password')}</label><input className="input" type="password" placeholder="••••••••" value={form.password} onChange={set('password')} /></div>
               <div className="form-group"><label className="label">{t('register.password2')}</label><input className="input" type="password" placeholder="••••••••" value={form.password2} onChange={set('password2')} /></div>
