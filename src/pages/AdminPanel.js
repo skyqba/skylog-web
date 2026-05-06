@@ -37,14 +37,16 @@ export default function AdminPanel() {
 
   const togglePremium = async (u) => {
     const next = !u.is_premium
-    await supabase.from('profiles').update({ is_premium: next }).eq('id', u.id)
-    setUsers(prev => prev.map(x => x.id === u.id ? { ...x, is_premium: next } : x))
+    const { data, error } = await supabase.from('profiles').update({ is_premium: next }).eq('id', u.id).select()
+    console.log('togglePremium:', { data, error, userId: u.id, next })
+    if (!error) setUsers(prev => prev.map(x => x.id === u.id ? { ...x, is_premium: next } : x))
   }
 
   const togglePerm = async (u, key) => {
     const next = !u[key]
-    await supabase.from('profiles').update({ [key]: next }).eq('id', u.id)
-    setUsers(prev => prev.map(x => x.id === u.id ? { ...x, [key]: next } : x))
+    const { data, error } = await supabase.from('profiles').update({ [key]: next }).eq('id', u.id).select()
+    console.log('togglePerm:', { data, error, userId: u.id, key, next })
+    if (!error) setUsers(prev => prev.map(x => x.id === u.id ? { ...x, [key]: next } : x))
   }
 
   const addAnnouncement = async () => {
@@ -78,7 +80,6 @@ export default function AdminPanel() {
   return (
     <div style={{ maxWidth: 700, margin: '0 auto', padding: '2rem 1rem' }}>
 
-      {/* Nagłówek */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1.5rem' }}>
         <div>
           <h2 style={{ fontFamily:'var(--head)', fontSize:'1.5rem', fontWeight:900, margin:0 }}>🛡 Panel Admina</h2>
@@ -89,7 +90,6 @@ export default function AdminPanel() {
         </button>
       </div>
 
-      {/* Tabs */}
       <div style={{ display:'flex', gap:'0.5rem', marginBottom:'1.5rem' }}>
         {[{ key:'users', label:'👥 Użytkownicy' }, { key:'announcements', label:'📢 Powiadomienia' }].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
@@ -99,7 +99,6 @@ export default function AdminPanel() {
         ))}
       </div>
 
-      {/* TAB: Użytkownicy */}
       {tab === 'users' && (
         <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
           {users.map(u => {
@@ -166,7 +165,6 @@ export default function AdminPanel() {
         </div>
       )}
 
-      {/* TAB: Powiadomienia */}
       {tab === 'announcements' && (
         <div>
           <div className="card" style={{ marginBottom:'1.5rem' }}>
