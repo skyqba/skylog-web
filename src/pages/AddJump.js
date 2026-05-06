@@ -250,11 +250,13 @@ export default function AddJump() {
               )}
             </div>
 
-            {/* Wynik */}
-            <div className="form-group">
-              <label className="label">{t('add_jump.result')}</label>
-              <input className="input" placeholder={t('add_jump.result_placeholder')} value={form.result} maxLength={150} onChange={set('result')} />
-            </div>
+            {/* Wynik - tylko dla ACC */}
+            {form.jump_type === 'ACC (Celność lądowania)' || form.jump_type === 'ACC (Accuracy)' ? (
+              <div className="form-group">
+                <label className="label">{t('add_jump.result')}</label>
+                <input className="input" placeholder={t('add_jump.result_placeholder')} value={form.result} maxLength={150} onChange={set('result')} />
+              </div>
+            ) : null}
 
             {/* Uwagi */}
             <div className="form-group">
