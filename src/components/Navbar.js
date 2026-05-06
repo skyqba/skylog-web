@@ -9,7 +9,7 @@ export default function Navbar() {
   const { pathname } = useLocation()
   const { t } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
-  const { isAdmin } = useProfile()
+  const { isAdmin, isPremium } = useProfile()
 
   const logout = async () => {
     sessionStorage.removeItem('dismissedRigs')
@@ -31,6 +31,7 @@ export default function Navbar() {
           <div>
             <span style={{ fontFamily:'var(--head)', fontSize:'1.35rem', fontWeight:900, color:'var(--text)', letterSpacing:'-0.5px' }}>
               <span style={{ color:'var(--accent2)' }}>Jump</span>Log<span style={{ color:'var(--accent2)' }}>X</span>
+              {isPremium && <span style={{ color:'#F59E0B', fontSize:'0.85rem', fontWeight:800, marginLeft:'0.3rem', letterSpacing:'0px' }}>Pro</span>}
             </span>
             <span style={{ display:'block', fontFamily:'var(--font)', fontSize:'0.62rem', color:'var(--muted)', letterSpacing:'0.5px', marginTop:'-2px' }}>by SkyQba ver 1.0</span>
           </div>
