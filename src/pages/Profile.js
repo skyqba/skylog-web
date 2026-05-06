@@ -113,12 +113,26 @@ export default function Profile() {
     setDropzones(dz => dz.filter(d => d.id !== id))
   }
 
+  const DEFAULT_AIRCRAFT = [
+    'Cessna 182', 'Cessna 206', 'Cessna 208 Caravan', 'Cessna 208B Grand Caravan',
+    'Pilatus PC-6 Porter', 'Antonov An-2', 'Antonov An-28', 'AN-28 Bryza',
+    'Let L-410 Turbolet', 'PAC 750 XL', 'de Havilland DHC-6 Twin Otter',
+    'Beechcraft King Air', 'CASA C-295', 'Mi-8', 'Mi-2', 'AS350',
+  ]
+
   const addAircraft = async () => {
     if (!newAc.trim()) return
     const { data: { user } } = await supabase.auth.getUser()
     const { data } = await supabase.from('aircraft').insert({ user_id: user.id, name: newAc.trim() }).select().single()
     if (data) setAircraft(ac => [...ac, data].sort((a, b) => a.name.localeCompare(b.name)))
     setNewAc('')
+  }
+
+  const addDefaultAircraft = async (name) => {
+    if (aircraft.some(a => a.name === name)) return
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data } = await supabase.from('aircraft').insert({ user_id: user.id, name }).select().single()
+    if (data) setAircraft(ac => [...ac, data].sort((a, b) => a.name.localeCompare(b.name)))
   }
 
   const deleteAircraft = async (id) => {
@@ -386,6 +400,22 @@ export default function Profile() {
           <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
             <input className="input" placeholder="np. Cessna 182" value={newAc} onChange={e => setNewAc(e.target.value)} onKeyDown={e => e.key==='Enter' && addAircraft()} style={{ flex:1 }} />
             <button onClick={addAircraft} disabled={!newAc.trim()} className="btn" style={{ width:'auto', padding:'0 1.25rem' }}>+ Dodaj</button>
+          </div>
+          <div style={{ marginTop:'1rem' }}>
+            <div style={{ fontSize:'0.72rem', color:'var(--muted)', fontFamily:'var(--mono)', textTransform:'uppercase', letterSpacing:1, marginBottom:'0.5rem' }}>Szybkie dodawanie</div>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:'0.4rem' }}>
+              {DEFAULT_AIRCRAFT.filter(d => !aircraft.some(a => a.name === d)).map(name => (
+                <button key={name} onClick={() => addDefaultAircraft(name)}
+                  style={{ background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:6, color:'var(--muted)', padding:'0.3rem 0.65rem', fontSize:'0.75rem', cursor:'pointer', fontFamily:'var(--font)' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor='var(--accent)'; e.currentTarget.style.color='var(--accent2)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.color='var(--muted)' }}>
+                  + {name}
+                </button>
+              ))}
+              {DEFAULT_AIRCRAFT.every(d => aircraft.some(a => a.name === d)) && (
+                <span style={{ fontSize:'0.75rem', color:'var(--success)' }}>✓ Wszystkie domyślne samoloty dodane</span>
+              )}
+            </div>
           </div>
         </div>
 
