@@ -25,7 +25,7 @@ export default function AdminPanel() {
     supabase
       .from('profiles_with_email')
       .select('id, email, is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language')
-      .then(({ data }) => setUsers(data || []))
+      .then(({ data }) => { if (data) setUsers(data) })
   }, [])
 
   useEffect(() => {
@@ -45,13 +45,19 @@ export default function AdminPanel() {
   const togglePremium = async (u) => {
     const next = !u.is_premium
     const { error } = await supabase.from('profiles').update({ is_premium: next }).eq('id', u.id)
-    if (!error) reloadUsers()
+    if (!error) {
+      setUsers(prev => prev.map(x => x.id === u.id ? { ...x, is_premium: next } : x))
+      setTimeout(reloadUsers, 500)
+    }
   }
 
   const togglePerm = async (u, key) => {
     const next = !u[key]
     const { error } = await supabase.from('profiles').update({ [key]: next }).eq('id', u.id)
-    if (!error) reloadUsers()
+    if (!error) {
+      setUsers(prev => prev.map(x => x.id === u.id ? { ...x, [key]: next } : x))
+      setTimeout(reloadUsers, 500)
+    }
   }
 
   const addAnnouncement = async () => {
