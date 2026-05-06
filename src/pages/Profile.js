@@ -15,6 +15,8 @@ export default function Profile() {
   const [docs, setDocs]               = useState([])
   const [uploadingDoc, setUploadingDoc] = useState(false)
   const [newDz, setNewDz]             = useState('')
+  const [aircraft, setAircraft]       = useState([])
+  const [newAc, setNewAc]             = useState('')
   const [msgs, setMsgs]               = useState({})
   const [saving, setSaving]           = useState({})
   const [rigs, setRigs]               = useState([])
@@ -28,17 +30,19 @@ export default function Profile() {
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
-    const [{ data: prof }, { data: dz }, { data: docList }, { data: rigList }] = await Promise.all([
+    const [{ data: prof }, { data: dz }, { data: docList }, { data: rigList }, { data: acList }] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase.from('dropzones').select('*').eq('user_id', user.id).order('name'),
       supabase.storage.from('documents').list(user.id, { sortBy: { column: 'created_at', order: 'desc' } }),
       supabase.from('rigs').select('*').eq('user_id', user.id).order('created_at'),
+      supabase.from('aircraft').select('*').eq('user_id', user.id).order('name'),
     ])
     setProfileBase({ ...prof, email: user.email, uid: user.id })
     if (prof?.avatar_url) setPreview(prof.avatar_url + '?t=' + Date.now())
     setDropzones(dz || [])
     setDocs(docList || [])
     setRigs(rigList || [])
+    setAircraft(acList || [])
   }, [])
 
   useEffect(() => { load() }, [load])
@@ -107,6 +111,19 @@ export default function Profile() {
   const deleteDz = async (id) => {
     await supabase.from('dropzones').delete().eq('id', id)
     setDropzones(dz => dz.filter(d => d.id !== id))
+  }
+
+  const addAircraft = async () => {
+    if (!newAc.trim()) return
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data } = await supabase.from('aircraft').insert({ user_id: user.id, name: newAc.trim() }).select().single()
+    if (data) setAircraft(ac => [...ac, data].sort((a, b) => a.name.localeCompare(b.name)))
+    setNewAc('')
+  }
+
+  const deleteAircraft = async (id) => {
+    await supabase.from('aircraft').delete().eq('id', id)
+    setAircraft(ac => ac.filter(a => a.id !== id))
   }
 
   const saveRig = async () => {
@@ -337,6 +354,39 @@ export default function Profile() {
               onMouseLeave={e => e.currentTarget.style.borderColor='var(--border2)'}
             >{t('profile.rigs_add')}</button>
           )}
+        </div>
+
+        {/* Moje samoloty */}
+        <div className="card" style={{ marginBottom:'1rem' }}>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>✈️ Moje samoloty</h3>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Lista dostępna przy dodawaniu skoku</p>
+          {aircraft.length === 0 && <div style={{ textAlign:'center', padding:'1rem', color:'var(--muted)', fontSize:'0.85rem', background:'var(--bg3)', borderRadius:'var(--r)', marginBottom:'1rem' }}>Brak samolotów</div>}
+          {aircraft.length > 0 && (
+            <div style={{ marginBottom:'1rem' }}>
+              <details style={{ background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--r)', overflow:'hidden' }}>
+                <summary style={{ padding:'0.7rem 1rem', cursor:'pointer', fontSize:'0.88rem', fontWeight:500, listStyle:'none', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                  <span>✈️ Twoje samoloty ({aircraft.length})</span>
+                  <span style={{ color:'var(--muted)', fontSize:'0.75rem' }}>▼</span>
+                </summary>
+                <div style={{ borderTop:'1px solid var(--border)', padding:'0.5rem' }}>
+                  {aircraft.map(ac => (
+                    <div key={ac.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.5rem 0.75rem', borderRadius:'var(--r)', marginBottom:'0.25rem' }}
+                      onMouseEnter={e => e.currentTarget.style.background='var(--bg2)'}
+                      onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                      <span style={{ fontSize:'0.85rem' }}>✈️ {ac.name}</span>
+                      <button onClick={() => deleteAircraft(ac.id)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'0.9rem', padding:'0.1rem 0.4rem', borderRadius:4 }}
+                        onMouseEnter={e => e.currentTarget.style.color='var(--danger)'}
+                        onMouseLeave={e => e.currentTarget.style.color='var(--muted)'}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            </div>
+          )}
+          <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
+            <input className="input" placeholder="np. Cessna 182" value={newAc} onChange={e => setNewAc(e.target.value)} onKeyDown={e => e.key==='Enter' && addAircraft()} style={{ flex:1 }} />
+            <button onClick={addAircraft} disabled={!newAc.trim()} className="btn" style={{ width:'auto', padding:'0 1.25rem' }}>+ Dodaj</button>
+          </div>
         </div>
 
         {/* Strefy zrzutu */}
