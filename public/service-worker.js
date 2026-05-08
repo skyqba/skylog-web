@@ -1,19 +1,16 @@
-const CACHE_NAME = 'jumplogx-v1'
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-]
+const CACHE_NAME = 'jumplogx-v2'
 
-// Install — cache static assets
+// Instalacja — cache index.html
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE_NAME).then(cache => 
+      cache.addAll(['/', '/index.html', '/manifest.json'])
+    )
   )
   self.skipWaiting()
 })
 
-// Activate — clean old caches
+// Aktywacja — usuń stare cache
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -23,39 +20,42 @@ self.addEventListener('activate', (event) => {
   self.clients.claim()
 })
 
-// Fetch — network first, fallback to cache
+// Fetch — cache all, network first
 self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Pomijaj żądania do Supabase i zewnętrznych API
-  if (url.hostname.includes('supabase') || 
-      url.hostname.includes('open-meteo') ||
-      url.hostname.includes('googleapis') ||
-      request.method !== 'GET') {
-    return
-  }
+  // Pomijaj zewnętrzne API
+  if (
+    url.hostname.includes('supabase') ||
+    url.hostname.includes('open-meteo') ||
+    url.hostname.includes('googleapis') ||
+    url.hostname.includes('gstatic') ||
+    request.method !== 'GET'
+  ) return
 
   event.respondWith(
     fetch(request)
       .then(response => {
-        // Zapisz do cache
         if (response.status === 200) {
           const clone = response.clone()
           caches.open(CACHE_NAME).then(cache => cache.put(request, clone))
         }
         return response
       })
-      .catch(() => {
-        // Offline — zwróć z cache
-        return caches.match(request).then(cached => {
+      .catch(() =>
+        caches.match(request).then(cached => {
           if (cached) return cached
-          // Dla nawigacji — zwróć index.html
-          if (request.mode === 'navigate') {
-            return caches.match('/index.html')
-          }
+          if (request.mode === 'navigate') return caches.match('/index.html')
           return new Response('Offline', { status: 503 })
         })
-      })
+      )
   )
+})
+
+// Wymuś update gdy dostępna nowa wersja
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
 })

@@ -24,7 +24,9 @@
     "react-router-dom": "^7.14.2",
     "react-scripts": "5.0.1",
     "recharts": "^3.8.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "workbox-webpack-plugin": "^7.4.1",
+    "workbox-window": "^7.4.1"
   },
   "scripts": {
     "start": "react-scripts start",
