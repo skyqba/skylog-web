@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
+import { useProfile } from '../useProfile'
 
 const JUMP_TYPES_PL = [
   { value: 'Tandem (T)',              label: 'Tandem (T)' },
@@ -67,6 +68,7 @@ export default function AddJump() {
   const [error, setError]                             = useState('')
   const [loading, setLoading]                         = useState(false)
   const [aircraftSuggestions, setAircraftSuggestions] = useState([])
+  const { canWeather } = useProfile()
   const [weatherLoading, setWeatherLoading]           = useState(false)
   const [showWeatherField] = useState(() => {
     try { const s = JSON.parse(localStorage.getItem('alertSettings') || '{}'); return s['show_weather'] !== false } catch { return true }
@@ -318,7 +320,7 @@ export default function AddJump() {
             </div>
 
             {/* Pogoda */}
-            {showWeatherField && <div className="form-group">
+            {showWeatherField && canWeather && <div className="form-group">
               <label className="label">🌤 Pogoda</label>
               {weatherLoading && (
                 <div style={{ fontSize: '0.82rem', color: 'var(--muted)', marginBottom: '0.5rem' }}>

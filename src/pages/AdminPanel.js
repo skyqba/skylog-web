@@ -8,6 +8,7 @@ const PERMISSIONS = [
   { key: 'perm_import',   label: 'Import',     icon: '📂' },
   { key: 'perm_stats',    label: 'Statystyki', icon: '📊' },
   { key: 'perm_language', label: 'Język',      icon: '🌐' },
+  { key: 'perm_weather',  label: 'Pogoda',     icon: '🌤' },
 ]
 
 export default function AdminPanel() {
@@ -26,7 +27,7 @@ export default function AdminPanel() {
     if (!isAdmin) { navigate('/'); return }
     supabase
       .from('profiles_with_email')
-      .select('id, email, is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language')
+      .select('id, email, is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language, perm_weather')
       .then(({ data }) => { setUsers(data || []); setLoadingUsers(false) })
     supabase
       .from('announcements')
