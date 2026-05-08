@@ -328,8 +328,6 @@ export default function Journal() {
           )
         })}
 
-        <JumpsMap jumps={jumps} />
-
         {docs.length > 0 && (
           <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'var(--r2)', marginBottom:'1rem', overflow:'hidden' }}>
             <button onClick={() => setShowDocs(d => !d)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 1.1rem', background:'transparent', border:'none', cursor:'pointer', color:'var(--text)', fontFamily:'var(--font)' }}>
