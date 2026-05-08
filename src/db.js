@@ -1,7 +1,7 @@
 import { openDB } from 'idb'
 
 const DB_NAME = 'skyjumplog'
-const DB_VERSION = 2
+const DB_VERSION = 3
 
 export const getDB = () => openDB(DB_NAME, DB_VERSION, {
   upgrade(db) {
@@ -22,6 +22,8 @@ export const getDB = () => openDB(DB_NAME, DB_VERSION, {
       db.createObjectStore('queue', { keyPath: 'id', autoIncrement: true })
     if (!db.objectStoreNames.contains('aircraft'))
       db.createObjectStore('aircraft', { keyPath: 'id' })
+    if (!db.objectStoreNames.contains('documents'))
+      db.createObjectStore('documents', { keyPath: 'name' })
   }
 })
 
@@ -136,5 +138,20 @@ export const dbSetAircraft = async (aircraft) => {
   const tx = db.transaction('aircraft', 'readwrite')
   await tx.store.clear()
   await Promise.all(aircraft.map(a => tx.store.put(a)))
+  await tx.done
+}
+
+// ─── Documents ────────────────────────────────────────────────────────────────
+export const dbGetDocuments = async () => {
+  const db = await getDB()
+  return db.getAll('documents')
+}
+
+export const dbSetDocuments = async (docs) => {
+  if (!docs) return
+  const db = await getDB()
+  const tx = db.transaction('documents', 'readwrite')
+  await tx.store.clear()
+  await Promise.all(docs.map(d => tx.store.put(d)))
   await tx.done
 }

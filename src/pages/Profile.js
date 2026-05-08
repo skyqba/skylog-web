@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
-import { dbGetProfile, dbGetRigs, dbGetDropzones, dbGetQuals, dbGetAircraft } from '../db'
+import { dbGetProfile, dbGetRigs, dbGetDropzones, dbGetQuals, dbGetAircraft, dbGetDocuments, dbSetDocuments } from '../db'
 import { getUser } from '../getUser'
 import { useProfile } from '../useProfile'
 
@@ -32,14 +32,15 @@ export default function Profile() {
 
   const load = useCallback(async () => {
     if (!navigator.onLine) {
-      const [prof, rigList, dz, ac] = await Promise.all([
-        dbGetProfile(), dbGetRigs(), dbGetDropzones(), dbGetAircraft()
+      const [prof, rigList, dz, ac, docList] = await Promise.all([
+        dbGetProfile(), dbGetRigs(), dbGetDropzones(), dbGetAircraft(), dbGetDocuments()
       ])
       if (prof) setProfileBase({ ...prof, email: prof.email || '', uid: prof.id })
       if (prof?.avatar_url) setPreview(prof.avatar_url)
       setRigs(rigList || [])
       setDropzones(dz || [])
       setAircraft(ac || [])
+      setDocs(docList || [])
       return
     }
     const user = await getUser()
@@ -54,6 +55,7 @@ export default function Profile() {
     if (prof?.avatar_url) setPreview(prof.avatar_url + '?t=' + Date.now())
     setDropzones(dz || [])
     setDocs(docList || [])
+    await dbSetDocuments(docList || [])
     setRigs(rigList || [])
     setAircraft(acList || [])
   }, [])
@@ -96,6 +98,7 @@ export default function Profile() {
       showMsg('docs', t('profile.saved'))
       const { data: docList } = await supabase.storage.from('documents').list(profileBase.uid, { sortBy: { column: 'created_at', order: 'desc' } })
       setDocs(docList || [])
+    await dbSetDocuments(docList || [])
     } else {
       showMsg('docs', t('common.error'))
     }
@@ -258,7 +261,11 @@ export default function Profile() {
                 {doc.metadata?.size && <div style={{ fontSize:'0.72rem', color:'var(--muted)', fontFamily:'var(--mono)', marginTop:2 }}>{fmtSize(doc.metadata.size)}</div>}
               </div>
               <div style={{ display:'flex', gap:'0.4rem', flexShrink:0 }}>
-                <button onClick={() => downloadDoc(doc.name)} style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--accent2)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.6rem', fontFamily:'var(--font)' }}>{t('profile.docs_download')}</button>
+                {navigator.onLine ? (
+                  <button onClick={() => downloadDoc(doc.name)} style={{ background:'transparent', border:'1px solid var(--border2)', borderRadius:7, color:'var(--accent2)', cursor:'pointer', fontSize:'0.75rem', padding:'0.3rem 0.6rem', fontFamily:'var(--font)' }}>{t('profile.docs_download')}</button>
+                ) : (
+                  <span style={{ fontSize:'0.7rem', color:'var(--muted)', padding:'0.3rem 0.6rem' }}>📵 Offline</span>
+                )}
                 <button onClick={() => deleteDoc(doc.name)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem', padding:'0.2rem 0.4rem', borderRadius:5 }}
                   onMouseEnter={e => e.target.style.color='var(--danger)'}
                   onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>
