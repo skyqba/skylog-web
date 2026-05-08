@@ -9,7 +9,7 @@ export default function Navbar() {
   const { pathname } = useLocation()
   const { t } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
-  const { isAdmin, isPremium } = useProfile()
+  const { isAdmin, isPremium, profile } = useProfile()
 
   const logout = async () => {
     sessionStorage.removeItem('dismissedRigs')
@@ -36,6 +36,8 @@ export default function Navbar() {
             <span style={{ display:'block', fontFamily:'var(--font)', fontSize:'0.62rem', color:'var(--muted)', letterSpacing:'0.5px', marginTop:'-2px' }}>by SkyQba ver 1.0</span>
           </div>
         </Link>
+
+        {isPremium && <PremiumAvatar profile={profile} />}
 
         {/* Desktop menu */}
         <div className="desktop-nav" style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
@@ -135,5 +137,56 @@ function MobileNavLink({ to, label, active, onClick }) {
     }}>
       {label}
     </Link>
+  )
+}
+function PremiumAvatar({ profile }) {
+  const [hovered, setHovered] = useState(false)
+  const initials = `${profile?.name?.[0] || ''}${profile?.surname?.[0] || ''}`.toUpperCase() || '?'
+  const avatar = profile?.avatar_url
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: 'relative',
+        width: 44,
+        height: 44,
+        borderRadius: '50%',
+        padding: 2,
+        background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)',
+        boxShadow: hovered
+          ? '0 0 0 3px rgba(139,92,246,0.3), 0 0 20px rgba(139,92,246,0.5)'
+          : '0 0 0 0px transparent',
+        transition: 'box-shadow 0.25s ease',
+        flexShrink: 0,
+        cursor: 'pointer',
+      }}
+    >
+      <div style={{ width:'100%', height:'100%', borderRadius:'50%', overflow:'hidden', background:'var(--bg3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.85rem', fontWeight:700, color:'var(--text)' }}>
+        {avatar
+          ? <img src={avatar} alt="avatar" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+          : initials
+        }
+      </div>
+      <div style={{
+        position: 'absolute',
+        bottom: -4,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: '#000',
+        border: '1px solid #fff',
+        borderRadius: 20,
+        padding: '0px 5px',
+        fontSize: '0.55rem',
+        fontWeight: 800,
+        color: '#fff',
+        letterSpacing: '0.5px',
+        whiteSpace: 'nowrap',
+        lineHeight: '14px',
+      }}>
+        PRO
+      </div>
+    </div>
   )
 }
