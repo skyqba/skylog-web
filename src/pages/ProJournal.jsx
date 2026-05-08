@@ -117,7 +117,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
 
   const perMonth = {}
   jumps.filter(j => j.jump_date).forEach(j => { const k = j.jump_date.slice(0,7); perMonth[k] = (perMonth[k]||0)+1 })
-  const monthData = Object.entries(perMonth).sort().slice(-12).map(([m,c]) => ({ month:m.slice(5), count:c }))
+  const monthData = Object.entries(perMonth).sort().slice(-6).map(([m,c]) => ({ month:m.slice(5), year:m.slice(0,4), count:c }))
 
   const perType = {}
   jumps.filter(j => j.jump_type).forEach(j => { perType[j.jump_type] = (perType[j.jump_type]||0)+1 })
@@ -184,7 +184,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
             <div style={{ fontFamily:'var(--mono)', fontSize:'0.6rem', color:'#64748B', textTransform:'uppercase', letterSpacing:2, marginBottom:8 }}>Łączna liczba skoków</div>
             <div style={{ fontFamily:'var(--head)', fontSize:'4rem', fontWeight:900, lineHeight:1, color:'#fff', textShadow:'0 0 30px rgba(139,92,246,0.7), 0 0 60px rgba(139,92,246,0.3)' }}>{loading ? '—' : totalJumps}</div>
             <div style={{ fontFamily:'var(--mono)', fontSize:'0.68rem', color:'#64748B', marginTop:6 }}>Total Skydives</div>
-            {monthData.length > 1 && <div style={{ marginTop:'1rem', height:50 }}><ResponsiveContainer width="100%" height="100%"><LineChart data={monthData}><Line type="monotone" dataKey="count" stroke="#8B5CF6" strokeWidth={2} dot={false} /><Tooltip contentStyle={{ background:'rgba(15,23,42,0.95)', border:'1px solid rgba(139,92,246,0.3)', borderRadius:10, fontSize:'0.78rem', color:'#fff', fontFamily:'var(--font)' }} itemStyle={{ color:'#A78BFA' }} labelFormatter={(l) => { const m = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień']; return m[parseInt(l)-1] || l }} formatter={(v) => [v + ' skoków', '']} cursor={{ stroke:'rgba(139,92,246,0.3)', strokeWidth:1 }} /></LineChart></ResponsiveContainer></div>}
+            {monthData.length > 1 && <div style={{ marginTop:'1rem', height:50 }}><ResponsiveContainer width="100%" height="100%"><LineChart data={monthData}><Line type="monotone" dataKey="count" stroke="#8B5CF6" strokeWidth={2} dot={false} /><Tooltip contentStyle={{ background:'rgba(15,23,42,0.95)', border:'1px solid rgba(139,92,246,0.3)', borderRadius:10, fontSize:'0.78rem', color:'#fff', fontFamily:'var(--font)' }} itemStyle={{ color:'#A78BFA' }} labelFormatter={(l, payload) => { const m = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień']; const yr = payload && payload[0] ? payload[0].payload.year : ''; return (m[parseInt(l)-1] || l) + ' ' + yr }} formatter={(v) => [v + ' skoków', '']} cursor={{ stroke:'rgba(139,92,246,0.3)', strokeWidth:1 }} /></LineChart></ResponsiveContainer></div>}
           </GlassCard>
           <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
             {typeData.length > 0 && (
