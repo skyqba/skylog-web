@@ -31,37 +31,44 @@ function JumpCardPro({ jump, onDelete, onClick }) {
   return (
     <motion.div initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-8 }}
       whileHover={{ y:-3, transition:{ duration:0.2 } }} onClick={onClick}
-      style={{ background:'rgba(30,41,59,0.55)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid rgba(255,255,255,0.08)', borderTop:'1px solid rgba(255,255,255,0.14)', borderRadius:18, padding:'1rem 1.25rem', marginBottom:'0.65rem', cursor:'pointer', boxShadow:'0 4px 20px rgba(0,0,0,0.35)', display:'flex', gap:'1rem', alignItems:'stretch' }}
+      style={{ background:'rgba(30,41,59,0.55)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', border:'1px solid rgba(255,255,255,0.08)', borderTop:'1px solid rgba(255,255,255,0.14)', borderRadius:18, padding:'0.85rem 1rem', marginBottom:'0.65rem', cursor:'pointer', boxShadow:'0 4px 20px rgba(0,0,0,0.35)', display:'flex', flexDirection:'column', gap:'0.75rem' }}
       onMouseEnter={e => e.currentTarget.style.borderColor='rgba(139,92,246,0.4)'}
       onMouseLeave={e => e.currentTarget.style.borderColor='rgba(255,255,255,0.08)'}
     >
-      <div style={{ display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', minWidth:56, borderRight:'1px solid rgba(255,255,255,0.07)', paddingRight:'1rem' }}>
-        <div style={{ fontFamily:'var(--head)', fontSize:'1.4rem', fontWeight:900, color:'#fff', lineHeight:1, textShadow:'0 0 20px rgba(139,92,246,0.5)' }}>#{jump.number}</div>
-        <div style={{ fontFamily:'var(--mono)', fontSize:'0.6rem', color:'#94A3B8', marginTop:3, textAlign:'center' }}>{new Date(jump.jump_date).toLocaleDateString('pl-PL', { day:'numeric', month:'short' })}</div>
-      </div>
-      <div style={{ flex:1, minWidth:0 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.6rem', flexWrap:'wrap' }}>
+      {/* Górny wiersz — numer, data, tagi, usuń */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'0.5rem' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', flexWrap:'wrap', flex:1, minWidth:0 }}>
+          <div style={{ display:'flex', flexDirection:'column' }}>
+            <span style={{ fontFamily:'var(--head)', fontSize:'1.2rem', fontWeight:900, color:'#fff', lineHeight:1, textShadow:'0 0 20px rgba(139,92,246,0.5)' }}>#{jump.number}</span>
+            <span style={{ fontFamily:'var(--mono)', fontSize:'0.6rem', color:'#94A3B8', marginTop:2 }}>{new Date(jump.jump_date).toLocaleDateString('pl-PL', { day:'numeric', month:'short', year:'numeric' })}</span>
+          </div>
           {jump.city && <div style={{ display:'flex', alignItems:'center', gap:'0.3rem' }}><MapPin size={11} color='#94A3B8' strokeWidth={1.5} /><span style={{ fontSize:'0.78rem', color:'#CBD5E1', fontWeight:500 }}>{jump.city}</span></div>}
           {jump.jump_type && <span style={{ background:'rgba(139,92,246,0.15)', border:'1px solid rgba(139,92,246,0.3)', borderRadius:6, padding:'0.15rem 0.55rem', fontSize:'0.68rem', fontWeight:600, color:'#A78BFA', fontFamily:'var(--mono)' }}>{jump.jump_type}</span>}
           {jump.parachute && <span style={{ background:'rgba(103,232,249,0.1)', border:'1px solid rgba(103,232,249,0.25)', borderRadius:6, padding:'0.15rem 0.55rem', fontSize:'0.68rem', fontWeight:600, color:'#67E8F9', fontFamily:'var(--mono)' }}>{jump.parachute}</span>}
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'0.4rem' }}>
-          <MiniChip icon={<ArrowUp size={11} strokeWidth={1.5} />} label="Alt" value={jump.altitude ? `${jump.altitude}m` : '—'} />
-          <MiniChip icon={<Clock size={11} strokeWidth={1.5} />} label="Delay" value={jump.delay ? `${jump.delay}s` : '—'} />
-          <MiniChip icon={<Plane size={11} strokeWidth={1.5} />} label="Plane" value={jump.aircraft || '—'} />
+        <button onClick={e => { e.stopPropagation(); onDelete(jump.id) }} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,0.2)', cursor:'pointer', fontSize:'0.8rem', padding:'0.15rem 0.3rem', borderRadius:4, lineHeight:1, flexShrink:0 }} onMouseEnter={e => e.target.style.color='#F87171'} onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.2)'}>✕</button>
+      </div>
+      {/* Chips — alt, delay, plane */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'0.4rem' }}>
+        <MiniChip icon={<ArrowUp size={11} strokeWidth={1.5} />} label="Alt" value={jump.altitude ? `${jump.altitude}m` : '—'} />
+        <MiniChip icon={<Clock size={11} strokeWidth={1.5} />} label="Delay" value={jump.delay ? `${jump.delay}s` : '—'} />
+        <MiniChip icon={<Plane size={11} strokeWidth={1.5} />} label="Plane" value={jump.aircraft || '—'} />
+      </div>
+      {/* Pogoda */}
+      {jump.weather && (
+        <div style={{ background:'rgba(59,130,246,0.08)', border:'1px solid rgba(59,130,246,0.18)', borderRadius:10, padding:'0.5rem 0.75rem', display:'flex', alignItems:'center', gap:'0.5rem', flexWrap:'wrap' }}>
+          <CloudSun size={13} color='#93C5FD' strokeWidth={1.5} />
+          <span style={{ fontSize:'0.8rem', fontWeight:600, color:'#93C5FD' }}>{jump.weather.split(',')[0]}</span>
+          {jump.weather.split(',')[1] && <span style={{ fontSize:'0.75rem', color:'#64748B' }}>{jump.weather.split(',').slice(1).join(',').trim()}</span>}
         </div>
-        {jump.notes && <div style={{ marginTop:'0.5rem', fontSize:'0.72rem', color:'#64748B', paddingLeft:'0.5rem', borderLeft:'2px solid rgba(139,92,246,0.4)', lineHeight:1.5 }}>{jump.notes.length > 80 ? jump.notes.slice(0,80)+'…' : jump.notes}</div>}
-      </div>
-      <div style={{ display:'flex', flexDirection:'column', justifyContent:'space-between', alignItems:'flex-end', gap:'0.4rem', flexShrink:0 }}>
-        <button onClick={e => { e.stopPropagation(); onDelete(jump.id) }} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,0.2)', cursor:'pointer', fontSize:'0.8rem', padding:'0.15rem 0.3rem', borderRadius:4, lineHeight:1 }} onMouseEnter={e => e.target.style.color='#F87171'} onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.2)'}>✕</button>
-        {jump.weather && (
-          <div style={{ background:'rgba(59,130,246,0.1)', border:'1px solid rgba(59,130,246,0.2)', borderRadius:10, padding:'0.4rem 0.7rem', textAlign:'right', minWidth:110 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:'0.3rem', justifyContent:'flex-end' }}><CloudSun size={12} color='#93C5FD' strokeWidth={1.5} /><span style={{ fontSize:'0.8rem', fontWeight:700, color:'#93C5FD' }}>{jump.weather.split(',')[0]}</span></div>
-            {jump.weather.split(',')[1] && <div style={{ display:'flex', alignItems:'center', gap:'0.3rem', justifyContent:'flex-end', marginTop:2 }}><Wind size={10} color='#64748B' strokeWidth={1.5} /><span style={{ fontSize:'0.68rem', color:'#64748B' }}>{jump.weather.split(',')[1].trim()}</span></div>}
-          </div>
-        )}
-        {jump.result && <div style={{ textAlign:'right' }}><div style={{ display:'flex', alignItems:'center', gap:'0.3rem', justifyContent:'flex-end' }}><Target size={11} color='#10B981' strokeWidth={1.5} /><span style={{ fontSize:'0.82rem', fontWeight:700, color:'#10B981' }}>{jump.result}</span></div></div>}
-      </div>
+      )}
+      {/* Wynik + notatki */}
+      {(jump.result || jump.notes) && (
+        <div style={{ display:'flex', alignItems:'center', gap:'1rem', flexWrap:'wrap' }}>
+          {jump.result && <div style={{ display:'flex', alignItems:'center', gap:'0.3rem' }}><Target size={11} color='#10B981' strokeWidth={1.5} /><span style={{ fontSize:'0.82rem', fontWeight:700, color:'#10B981' }}>{jump.result}</span></div>}
+          {jump.notes && <div style={{ fontSize:'0.72rem', color:'#64748B', paddingLeft:'0.5rem', borderLeft:'2px solid rgba(139,92,246,0.4)', lineHeight:1.5, flex:1 }}>{jump.notes.length > 60 ? jump.notes.slice(0,60)+'…' : jump.notes}</div>}
+        </div>
+      )}
     </motion.div>
   )
 }
@@ -126,7 +133,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
       <div style={{ position:'relative', zIndex:1, maxWidth:780, margin:'0 auto' }}>
 
         {/* Hero stats */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem', marginBottom:'1.25rem' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:'1rem', marginBottom:'1.25rem' }}>
           <GlassCard style={{ padding:'1.5rem' }}>
             <div style={{ fontFamily:'var(--mono)', fontSize:'0.6rem', color:'#64748B', textTransform:'uppercase', letterSpacing:2, marginBottom:8 }}>Łączna liczba skoków</div>
             <div style={{ fontFamily:'var(--head)', fontSize:'4rem', fontWeight:900, lineHeight:1, color:'#fff', textShadow:'0 0 30px rgba(139,92,246,0.7), 0 0 60px rgba(139,92,246,0.3)' }}>{loading ? '—' : totalJumps}</div>
