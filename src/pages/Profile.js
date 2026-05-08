@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
-import { dbGetProfile, dbGetRigs, dbGetDropzones } from '../db'
+import { dbGetProfile, dbGetRigs, dbGetDropzones, dbGetQuals, dbGetAircraft } from '../db'
 import { useProfile } from '../useProfile'
 
 export default function Profile() {
@@ -31,13 +31,15 @@ export default function Profile() {
 
   const load = useCallback(async () => {
     if (!navigator.onLine) {
-      const [prof, rigList, dz] = await Promise.all([
-        dbGetProfile(), dbGetRigs(), dbGetDropzones()
+      const [prof, rigList, dz, ac] = await Promise.all([
+        dbGetProfile(), dbGetRigs(), dbGetDropzones(), dbGetAircraft()
       ])
+      console.log('OFFLINE PROF:', prof)
       if (prof) setProfileBase({ ...prof, email: prof.email || '', uid: prof.id })
       if (prof?.avatar_url) setPreview(prof.avatar_url)
       setRigs(rigList || [])
       setDropzones(dz || [])
+      setAircraft(ac || [])
       return
     }
     const { data: { user } } = await supabase.auth.getUser()
