@@ -11,6 +11,7 @@ import {
   dbGetProfile, dbSetProfile,
   dbGetRigs, dbSetRigs,
   dbGetQuals, dbSetQuals,
+  dbGetDropzones, dbSetDropzones,
   dbAddJump, dbDeleteJump
 } from '../db'
 import { saveToQueue } from '../offlineQueue'
@@ -70,6 +71,7 @@ export default function Journal() {
     await dbSetProfile(prof)
     await dbSetRigs(rigList || [])
     await dbSetQuals(q || null)
+    await dbSetDropzones(dzList || [])
     setJumps(j || [])
     setProfile(prof)
     setRigs(rigList || [])

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
+import { dbGetJumps, dbAddJump, dbGetDropzones, dbGetRigs } from '../db'
+import { saveToQueue } from '../offlineQueue'
 import { useProfile } from '../useProfile'
 
 const JUMP_TYPES_PL = [
@@ -76,6 +78,20 @@ export default function AddJump() {
 
   useEffect(() => {
     const load = async () => {
+      if (!navigator.onLine) {
+        // Tryb offline — dane z IndexedDB
+        const [offlineJumps, offlineDz, offlineRigs] = await Promise.all([
+          dbGetJumps(),
+          dbGetDropzones(),
+          dbGetRigs(),
+        ])
+        const uniqueChutes = [...new Set((offlineRigs || []).map(r => r.main).filter(Boolean))]
+        setMainChutes(uniqueChutes)
+        setDropzones(offlineDz || [])
+        const nextNum = offlineJumps.length > 0 ? (Math.max(...offlineJumps.map(j => j.number || 0)) + 1) : 1
+        setForm(f => ({ ...f, number: String(nextNum) }))
+        return
+      }
       const { data: { user } } = await supabase.auth.getUser()
       const [{ data: rigs }, { data: dz }, { data: lastJump }, { data: ac }] = await Promise.all([
         supabase.from('rigs').select('main').eq('user_id', user.id).not('main', 'is', null),
@@ -158,8 +174,7 @@ export default function AddJump() {
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
     const finalType = form.jump_type === 'inny' ? form.custom_type.trim() : form.jump_type
-    const { error } = await supabase.from('jumps').insert({
-      user_id:   user.id,
+    const jumpData = {
       number:    parseInt(form.number),
       jump_date: form.jump_date,
       city:      form.city,
@@ -171,7 +186,16 @@ export default function AddJump() {
       result:    form.result || null,
       jump_type: finalType || null,
       weather:   form.weather || null,
-    })
+    }
+    if (!navigator.onLine) {
+      const offlineJump = { ...jumpData, id: 'offline_' + Date.now(), user_id: user?.id || 'offline' }
+      await dbAddJump(offlineJump)
+      await saveToQueue({ type: 'INSERT_JUMP', payload: jumpData })
+      setLoading(false)
+      navigate('/')
+      return
+    }
+    const { error } = await supabase.from('jumps').insert({ ...jumpData, user_id: user.id })
     setLoading(false)
     if (error) { setError(error.message); return }
     navigate('/')
