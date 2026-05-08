@@ -68,7 +68,7 @@ export default function AddJump() {
   const [error, setError]                             = useState('')
   const [loading, setLoading]                         = useState(false)
   const [aircraftSuggestions, setAircraftSuggestions] = useState([])
-  const { canWeather } = useProfile()
+  const { canWeather, loading: profileLoading } = useProfile()
   const [weatherLoading, setWeatherLoading]           = useState(false)
   const [showWeatherField] = useState(() => {
     try { const s = JSON.parse(localStorage.getItem('alertSettings') || '{}'); return s['show_weather'] !== false } catch { return true }
@@ -320,7 +320,7 @@ export default function AddJump() {
             </div>
 
             {/* Pogoda */}
-            {showWeatherField && canWeather && <div className="form-group">
+            {showWeatherField && canWeather && !profileLoading && <div className="form-group">
               <label className="label">🌤 Pogoda</label>
               {weatherLoading && (
                 <div style={{ fontSize: '0.82rem', color: 'var(--muted)', marginBottom: '0.5rem' }}>
