@@ -83,7 +83,7 @@ export default function Settings() {
 
   const resetAll = (value) => {
     const reset = Object.fromEntries(ALERT_KEYS.map(a => [a.key, value]))
-    setSettings(reset)
+    setSettings(s => ({ ...reset, show_weather: s.show_weather ?? true }))
     setSaved(false)
   }
 
