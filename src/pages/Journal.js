@@ -53,8 +53,6 @@ export default function Journal() {
   useEffect(() => { fetchAll() }, [])
 
   const fetchAll = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
     if (!navigator.onLine) {
       setJumps(await dbGetJumps())
       setProfile(await dbGetProfile())
@@ -64,6 +62,8 @@ export default function Journal() {
       setLoading(false)
       return
     }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
     const [{ data: j }, { data: prof }, { data: rigList }, { data: q }, { data: dzList }, { data: acList }] = await Promise.all([
       supabase.from('jumps').select('*').order('number', { ascending: false }),
       supabase.from('profiles').select('id,insurance_expiry,medical_expiry').eq('id', user.id).single(),
