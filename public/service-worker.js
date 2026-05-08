@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jumplogx-v4'
+const CACHE_NAME = 'jumplogx-v202605090038'
 const FONT_CACHE = 'jumplogx-fonts-v1'
 
 self.addEventListener('install', (event) => {
