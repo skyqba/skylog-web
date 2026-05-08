@@ -68,6 +68,9 @@ export default function AddJump() {
   const [loading, setLoading]                         = useState(false)
   const [aircraftSuggestions, setAircraftSuggestions] = useState([])
   const [weatherLoading, setWeatherLoading]           = useState(false)
+  const [showWeatherField] = useState(() => {
+    try { const s = JSON.parse(localStorage.getItem('alertSettings') || '{}'); return s['show_weather'] !== false } catch { return true }
+  })
   const [weatherData, setWeatherData]                 = useState(null)
   const navigate = useNavigate()
 
@@ -315,7 +318,7 @@ export default function AddJump() {
             </div>
 
             {/* Pogoda */}
-            <div className="form-group">
+            {showWeatherField && <div className="form-group">
               <label className="label">🌤 Pogoda</label>
               {weatherLoading && (
                 <div style={{ fontSize: '0.82rem', color: 'var(--muted)', marginBottom: '0.5rem' }}>
@@ -346,7 +349,7 @@ export default function AddJump() {
                   💡 Zezwól na dostęp do lokalizacji aby pobrać pogodę automatycznie.
                 </div>
               )}
-            </div>
+            </div>}
 
             {/* Wynik - tylko dla ACC */}
             {(form.jump_type === 'ACC (Celność lądowania)' || form.jump_type === 'ACC (Accuracy)') && (
