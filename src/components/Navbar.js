@@ -184,7 +184,7 @@ function PremiumAvatar({ profile, onClick }) {
   const initials = `${profile?.name?.[0]||''}${profile?.surname?.[0]||''}`.toUpperCase() || '?'
   const avatar = profile?.avatar_url
   return (
-    <div onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onClick={onClick} style={{ position:'relative', width:40, height:40, borderRadius:'50%', padding:2, background:'linear-gradient(135deg,#8B5CF6,#3B82F6)', boxShadow: hovered?'0 0 0 3px rgba(139,92,246,0.3), 0 0 20px rgba(139,92,246,0.5)':'none', transition:'box-shadow 0.25s ease', flexShrink:0, cursor:'pointer' }}>
+    <div onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onClick={onClick} style={{ position:'relative', width:48, height:48, borderRadius:'50%', padding:2, background:'linear-gradient(135deg,#8B5CF6,#3B82F6)', boxShadow: hovered?'0 0 0 3px rgba(139,92,246,0.3), 0 0 20px rgba(139,92,246,0.5)':'none', transition:'box-shadow 0.25s ease', flexShrink:0, cursor:'pointer' }}>
       <div style={{ width:'100%', height:'100%', borderRadius:'50%', overflow:'hidden', background:'#1E293B', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.82rem', fontWeight:700, color:'#fff' }}>
         {avatar ? <img src={avatar} alt="avatar" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : initials}
       </div>
