@@ -48,7 +48,7 @@ const fmt = (d) => {
 export default function Settings() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { canLanguage, canWeather } = useProfile()
+  const { canLanguage, canWeather, canProTheme } = useProfile()
   const [theme, setTheme] = useState(() => localStorage.getItem('jumplogx_theme') || 'classic')
 
   const changeTheme = (t) => {
@@ -345,7 +345,7 @@ export default function Settings() {
         </div>
 
         {/* MOTYW */}
-        <div className="card" style={{ marginBottom:'1rem' }}>
+        {canProTheme && <div className="card" style={{ marginBottom:'1rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>🎨 Motyw aplikacji</h3>
           <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Wybierz wygląd aplikacji</p>
           <div style={{ display:'flex', gap:'0.75rem' }}>
@@ -360,7 +360,7 @@ export default function Settings() {
               </button>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* JĘZYK — tylko dla premium */}
         {canLanguage &&  (

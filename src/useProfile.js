@@ -12,7 +12,7 @@ export function useProfile() {
       if (!user) { if (!cancelled) setLoading(false); return }
       const { data } = await supabase
         .from('profiles')
-        .select('is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language, perm_weather')
+        .select('is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language, perm_weather, perm_pro_theme')
         .eq('id', user.id)
         .single()
       if (!cancelled) {
@@ -34,5 +34,6 @@ export function useProfile() {
     canStats:    profile?.is_premium ? (profile?.perm_stats    ?? true)  : (profile?.perm_stats    ?? false),
     canLanguage: profile?.is_premium ? (profile?.perm_language ?? false) : (profile?.perm_language ?? false),
     canWeather:  profile?.is_premium ? (profile?.perm_weather  ?? false) : (profile?.perm_weather  ?? false),
+    canProTheme: profile?.is_premium ? (profile?.perm_pro_theme ?? false) : (profile?.perm_pro_theme ?? false),
   }
 }

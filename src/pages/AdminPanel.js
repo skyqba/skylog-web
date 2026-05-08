@@ -9,6 +9,7 @@ const PERMISSIONS = [
   { key: 'perm_stats',    label: 'Statystyki', icon: '📊' },
   { key: 'perm_language', label: 'Język',      icon: '🌐' },
   { key: 'perm_weather',  label: 'Pogoda',     icon: '🌤' },
+  { key: 'perm_pro_theme', label: 'Motyw Pro',  icon: '💎' },
 ]
 
 export default function AdminPanel() {
@@ -27,7 +28,7 @@ export default function AdminPanel() {
     if (!isAdmin) { navigate('/'); return }
     supabase
       .from('profiles_with_email')
-      .select('id, email, is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language, perm_weather')
+      .select('id, email, is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language, perm_weather, perm_pro_theme')
       .then(({ data }) => { setUsers(data || []); setLoadingUsers(false) })
     supabase
       .from('announcements')
@@ -120,20 +121,18 @@ export default function AdminPanel() {
                       ))}
                     </div>
                   </div>
-                  {!u.is_admin && (
-                    <div style={{ display:'flex', gap:'0.4rem', alignItems:'center', flexShrink:0 }}>
+                  <div style={{ display:'flex', gap:'0.4rem', alignItems:'center', flexShrink:0 }}>
                       <button onClick={() => togglePremium(u)}
                         style={{ background: u.is_premium ? 'rgba(108,99,255,0.15)' : 'transparent', border:`1px solid ${u.is_premium ? 'var(--accent)' : 'var(--border)'}`, borderRadius:8, padding:'0.35rem 0.75rem', cursor:'pointer', color: u.is_premium ? 'var(--accent2)' : 'var(--muted)', fontFamily:'var(--font)', fontSize:'0.78rem', fontWeight:600, whiteSpace:'nowrap' }}>
                         {u.is_premium ? '⭐ Premium' : '+ Premium'}
                       </button>
-                      <button onClick={() => setExpanded(expanded === u.id ? null : u.id)}
-                        style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, padding:'0.35rem 0.55rem', cursor:'pointer', color:'var(--muted)', fontSize:'0.75rem' }}>
-                        {expanded === u.id ? '▲' : '▼'}
-                      </button>
-                    </div>
-                  )}
+                    <button onClick={() => setExpanded(expanded === u.id ? null : u.id)}
+                      style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, padding:'0.35rem 0.55rem', cursor:'pointer', color:'var(--muted)', fontSize:'0.75rem' }}>
+                      {expanded === u.id ? '▲' : '▼'}
+                    </button>
+                  </div>
                 </div>
-                {expanded === u.id && !u.is_admin && (
+                {expanded === u.id && (
                   <div style={{ borderTop:'1px solid var(--border)', padding:'1rem', background:'var(--bg3)' }}>
                     <div style={{ fontSize:'0.72rem', color:'var(--muted)', fontFamily:'var(--mono)', textTransform:'uppercase', letterSpacing:1, marginBottom:'0.75rem' }}>Indywidualne uprawnienia</div>
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem' }}>
