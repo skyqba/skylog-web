@@ -114,7 +114,7 @@ export default function Navbar() {
             <span style={{ display:'block', fontFamily:'var(--font)', fontSize:'0.62rem', color:'var(--muted)', letterSpacing:'0.5px', marginTop:'-2px' }}>by SkyQba ver 1.0</span>
           </div>
         </Link>
-        {isPremium && <PremiumAvatar profile={profile} onClick={() => {}} />}
+
         <div className="desktop-nav" style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
           <NavLink to="/" label={t('nav.journal')} active={pathname==='/'} />
           <NavLink to="/profile" label={t('nav.profile')} active={pathname==='/profile'} />
