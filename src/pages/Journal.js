@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 import JumpCard from '../components/JumpCard'
+import JumpsMap from '../components/JumpsMap'
 import {
   dbGetJumps, dbSetJumps,
   dbGetProfile, dbSetProfile,
@@ -296,6 +297,8 @@ export default function Journal() {
             />
           )
         })}
+
+        <JumpsMap jumps={jumps} />
 
         {docs.length > 0 && (
           <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'var(--r2)', marginBottom:'1rem', overflow:'hidden' }}>

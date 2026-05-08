@@ -18,6 +18,10 @@ import Settings       from './pages/Settings'
 import ResetPassword  from './pages/ResetPassword'
 import AdminPanel     from './pages/AdminPanel'
 
+// Inicjalizacja motywu przy starcie
+const savedTheme = localStorage.getItem('jumplogx_theme')
+if (savedTheme === 'pro') document.body.classList.add('theme-pro')
+
 function App() {
   const [session, setSession] = useState(undefined)
   const [online, setOnline]   = useState(navigator.onLine)

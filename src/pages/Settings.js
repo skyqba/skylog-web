@@ -49,6 +49,17 @@ export default function Settings() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { canLanguage, canWeather } = useProfile()
+  const [theme, setTheme] = useState(() => localStorage.getItem('jumplogx_theme') || 'classic')
+
+  const changeTheme = (t) => {
+    setTheme(t)
+    localStorage.setItem('jumplogx_theme', t)
+    if (t === 'pro') {
+      document.body.classList.add('theme-pro')
+    } else {
+      document.body.classList.remove('theme-pro')
+    }
+  }
   const [currentLang, setCurrentLang] = useState(i18n.language?.startsWith('en') ? 'en' : 'pl')
   const [settings, setSettings] = useState(() => {
     try {
@@ -331,6 +342,24 @@ export default function Settings() {
             {t('settings.back')}
           </button>
           <h2 style={{ fontFamily:'var(--head)', fontSize:'1.3rem', fontWeight:800 }}>{t('settings.title')}</h2>
+        </div>
+
+        {/* MOTYW */}
+        <div className="card" style={{ marginBottom:'1rem' }}>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>🎨 Motyw aplikacji</h3>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Wybierz wygląd aplikacji</p>
+          <div style={{ display:'flex', gap:'0.75rem' }}>
+            {[
+              { code:'classic', label:'⚡ Classic', desc:'Obecny wygląd' },
+              { code:'pro',     label:'💎 Pro',     desc:'Glassmorphism' },
+            ].map(m => (
+              <button key={m.code} onClick={() => changeTheme(m.code)}
+                style={{ flex:1, padding:'0.85rem', background: theme === m.code ? 'rgba(108,99,255,0.15)' : 'var(--bg3)', border:`1px solid ${theme === m.code ? 'var(--accent)' : 'var(--border)'}`, borderRadius:12, color: theme === m.code ? 'var(--accent2)' : 'var(--muted)', fontFamily:'var(--font)', fontSize:'0.88rem', fontWeight: theme === m.code ? 700 : 400, cursor:'pointer', transition:'all 0.2s', textAlign:'center' }}>
+                <div>{m.label}</div>
+                <div style={{ fontSize:'0.7rem', marginTop:2, opacity:0.7 }}>{m.desc}</div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* JĘZYK — tylko dla premium */}

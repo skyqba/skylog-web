@@ -69,3 +69,97 @@ z-index: 0;
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 .form-row .form-group { min-width: 0; }
 .form-group { margin-bottom: 0.9rem; }
+/* ─── MOTYW PRO ─────────────────────────────────────────────────────────────── */
+body.theme-pro {
+  --bg:      #070B14;
+  --bg2:     rgba(17, 25, 40, 0.75);
+  --bg3:     rgba(255, 255, 255, 0.03);
+  --border:  rgba(255, 255, 255, 0.08);
+  --border2: rgba(255, 255, 255, 0.125);
+  --text:    #F0F0FF;
+  --muted:   rgba(240,240,255,0.45);
+  --accent:  #6C63FF;
+  --accent2: #9D97FF;
+}
+
+body.theme-pro::before {
+  background-image: none;
+}
+
+body.theme-pro::after {
+  display: none;
+}
+
+body.theme-pro .blob-1,
+body.theme-pro .blob-2 {
+  display: block;
+}
+
+.blob-1, .blob-2 { display: none; }
+
+.blob-1 {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 70%);
+  filter: blur(60px);
+  top: -200px;
+  left: -200px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.blob-2 {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+  filter: blur(60px);
+  bottom: -150px;
+  right: -150px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.theme-pro .card {
+  background: rgba(17, 25, 40, 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+body.theme-pro .card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(108, 99, 255, 0.4);
+}
+
+body.theme-pro .btn {
+  background: linear-gradient(135deg, #6C63FF 0%, #3B82F6 100%);
+  box-shadow: 0 4px 15px rgba(108, 99, 255, 0.35);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+body.theme-pro .btn:hover {
+  box-shadow: 0 6px 20px rgba(108, 99, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+body.theme-pro .input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+body.theme-pro .input:focus {
+  border-color: rgba(108, 99, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+}
