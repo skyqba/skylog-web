@@ -61,11 +61,12 @@ export default function Journal() {
       setLoading(false)
       return
     }
-    const [{ data: j }, { data: prof }, { data: rigList }, { data: q }] = await Promise.all([
+    const [{ data: j }, { data: prof }, { data: rigList }, { data: q }, { data: dzList }] = await Promise.all([
       supabase.from('jumps').select('*').order('number', { ascending: false }),
       supabase.from('profiles').select('id,insurance_expiry,medical_expiry').eq('id', user.id).single(),
       supabase.from('rigs').select('id,name,reserve_expiry').eq('user_id', user.id),
       supabase.from('qualifications').select('*').eq('user_id', user.id).single(),
+      supabase.from('dropzones').select('*').eq('user_id', user.id).order('name'),
     ])
     await dbSetJumps(j || [])
     await dbSetProfile(prof)
