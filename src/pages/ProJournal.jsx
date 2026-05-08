@@ -117,7 +117,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
 
   const perMonth = {}
   jumps.filter(j => j.jump_date).forEach(j => { const k = j.jump_date.slice(0,7); perMonth[k] = (perMonth[k]||0)+1 })
-  const monthData = Object.entries(perMonth).sort().slice(-6).map(([m,c]) => ({ month:m.slice(5), count:c }))
+  const monthData = Object.entries(perMonth).sort().slice(-12).map(([m,c]) => ({ month:m.slice(5), count:c }))
 
   const perType = {}
   jumps.filter(j => j.jump_type).forEach(j => { perType[j.jump_type] = (perType[j.jump_type]||0)+1 })
