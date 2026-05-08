@@ -195,9 +195,10 @@ export default function AddJump() {
       navigate('/')
       return
     }
-    const { error } = await supabase.from('jumps').insert({ ...jumpData, user_id: user.id })
+    const { data: newJump, error } = await supabase.from('jumps').insert({ ...jumpData, user_id: user.id }).select().single()
+    if (error) { setLoading(false); setError(error.message); return }
+    if (newJump) await dbAddJump(newJump)
     setLoading(false)
-    if (error) { setError(error.message); return }
     navigate('/')
   }
 
