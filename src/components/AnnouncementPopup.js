@@ -7,6 +7,7 @@ export default function AnnouncementPopup({ session }) {
 
   useEffect(() => {
     if (!session) return
+    if (!navigator.onLine) return
     const seen = JSON.parse(sessionStorage.getItem('seen_announcements') || '[]')
     supabase
       .from('announcements')
