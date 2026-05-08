@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
-import { dbGetJumps, dbAddJump, dbGetDropzones, dbGetRigs } from '../db'
+import { dbGetJumps, dbAddJump, dbGetDropzones, dbGetRigs, dbGetAircraft } from '../db'
 import { saveToQueue } from '../offlineQueue'
 import { useProfile } from '../useProfile'
 
@@ -79,15 +79,13 @@ export default function AddJump() {
   useEffect(() => {
     const load = async () => {
       if (!navigator.onLine) {
-        // Tryb offline — dane z IndexedDB
-        const [offlineJumps, offlineDz, offlineRigs] = await Promise.all([
-          dbGetJumps(),
-          dbGetDropzones(),
-          dbGetRigs(),
+        const [offlineJumps, offlineDz, offlineRigs, offlineAc] = await Promise.all([
+          dbGetJumps(), dbGetDropzones(), dbGetRigs(), dbGetAircraft(),
         ])
         const uniqueChutes = [...new Set((offlineRigs || []).map(r => r.main).filter(Boolean))]
         setMainChutes(uniqueChutes)
         setDropzones(offlineDz || [])
+        setUserAircraft(offlineAc || [])
         const nextNum = offlineJumps.length > 0 ? (Math.max(...offlineJumps.map(j => j.number || 0)) + 1) : 1
         setForm(f => ({ ...f, number: String(nextNum) }))
         return

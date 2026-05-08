@@ -12,6 +12,7 @@ import {
   dbGetRigs, dbSetRigs,
   dbGetQuals, dbSetQuals,
   dbGetDropzones, dbSetDropzones,
+  dbGetAircraft, dbSetAircraft,
   dbAddJump, dbDeleteJump
 } from '../db'
 import { saveToQueue } from '../offlineQueue'
@@ -23,6 +24,7 @@ export default function Journal() {
   const [rigs, setRigs]           = useState([])
   const [quals, setQuals]         = useState(null)
   const [loading, setLoading]     = useState(true)
+  const [dropzones, setDropzones]   = useState([])
   const [showDocs, setShowDocs]   = useState(false)
   const [search, setSearch]       = useState('')
   const [repeating, setRepeating] = useState(false)
@@ -58,21 +60,25 @@ export default function Journal() {
       setProfile(await dbGetProfile())
       setRigs(await dbGetRigs())
       setQuals(await dbGetQuals())
+      setDropzones(await dbGetDropzones())
       setLoading(false)
       return
     }
-    const [{ data: j }, { data: prof }, { data: rigList }, { data: q }, { data: dzList }] = await Promise.all([
+    const [{ data: j }, { data: prof }, { data: rigList }, { data: q }, { data: dzList }, { data: acList }] = await Promise.all([
       supabase.from('jumps').select('*').order('number', { ascending: false }),
       supabase.from('profiles').select('id,insurance_expiry,medical_expiry').eq('id', user.id).single(),
       supabase.from('rigs').select('id,name,reserve_expiry').eq('user_id', user.id),
       supabase.from('qualifications').select('*').eq('user_id', user.id).single(),
       supabase.from('dropzones').select('*').eq('user_id', user.id).order('name'),
+      supabase.from('aircraft').select('*').eq('user_id', user.id).order('name'),
     ])
     await dbSetJumps(j || [])
     await dbSetProfile(prof)
     await dbSetRigs(rigList || [])
     await dbSetQuals(q || null)
     await dbSetDropzones(dzList || [])
+    setDropzones(dzList || [])
+    await dbSetAircraft(acList || [])
     setJumps(j || [])
     setProfile(prof)
     setRigs(rigList || [])
