@@ -48,7 +48,7 @@ const fmt = (d) => {
 export default function Settings() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { canLanguage  } = useProfile()
+  const { canLanguage, canWeather } = useProfile()
   const [currentLang, setCurrentLang] = useState(i18n.language?.startsWith('en') ? 'en' : 'pl')
   const [settings, setSettings] = useState(() => {
     try {
@@ -382,7 +382,7 @@ export default function Settings() {
         </div>
 
         {/* FUNKCJE */}
-        <div className="card" style={{ marginBottom:'1rem' }}>
+        {canWeather && <div className="card" style={{ marginBottom:'1rem' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>⚙️ Funkcje</h3>
           <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1.25rem' }}>Włącz lub wyłącz dodatkowe funkcje aplikacji</p>
           <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
@@ -400,7 +400,7 @@ export default function Settings() {
               </div>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* PRÓG OSTRZEŻEŃ */}
         <div className="card" style={{ marginBottom:'1.5rem' }}>
