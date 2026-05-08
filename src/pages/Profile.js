@@ -34,7 +34,6 @@ export default function Profile() {
       const [prof, rigList, dz, ac] = await Promise.all([
         dbGetProfile(), dbGetRigs(), dbGetDropzones(), dbGetAircraft()
       ])
-      console.log('OFFLINE PROF:', prof)
       if (prof) setProfileBase({ ...prof, email: prof.email || '', uid: prof.id })
       if (prof?.avatar_url) setPreview(prof.avatar_url)
       setRigs(rigList || [])
