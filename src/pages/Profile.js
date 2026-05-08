@@ -34,7 +34,7 @@ export default function Profile() {
       const [prof, rigList, dz] = await Promise.all([
         dbGetProfile(), dbGetRigs(), dbGetDropzones()
       ])
-      if (prof) setProfileBase({ ...prof, email: '', uid: prof.id })
+      if (prof) setProfileBase({ ...prof, email: prof.email || '', uid: prof.id })
       if (prof?.avatar_url) setPreview(prof.avatar_url)
       setRigs(rigList || [])
       setDropzones(dz || [])
