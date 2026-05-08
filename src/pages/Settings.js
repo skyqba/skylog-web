@@ -16,7 +16,14 @@ const ALERT_KEYS = [
   { key: 'alert_uspa',      label: 'Licencja i uprawnienia USPA',   icon: '🌐', desc: 'Alert dla licencji i uprawnien USPA' },
 ]
 
-const DEFAULT_SETTINGS = Object.fromEntries(ALERT_KEYS.map(a => [a.key, true]))
+const FEATURE_KEYS = [
+  { key: 'show_weather', label: 'Pogoda przy dodawaniu skoku', icon: '🌤', desc: 'Automatycznie pobiera pogode na podstawie lokalizacji' },
+]
+
+const DEFAULT_SETTINGS = {
+  ...Object.fromEntries(ALERT_KEYS.map(a => [a.key, true])),
+  show_weather: true,
+}
 
 const plChar = (str) => {
   if (!str) return ''
@@ -371,6 +378,27 @@ export default function Settings() {
                 </div>
               )
             })}
+          </div>
+        </div>
+
+        {/* FUNKCJE */}
+        <div className="card" style={{ marginBottom:'1rem' }}>
+          <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.25rem' }}>⚙️ Funkcje</h3>
+          <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1.25rem' }}>Włącz lub wyłącz dodatkowe funkcje aplikacji</p>
+          <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
+            {FEATURE_KEYS.map(feature => (
+              <div key={feature.key} onClick={() => toggle(feature.key)}
+                style={{ display:'flex', alignItems:'center', gap:'1rem', padding:'0.85rem 1rem', background: settings[feature.key] ? 'rgba(108,99,255,0.06)' : 'var(--bg3)', border:'1px solid ' + (settings[feature.key] ? 'rgba(108,99,255,0.3)' : 'var(--border)'), borderRadius:'var(--r)', cursor:'pointer', userSelect:'none' }}>
+                <span style={{ fontSize:20, flexShrink:0 }}>{feature.icon}</span>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:'0.88rem', fontWeight:600, color: settings[feature.key] ? 'var(--text)' : 'var(--muted)', marginBottom:2 }}>{feature.label}</div>
+                  <div style={{ fontSize:'0.72rem', color:'var(--muted)' }}>{feature.desc}</div>
+                </div>
+                <div style={{ flexShrink:0, width:42, height:24, borderRadius:12, background: settings[feature.key] ? 'var(--accent)' : 'var(--bg3)', border:'2px solid ' + (settings[feature.key] ? 'var(--accent)' : 'var(--border2)'), position:'relative', transition:'all 0.2s' }}>
+                  <div style={{ position:'absolute', top:2, left: settings[feature.key] ? 18 : 2, width:16, height:16, borderRadius:'50%', background: settings[feature.key] ? '#fff' : 'var(--muted)', transition:'left 0.2s' }} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
