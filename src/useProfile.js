@@ -29,10 +29,10 @@ export function useProfile() {
     loading,
     isPremium:   profile?.is_premium   ?? false,
     isAdmin:     profile?.is_admin     ?? false,
-    canExport:   (profile?.is_premium || profile?.perm_export)   ?? false,
-    canImport:   (profile?.is_premium || profile?.perm_import)   ?? false,
-    canStats:    (profile?.is_premium || profile?.perm_stats)    ?? false,
-    canLanguage: (profile?.is_premium || profile?.perm_language) ?? false,
-    canWeather:  (profile?.is_premium || profile?.perm_weather)  ?? false,
+    canExport:   profile?.is_premium ? (profile?.perm_export   ?? true)  : (profile?.perm_export   ?? false),
+    canImport:   profile?.is_premium ? (profile?.perm_import   ?? true)  : (profile?.perm_import   ?? false),
+    canStats:    profile?.is_premium ? (profile?.perm_stats    ?? true)  : (profile?.perm_stats    ?? false),
+    canLanguage: profile?.is_premium ? (profile?.perm_language ?? false) : (profile?.perm_language ?? false),
+    canWeather:  profile?.is_premium ? (profile?.perm_weather  ?? false) : (profile?.perm_weather  ?? false),
   }
 }
