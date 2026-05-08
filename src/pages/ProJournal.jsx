@@ -107,8 +107,9 @@ function JumpModal({ jump, onClose, onDelete }) {
   )
 }
 
-export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeating }) {
+export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeating, docs = [], urgentDocs = [] }) {
   const [search, setSearch] = useState('')
+  const [showDocs, setShowDocs] = useState(false)
   const [selectedJump, setSelectedJump] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
 
@@ -131,6 +132,51 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
   return (
     <div style={{ minHeight:'100vh', padding:'1.5rem 1rem 5rem', position:'relative' }}>
       <div style={{ position:'relative', zIndex:1, maxWidth:780, margin:'0 auto' }}>
+
+        {/* Dokumenty */}
+        {docs.length > 0 && (
+          <div style={{ background:'rgba(30,41,59,0.6)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', border:'1px solid rgba(255,255,255,0.1)', borderTop:'1px solid rgba(255,255,255,0.18)', borderRadius:20, marginBottom:'1rem', overflow:'hidden', boxShadow:'0 8px 32px rgba(0,0,0,0.4)' }}>
+            <button onClick={() => setShowDocs(d => !d)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 1.1rem', background:'transparent', border:'none', cursor:'pointer', color:'#F1F5F9', fontFamily:'var(--font)' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
+                <span style={{ fontSize:15 }}>📋</span>
+                <span style={{ fontSize:'0.88rem', fontWeight:500 }}>Moje dokumenty</span>
+                {urgentDocs.length > 0 && (
+                  <span style={{ background:'rgba(251,191,36,0.15)', border:'1px solid rgba(251,191,36,0.4)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.72rem', color:'#FBBF24', fontWeight:600 }}>
+                    {urgentDocs.length} wymaga uwagi
+                  </span>
+                )}
+              </div>
+              <span style={{ color:'#64748B', fontSize:'0.8rem' }}>{showDocs ? '▲' : '▼'}</span>
+            </button>
+            {showDocs && (
+              <div style={{ borderTop:'1px solid rgba(255,255,255,0.07)', padding:'0.75rem 1.1rem', display:'flex', flexDirection:'column', gap:'0.6rem' }}>
+                {docs.map(doc => {
+                  const expired = doc.days !== null && doc.days < 0
+                  const warning = doc.days !== null && doc.days <= 30
+                  const color = expired ? '#F87171' : warning ? '#FBBF24' : '#10B981'
+                  const dot = expired ? '#F87171' : warning ? '#FBBF24' : '#10B981'
+                  const fmt = doc.expiry ? new Date(doc.expiry).toLocaleDateString('pl-PL') : ''
+                  return (
+                    <div key={doc.label} style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:'0.6rem' }}>
+                        <div style={{ width:7, height:7, borderRadius:'50%', background: doc.noExpiry ? '#10B981' : dot, flexShrink:0 }} />
+                        <span style={{ fontSize:'0.85rem', color:'#94A3B8' }}>{doc.label}</span>
+                      </div>
+                      <span style={{ fontFamily:'var(--mono)', fontSize:'0.78rem', color: doc.noExpiry ? '#10B981' : color }}>
+                        {doc.noExpiry ? '' : doc.days < 0
+                          ? `Wygasło ${Math.abs(doc.days)} dni temu`
+                          : doc.days <= 30
+                            ? `Wygasa za ${doc.days} dni`
+                            : `Ważne do ${fmt}`}
+                      </span>
+                    </div>
+                  )
+                })}
+                <a href="/profile" style={{ color:'#A78BFA', textDecoration:'none', fontSize:'0.78rem', marginTop:'0.25rem', display:'inline-block' }}>Zarządzaj dokumentami →</a>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Hero stats */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:'1rem', marginBottom:'1.25rem' }}>

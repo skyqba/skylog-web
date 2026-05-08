@@ -224,6 +224,8 @@ export default function Journal() {
           onDelete={(id) => setConfirmDelete({ id, number: jumps.find(j=>j.id===id)?.number })}
           onRepeat={repeatLastJump}
           repeating={repeating}
+          docs={docs}
+          urgentDocs={urgentDocs}
         />
         {confirmDelete && (
           <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
