@@ -179,30 +179,14 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
         )}
 
         {/* Hero stats */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:'1rem', marginBottom:'1.25rem' }}>
+        <div style={{ marginBottom:'1.25rem' }}>
           <GlassCard style={{ padding:'1.5rem' }}>
             <div style={{ fontFamily:'var(--mono)', fontSize:'0.6rem', color:'#64748B', textTransform:'uppercase', letterSpacing:2, marginBottom:8 }}>Łączna liczba skoków</div>
             <div style={{ fontFamily:'var(--head)', fontSize:'4rem', fontWeight:900, lineHeight:1, color:'#fff', textShadow:'0 0 30px rgba(139,92,246,0.7), 0 0 60px rgba(139,92,246,0.3)' }}>{loading ? '—' : totalJumps}</div>
             <div style={{ fontFamily:'var(--mono)', fontSize:'0.68rem', color:'#64748B', marginTop:6 }}>Total Skydives</div>
             {monthData.length > 1 && <div style={{ marginTop:'1rem', height:50, outline:'none' }}><ResponsiveContainer width="100%" height="100%"><LineChart data={monthData}><XAxis dataKey="month" hide /><Line type="monotone" dataKey="count" stroke="#8B5CF6" strokeWidth={2} dot={false} /><Tooltip contentStyle={{ background:'rgba(15,23,42,0.95)', border:'1px solid rgba(139,92,246,0.3)', borderRadius:10, fontSize:'0.78rem', color:'#fff', fontFamily:'var(--font)' }} itemStyle={{ color:'#A78BFA', fontWeight:700 }} separator='' labelFormatter={(l, payload) => { const m = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień']; const yr = payload && payload[0] ? payload[0].payload.year : ''; return (m[parseInt(l)-1] || l) + ' ' + yr }} formatter={(v) => [v + ' skoków']} cursor={{ stroke:'rgba(139,92,246,0.3)', strokeWidth:1 }} /></LineChart></ResponsiveContainer></div>}
           </GlassCard>
-          <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
-            {typeData.length > 0 && (
-              <GlassCard style={{ padding:'1rem', flex:1 }}>
-                <div style={{ fontFamily:'var(--mono)', fontSize:'0.58rem', color:'#64748B', textTransform:'uppercase', letterSpacing:1.5, marginBottom:8 }}>Typy skoków</div>
-                <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
-                  <div style={{ width:60, height:60, flexShrink:0 }}><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={typeData} cx="50%" cy="50%" innerRadius={18} outerRadius={28} dataKey="value" strokeWidth={0}>{typeData.map((_,i)=><Cell key={i} fill={COLORS[i%COLORS.length]}/>)}</Pie></PieChart></ResponsiveContainer></div>
-                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:3 }}>{typeData.slice(0,3).map((t,i)=><div key={t.name} style={{ display:'flex', alignItems:'center', gap:'0.35rem' }}><div style={{ width:6, height:6, borderRadius:'50%', background:COLORS[i], flexShrink:0 }}/><span style={{ fontSize:'0.68rem', color:'#94A3B8', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{t.name}</span><span style={{ fontSize:'0.68rem', color:'#64748B', marginLeft:'auto', fontFamily:'var(--mono)' }}>{t.value}</span></div>)}</div>
-                </div>
-              </GlassCard>
-            )}
-            {monthData.length > 0 && (
-              <GlassCard style={{ padding:'1rem', flex:1 }}>
-                <div style={{ fontFamily:'var(--mono)', fontSize:'0.58rem', color:'#64748B', textTransform:'uppercase', letterSpacing:1.5, marginBottom:8 }}>Ostatnie miesiące</div>
-                <div style={{ height:50 }}><ResponsiveContainer width="100%" height="100%"><BarChart data={monthData} barSize={10}><Bar dataKey="count" radius={[3,3,0,0]}>{monthData.map((_,i)=><Cell key={i} fill={i===monthData.length-1?'#8B5CF6':'rgba(139,92,246,0.4)'}/>)}</Bar><Tooltip contentStyle={{ background:'rgba(15,23,42,0.9)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, fontSize:'0.75rem', color:'#fff' }} cursor={{ fill:'rgba(255,255,255,0.03)' }}/></BarChart></ResponsiveContainer></div>
-              </GlassCard>
-            )}
-          </div>
+
         </div>
 
         {/* Dziennik header */}
