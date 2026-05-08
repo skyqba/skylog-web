@@ -188,7 +188,7 @@ function PremiumAvatar({ profile, onClick }) {
       <div style={{ width:'100%', height:'100%', borderRadius:'50%', overflow:'hidden', background:'#1E293B', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.82rem', fontWeight:700, color:'#fff' }}>
         {avatar ? <img src={avatar} alt="avatar" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : initials}
       </div>
-      <div style={{ position:'absolute', bottom:-4, left:'50%', transform:'translateX(-50%)', background:'#000', border:'1px solid rgba(255,255,255,0.3)', borderRadius:20, padding:'0px 5px', fontSize:'0.52rem', fontWeight:800, color:'#fff', letterSpacing:'0.5px', whiteSpace:'nowrap', lineHeight:'14px' }}>PRO</div>
+
     </div>
   )
 }

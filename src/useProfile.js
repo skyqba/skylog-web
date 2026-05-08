@@ -12,7 +12,7 @@ export function useProfile() {
       if (!user) { if (!cancelled) setLoading(false); return }
       const { data } = await supabase
         .from('profiles')
-        .select('is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language, perm_weather, perm_pro_theme')
+        .select('is_premium, is_admin, perm_export, perm_import, perm_stats, perm_language, perm_weather, perm_pro_theme, avatar_url, name, surname')
         .eq('id', user.id)
         .single()
       if (!cancelled) {
