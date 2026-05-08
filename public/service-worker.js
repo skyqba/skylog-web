@@ -1,39 +1,57 @@
-const CACHE_NAME = 'jumplogx-v2'
+const CACHE_NAME = 'jumplogx-v3'
+const FONT_CACHE = 'jumplogx-fonts-v1'
 
-// Instalacja — cache index.html
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => 
+    caches.open(CACHE_NAME).then(cache =>
       cache.addAll(['/', '/index.html', '/manifest.json'])
     )
   )
   self.skipWaiting()
 })
 
-// Aktywacja — usuń stare cache
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(
+        keys.filter(k => k !== CACHE_NAME && k !== FONT_CACHE)
+            .map(k => caches.delete(k))
+      )
     )
   )
   self.clients.claim()
 })
 
-// Fetch — cache all, network first
 self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Pomijaj zewnętrzne API
-  if (
-    url.hostname.includes('supabase') ||
-    url.hostname.includes('open-meteo') ||
-    url.hostname.includes('googleapis') ||
-    url.hostname.includes('gstatic') ||
-    request.method !== 'GET'
-  ) return
+  if (request.method !== 'GET') return
 
+  // Supabase — zawsze network, nigdy cache
+  if (url.hostname.includes('supabase')) return
+
+  // Open-Meteo — tylko network
+  if (url.hostname.includes('open-meteo')) return
+
+  // Fonty Google — cache first
+  if (url.hostname.includes('fonts.googleapis.com') ||
+      url.hostname.includes('fonts.gstatic.com')) {
+    event.respondWith(
+      caches.open(FONT_CACHE).then(cache =>
+        cache.match(request).then(cached => {
+          if (cached) return cached
+          return fetch(request).then(response => {
+            cache.put(request, response.clone())
+            return response
+          }).catch(() => cached)
+        })
+      )
+    )
+    return
+  }
+
+  // Wszystko inne — network first, fallback cache
   event.respondWith(
     fetch(request)
       .then(response => {
@@ -53,9 +71,6 @@ self.addEventListener('fetch', (event) => {
   )
 })
 
-// Wymuś update gdy dostępna nowa wersja
 self.addEventListener('message', (event) => {
-  if (event.data?.type === 'SKIP_WAITING') {
-    self.skipWaiting()
-  }
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting()
 })

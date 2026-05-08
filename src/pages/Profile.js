@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 import { dbGetProfile, dbGetRigs, dbGetDropzones, dbGetQuals, dbGetAircraft } from '../db'
+import { getUser } from '../getUser'
 import { useProfile } from '../useProfile'
 
 export default function Profile() {
@@ -41,7 +42,7 @@ export default function Profile() {
       setAircraft(ac || [])
       return
     }
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await getUser()
     const [{ data: prof }, { data: dz }, { data: docList }, { data: rigList }, { data: acList }] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase.from('dropzones').select('*').eq('user_id', user.id).order('name'),
@@ -114,7 +115,7 @@ export default function Profile() {
 
   const addDropzone = async () => {
     if (!newDz.trim()) return
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await getUser()
     const { data } = await supabase.from('dropzones').insert({ user_id: user.id, name: newDz.trim() }).select().single()
     if (data) setDropzones(dz => [...dz, data].sort((a, b) => a.name.localeCompare(b.name)))
     setNewDz('')
@@ -134,7 +135,7 @@ export default function Profile() {
 
   const addAircraft = async () => {
     if (!newAc.trim()) return
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await getUser()
     const { data } = await supabase.from('aircraft').insert({ user_id: user.id, name: newAc.trim() }).select().single()
     if (data) setAircraft(ac => [...ac, data].sort((a, b) => a.name.localeCompare(b.name)))
     setNewAc('')
@@ -142,7 +143,7 @@ export default function Profile() {
 
   const addDefaultAircraft = async (name) => {
     if (aircraft.some(a => a.name === name)) return
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await getUser()
     const { data } = await supabase.from('aircraft').insert({ user_id: user.id, name }).select().single()
     if (data) setAircraft(ac => [...ac, data].sort((a, b) => a.name.localeCompare(b.name)))
   }
@@ -155,7 +156,7 @@ export default function Profile() {
   const saveRig = async () => {
     if (!newRig.name.trim()) return
     setSavingRig(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await getUser()
     const { data } = await supabase.from('rigs').insert({
       user_id: user.id,
       name: newRig.name.trim(),

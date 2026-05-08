@@ -59,7 +59,6 @@ export const dbGetProfile = async () => {
 
 export const dbSetProfile = async (profile) => {
   if (!profile) return
-  console.log('SAVING PROFILE TO IDB:', Object.keys(profile))
   const db = await getDB()
   await db.put('profile', profile)
 }

@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar'
 import { dbGetJumps, dbAddJump, dbGetDropzones, dbGetRigs, dbGetAircraft } from '../db'
 import { saveToQueue } from '../offlineQueue'
 import { useProfile } from '../useProfile'
+import { getUser } from '../getUser'
 
 const JUMP_TYPES_PL = [
   { value: 'Tandem (T)',              label: 'Tandem (T)' },
@@ -90,7 +91,7 @@ export default function AddJump() {
         setForm(f => ({ ...f, number: String(nextNum) }))
         return
       }
-      const { data: { user } } = await supabase.auth.getUser()
+      const user = await getUser()
       const [{ data: rigs }, { data: dz }, { data: lastJump }, { data: ac }] = await Promise.all([
         supabase.from('rigs').select('main').eq('user_id', user.id).not('main', 'is', null),
         supabase.from('dropzones').select('*').eq('user_id', user.id).order('name'),
@@ -155,7 +156,7 @@ export default function AddJump() {
     setForm(f => ({ ...f, aircraft: a }))
     setAircraftSuggestions([])
     if (!userAircraft.some(ua => ua.name === a)) {
-      const { data: { user } } = await supabase.auth.getUser()
+      const user = await getUser()
       const { data } = await supabase.from('aircraft').insert({ user_id: user.id, name: a }).select().single()
       if (data) setUserAircraft(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
     }
@@ -170,7 +171,7 @@ export default function AddJump() {
     setError('')
     if (!form.number || !form.jump_date) { setError(t('add_jump.error_required')); return }
     setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await getUser()
     const finalType = form.jump_type === 'inny' ? form.custom_type.trim() : form.jump_type
     const jumpData = {
       number:    parseInt(form.number),
