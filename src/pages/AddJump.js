@@ -92,6 +92,8 @@ export default function AddJump() {
   }, [])
 
   const fetchWeather = () => {
+    const settings = (() => { try { return JSON.parse(localStorage.getItem('alertSettings') || '{}') } catch { return {} } })()
+    if (settings['show_weather'] === false) return
     if (!navigator.geolocation) return
     setWeatherLoading(true)
     navigator.geolocation.getCurrentPosition(async (pos) => {
