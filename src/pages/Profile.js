@@ -219,7 +219,21 @@ export default function Profile() {
 
   const cleanName = (name) => name.replace(/^\d+_/, '')
 
-  if (!profileBase) return <div><Navbar /><p style={{ textAlign:'center', padding:'4rem', color:'var(--muted)' }}>{t('profile.loading')}</p></div>
+  if (!profileBase) return (
+    <div>
+      <Navbar />
+      <div style={{ textAlign:'center', padding:'4rem', color:'var(--muted)' }}>
+        <p>{t('profile.loading')}</p>
+        <button onClick={async () => {
+          const { dbGetProfile } = await import('../db')
+          const p = await dbGetProfile()
+          alert(JSON.stringify(p, null, 2))
+        }} style={{ marginTop:'1rem', padding:'0.5rem 1rem', background:'var(--accent)', color:'#fff', border:'none', borderRadius:8, cursor:'pointer' }}>
+          Sprawdź IDB
+        </button>
+      </div>
+    </div>
+  )
 
   return (
     <div>
