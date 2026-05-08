@@ -39,6 +39,19 @@ const DEFAULT_AIRCRAFT = [
   'Beechcraft King Air', 'CASA C-295', 'Mi-8', 'Mi-2', 'AS350',
 ]
 
+const WIND_DIRS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW']
+const getWindDir = (deg) => WIND_DIRS[Math.round(deg / 22.5) % 16]
+
+const WMO_CODES = {
+  0: 'Bezchmurnie ☀️', 1: 'Przeważnie słonecznie 🌤', 2: 'Częściowe zachmurzenie ⛅', 3: 'Zachmurzenie ☁️',
+  45: 'Mgła 🌫', 48: 'Mgła z szronem 🌫',
+  51: 'Lekka mżawka 🌦', 53: 'Mżawka 🌦', 55: 'Gęsta mżawka 🌧',
+  61: 'Lekki deszcz 🌧', 63: 'Deszcz 🌧', 65: 'Ulewny deszcz 🌧',
+  71: 'Lekki śnieg ❄️', 73: 'Śnieg ❄️', 75: 'Intensywny śnieg ❄️',
+  80: 'Przelotny deszcz 🌦', 81: 'Deszcz przelotny 🌧', 82: 'Gwałtowny deszcz 🌧',
+  95: 'Burza ⛈', 96: 'Burza z gradem ⛈', 99: 'Burza z silnym gradem ⛈',
+}
+
 export default function AddJump() {
   const { t, i18n } = useTranslation()
   const JUMP_TYPES = i18n.language?.startsWith('en') ? JUMP_TYPES_EN : JUMP_TYPES_PL
@@ -46,7 +59,7 @@ export default function AddJump() {
   const [form, setForm] = useState({
     number: '', jump_date: new Date().toISOString().split('T')[0],
     city: '', parachute: '', altitude: '', delay: '', aircraft: '', notes: '', result: '',
-    jump_type: '', custom_type: '',
+    jump_type: '', custom_type: '', weather: '',
   })
   const [mainChutes, setMainChutes]                   = useState([])
   const [dropzones, setDropzones]                     = useState([])
@@ -54,6 +67,8 @@ export default function AddJump() {
   const [error, setError]                             = useState('')
   const [loading, setLoading]                         = useState(false)
   const [aircraftSuggestions, setAircraftSuggestions] = useState([])
+  const [weatherLoading, setWeatherLoading]           = useState(false)
+  const [weatherData, setWeatherData]                 = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -73,7 +88,32 @@ export default function AddJump() {
       setForm(f => ({ ...f, number: String(nextNum) }))
     }
     load()
+    fetchWeather()
   }, [])
+
+  const fetchWeather = () => {
+    if (!navigator.geolocation) return
+    setWeatherLoading(true)
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      try {
+        const { latitude, longitude } = pos.coords
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,windspeed_10m,winddirection_10m,weathercode&timezone=auto&windspeed_unit=ms`
+        const res = await fetch(url)
+        const data = await res.json()
+        const c = data.current
+        const temp = Math.round(c.temperature_2m)
+        const wind = Math.round(c.windspeed_10m * 10) / 10
+        const dir = getWindDir(c.winddirection_10m)
+        const desc = WMO_CODES[c.weathercode] || ''
+        const weatherStr = `${temp}°C, Wiatr ${wind} m/s ${dir}${desc ? `, ${desc}` : ''}`
+        setWeatherData({ temp, wind, dir, desc, weatherStr })
+        setForm(f => ({ ...f, weather: weatherStr }))
+      } catch (e) {
+        console.error('Weather error:', e)
+      }
+      setWeatherLoading(false)
+    }, () => setWeatherLoading(false), { timeout: 10000 })
+  }
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
 
@@ -125,6 +165,7 @@ export default function AddJump() {
       notes:     form.notes,
       result:    form.result || null,
       jump_type: finalType || null,
+      weather:   form.weather || null,
     })
     setLoading(false)
     if (error) { setError(error.message); return }
@@ -269,6 +310,40 @@ export default function AddJump() {
               <div style={{ fontSize: '0.72rem', color: 'var(--muted)', marginTop: '0.35rem' }}>
                 💡 Zarządzaj listą samolotów w Profilu.
               </div>
+            </div>
+
+            {/* Pogoda */}
+            <div className="form-group">
+              <label className="label">🌤 Pogoda</label>
+              {weatherLoading && (
+                <div style={{ fontSize: '0.82rem', color: 'var(--muted)', marginBottom: '0.5rem' }}>
+                  Pobieranie pogody...
+                </div>
+              )}
+              {weatherData && !weatherLoading && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.9rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: 'var(--r)', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '1.5rem' }}>🌡</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)' }}>{weatherData.temp}°C</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>Wiatr {weatherData.wind} m/s {weatherData.dir} · {weatherData.desc}</div>
+                  </div>
+                  <button type="button" onClick={fetchWeather} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--muted)', fontSize: '0.72rem', padding: '0.25rem 0.6rem', cursor: 'pointer', fontFamily: 'var(--font)' }}>
+                    ↻ Odśwież
+                  </button>
+                </div>
+              )}
+              <input
+                className="input"
+                placeholder="np. 22°C, Wiatr 4 m/s NW, Bezchmurnie"
+                value={form.weather}
+                maxLength={200}
+                onChange={set('weather')}
+              />
+              {!weatherData && !weatherLoading && (
+                <div style={{ fontSize: '0.72rem', color: 'var(--muted)', marginTop: '0.35rem' }}>
+                  💡 Zezwól na dostęp do lokalizacji aby pobrać pogodę automatycznie.
+                </div>
+              )}
             </div>
 
             {/* Wynik - tylko dla ACC */}

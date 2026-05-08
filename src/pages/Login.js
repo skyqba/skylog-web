@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 
 export default function Login() {
+  const { t } = useTranslation()
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
@@ -47,7 +49,9 @@ export default function Login() {
   const handleReset = async (e) => {
     e.preventDefault()
     setLoading(true); setError('')
-    const { error } = await supabase.auth.resetPasswordForEmail(email)
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://skylog-web-dec7.vercel.app/reset-password',
+    })
     if (error) setError(error.message)
     else setResetSent(true)
     setLoading(false)
@@ -61,25 +65,25 @@ export default function Login() {
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
           <div style={{ marginBottom:'0.25rem' }}>
             <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:900, color:'var(--text)' }}>
-              <span style={{ color:'var(--accent2)' }}>Jump</span>Log<span style={{ color:'var(--accent2)', }}>X</span>
+              <span style={{ color:'var(--accent2)' }}>Jump</span>Log<span style={{ color:'var(--accent2)' }}>X</span>
             </span>
           </div>
           <div style={{ fontFamily:'var(--font)', fontSize:'0.65rem', color:'var(--muted)', marginBottom:'0.4rem' }}>
             by SkyQba ver 1.0
           </div>
           <div style={{ fontFamily:'var(--mono)', fontSize:'0.7rem', letterSpacing:'2px', color:'var(--muted)', textTransform:'uppercase' }}>
-            Dziennik skoków spadochronowych
+            {t('login.tagline')}
           </div>
         </div>
 
         <div className="card">
           <h2 style={{ fontFamily:'var(--head)', fontSize:'1.2rem', fontWeight:800, marginBottom:'1.5rem' }}>
-            {resetMode ? 'Resetowanie hasła' : 'Logowanie'}
+            {resetMode ? t('login.reset_title') : t('login.title')}
           </h2>
 
           {resetSent && (
             <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.85rem 1rem', marginBottom:'1rem', fontSize:'0.88rem', color:'var(--success)' }}>
-              Link do resetowania hasła został wysłany! Sprawdź skrzynkę e-mail.
+              {t('login.reset_sent')}
             </div>
           )}
 
@@ -91,16 +95,15 @@ export default function Login() {
 
           <form onSubmit={resetMode ? handleReset : handleLogin}>
             <div className="form-group">
-              <label className="label">Email</label>
+              <label className="label">{t('login.email')}</label>
               <input className="input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" required />
             </div>
             {!resetMode && (
               <div className="form-group">
-                <label className="label">Password</label>
+                <label className="label">{t('login.password')}</label>
                 <input className="input" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
               </div>
             )}
-
             {!resetMode && (
               <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'1rem' }}>
                 <input
@@ -111,23 +114,22 @@ export default function Login() {
                   style={{ width:15, height:15, accentColor:'var(--accent)', cursor:'pointer' }}
                 />
                 <label htmlFor="remember" style={{ fontSize:'0.82rem', color:'var(--muted)', cursor:'pointer', fontFamily:'var(--font)' }}>
-                  Zapamiętaj moje dane
+                  {t('login.remember')}
                 </label>
               </div>
             )}
-
             <button className="btn" type="submit" disabled={loading}>
-              {loading ? 'Proszę czekać...' : resetMode ? 'Wyślij link resetujący' : 'Zaloguj się'}
+              {loading ? t('login.loading') : resetMode ? t('login.reset_send') : t('login.submit')}
             </button>
           </form>
 
           <div style={{ marginTop:'1rem', display:'flex', flexDirection:'column', gap:'0.5rem', alignItems:'center' }}>
             <button onClick={() => { setResetMode(!resetMode); setError(''); setResetSent(false) }}
               style={{ background:'none', border:'none', color:'var(--muted)', fontSize:'0.82rem', cursor:'pointer', fontFamily:'var(--font)' }}>
-              {resetMode ? '← Wróć do logowania' : 'Zapomniałeś hasła?'}
+              {resetMode ? t('login.back_to_login') : t('login.forgot')}
             </button>
             <Link to="/register" style={{ color:'var(--accent2)', fontSize:'0.82rem', textDecoration:'none' }}>
-              Nie masz konta? Zarejestruj się →
+              {t('login.no_account')}
             </Link>
           </div>
         </div>
