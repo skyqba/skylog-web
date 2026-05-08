@@ -228,3 +228,8 @@ body.theme-pro .tag-pro {
   color: #A78BFA;
   font-family: var(--mono);
 }
+
+/* Remove focus outline from charts */
+.recharts-wrapper, .recharts-surface, .recharts-wrapper * {
+  outline: none !important;
+}
