@@ -139,7 +139,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
             <button onClick={() => setShowDocs(d => !d)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 1.1rem', background:'transparent', border:'none', cursor:'pointer', color:'#F1F5F9', fontFamily:'var(--font)' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
                 <span style={{ fontSize:15 }}>📋</span>
-                <span style={{ fontSize:'0.88rem', fontWeight:500, fontFamily:'Inter, sans-serif' }}>Moje dokumenty</span>
+                <span style={{ fontSize:'0.88rem', fontWeight:500, fontFamily:'Geist, Inter, sans-serif' }}>Moje dokumenty</span>
                 {urgentDocs.length > 0 && (
                   <span style={{ background:'rgba(251,191,36,0.15)', border:'1px solid rgba(251,191,36,0.4)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.72rem', color:'#FBBF24', fontWeight:600 }}>
                     {urgentDocs.length} wymaga uwagi
@@ -160,9 +160,9 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
                     <div key={doc.label} style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                       <div style={{ display:'flex', alignItems:'center', gap:'0.6rem' }}>
                         <div style={{ width:7, height:7, borderRadius:'50%', background: doc.noExpiry ? '#10B981' : dot, flexShrink:0 }} />
-                        <span style={{ fontSize:'0.85rem', color:'#94A3B8', fontFamily:'Inter, sans-serif' }}>{doc.label}</span>
+                        <span style={{ fontSize:'0.85rem', color:'#94A3B8', fontFamily:'Geist, Inter, sans-serif' }}>{doc.label}</span>
                       </div>
-                      <span style={{ fontFamily:'Inter, sans-serif', fontSize:'0.78rem', color: doc.noExpiry ? '#10B981' : color }}>
+                      <span style={{ fontFamily:'Geist, Inter, sans-serif', fontSize:'0.78rem', color: doc.noExpiry ? '#10B981' : color }}>
                         {doc.noExpiry ? '' : doc.days < 0
                           ? `Wygasło ${Math.abs(doc.days)} dni temu`
                           : doc.days <= 30
