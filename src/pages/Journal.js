@@ -346,7 +346,7 @@ export default function Journal() {
             {t('journal.total_jumps')}
           </div>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'1rem', flexWrap:'wrap' }}>
-            <div style={{ fontFamily:'var(--head)', fontSize:'3rem', fontWeight:900, letterSpacing:'-2px', lineHeight:1, color:'var(--text)' }}>
+            <div className={document.body.classList.contains('theme-pro') ? 'pro-glow' : ''} style={{ fontFamily:'var(--head)', fontSize:'3rem', fontWeight:900, letterSpacing:'-2px', lineHeight:1, color:'var(--text)' }}>
               {loading ? '—' : (jumps.length > 0 ? Math.max(...jumps.map(j => j.number || 0)) : 0)}
             </div>
             <div style={{ display:'flex', flexDirection:'row', gap:'0.5rem', alignItems:'center', flexShrink:0 }}>

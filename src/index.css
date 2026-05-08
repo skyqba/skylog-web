@@ -69,97 +69,162 @@ z-index: 0;
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 .form-row .form-group { min-width: 0; }
 .form-group { margin-bottom: 0.9rem; }
+
 /* ─── MOTYW PRO ─────────────────────────────────────────────────────────────── */
 body.theme-pro {
-  --bg:      #070B14;
-  --bg2:     rgba(17, 25, 40, 0.75);
-  --bg3:     rgba(255, 255, 255, 0.03);
+  --bg:      #0F172A;
+  --bg2:     rgba(30, 41, 59, 0.7);
+  --bg3:     rgba(255, 255, 255, 0.04);
   --border:  rgba(255, 255, 255, 0.08);
-  --border2: rgba(255, 255, 255, 0.125);
-  --text:    #F0F0FF;
-  --muted:   rgba(240,240,255,0.45);
-  --accent:  #6C63FF;
-  --accent2: #9D97FF;
+  --border2: rgba(255, 255, 255, 0.13);
+  --text:    #F1F5F9;
+  --muted:   #94A3B8;
+  --accent:  #8B5CF6;
+  --accent2: #A78BFA;
+  --success: #10B981;
+  --danger:  #F87171;
+  background: #0F172A;
 }
 
+/* Mesh gradient background */
 body.theme-pro::before {
-  background-image: none;
-}
-
-body.theme-pro::after {
-  display: none;
-}
-
-body.theme-pro .blob-1,
-body.theme-pro .blob-2 {
-  display: block;
-}
-
-.blob-1, .blob-2 { display: none; }
-
-.blob-1 {
+  content: '';
   position: fixed;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 70%);
-  filter: blur(60px);
-  top: -200px;
-  left: -200px;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(139,92,246,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(59,130,246,0.15) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 50% 90%, rgba(16,185,129,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(139,92,246,0.1) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
 }
 
-.blob-2 {
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
-  filter: blur(60px);
-  bottom: -150px;
-  right: -150px;
-  pointer-events: none;
-  z-index: 0;
-}
+body.theme-pro::after { display: none; }
 
+/* Glassmorphism cards */
 body.theme-pro .card {
-  background: rgba(17, 25, 40, 0.75);
+  background: rgba(30, 41, 59, 0.65);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 body.theme-pro .card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(108, 99, 255, 0.4);
+  transform: translateY(-3px);
+  border-color: rgba(139, 92, 246, 0.45);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(139, 92, 246, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
+/* Glow buttons */
 body.theme-pro .btn {
-  background: linear-gradient(135deg, #6C63FF 0%, #3B82F6 100%);
-  box-shadow: 0 4px 15px rgba(108, 99, 255, 0.35);
+  background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+  border: none;
   border-radius: 12px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+  transition: all 0.25s ease;
 }
 
 body.theme-pro .btn:hover {
-  box-shadow: 0 6px 20px rgba(108, 99, 255, 0.5);
+  background: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%);
+  box-shadow: 0 6px 28px rgba(139, 92, 246, 0.6);
   transform: translateY(-2px);
 }
 
+body.theme-pro .btn.ghost {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted);
+  box-shadow: none;
+}
+
+body.theme-pro .btn.ghost:hover {
+  background: rgba(139,92,246,0.1);
+  border-color: rgba(139,92,246,0.4);
+  color: var(--accent2);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+/* Glass inputs */
 body.theme-pro .input {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
+  color: var(--text);
   backdrop-filter: blur(8px);
+  transition: all 0.2s;
 }
 
 body.theme-pro .input:focus {
-  border-color: rgba(108, 99, 255, 0.6);
-  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* Floating navbar */
+body.theme-pro nav {
+  background: rgba(15, 23, 42, 0.8) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 1px 40px rgba(0,0,0,0.4) !important;
+}
+
+/* Neon number glow */
+body.theme-pro .pro-glow {
+  text-shadow:
+    0 0 20px rgba(139, 92, 246, 0.6),
+    0 0 40px rgba(139, 92, 246, 0.3),
+    0 0 80px rgba(139, 92, 246, 0.15);
+  color: #fff;
+}
+
+/* Jump card pro layout */
+body.theme-pro .jump-card-pro {
+  background: rgba(30, 41, 59, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255,255,255,0.15);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  transition: all 0.25s ease;
+}
+
+body.theme-pro .jump-card-pro:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139,92,246,0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.15);
+}
+
+/* Weather chip pro */
+body.theme-pro .weather-chip {
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 12px;
+  padding: 0.5rem 0.85rem;
+}
+
+/* Tag pro style */
+body.theme-pro .tag-pro {
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  color: #A78BFA;
+  font-family: var(--mono);
 }
