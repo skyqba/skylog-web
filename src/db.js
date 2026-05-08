@@ -1,7 +1,7 @@
 import { openDB } from 'idb'
 
 const DB_NAME = 'skyjumplog'
-const DB_VERSION = 3
+const DB_VERSION = 4
 
 export const getDB = () => openDB(DB_NAME, DB_VERSION, {
   upgrade(db) {
@@ -24,6 +24,8 @@ export const getDB = () => openDB(DB_NAME, DB_VERSION, {
       db.createObjectStore('aircraft', { keyPath: 'id' })
     if (!db.objectStoreNames.contains('documents'))
       db.createObjectStore('documents', { keyPath: 'name' })
+    if (!db.objectStoreNames.contains('avatar'))
+      db.createObjectStore('avatar', { keyPath: 'id' })
   }
 })
 
@@ -154,4 +156,17 @@ export const dbSetDocuments = async (docs) => {
   await tx.store.clear()
   await Promise.all(docs.map(d => tx.store.put(d)))
   await tx.done
+}
+
+// ─── Avatar ───────────────────────────────────────────────────────────────────
+export const dbGetAvatar = async () => {
+  const db = await getDB()
+  const all = await db.getAll('avatar')
+  return all[0]?.data || null
+}
+
+export const dbSetAvatar = async (base64) => {
+  if (!base64) return
+  const db = await getDB()
+  await db.put('avatar', { id: 'avatar', data: base64 })
 }

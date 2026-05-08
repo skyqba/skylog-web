@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
-import { dbGetProfile, dbGetRigs, dbGetDropzones, dbGetQuals, dbGetAircraft, dbGetDocuments, dbSetDocuments } from '../db'
+import { dbGetProfile, dbGetRigs, dbGetDropzones, dbGetQuals, dbGetAircraft, dbGetDocuments, dbSetDocuments, dbGetAvatar, dbSetAvatar } from '../db'
 import { getUser } from '../getUser'
 import { useProfile } from '../useProfile'
 
@@ -36,7 +36,9 @@ export default function Profile() {
         dbGetProfile(), dbGetRigs(), dbGetDropzones(), dbGetAircraft(), dbGetDocuments()
       ])
       if (prof) setProfileBase({ ...prof, email: prof.email || '', uid: prof.id })
-      if (prof?.avatar_url) setPreview(prof.avatar_url)
+      const avatarData = await dbGetAvatar()
+      if (avatarData) setPreview(avatarData)
+      else if (prof?.avatar_url) setPreview(prof.avatar_url)
       setRigs(rigList || [])
       setDropzones(dz || [])
       setAircraft(ac || [])
@@ -52,7 +54,17 @@ export default function Profile() {
       supabase.from('aircraft').select('*').eq('user_id', user.id).order('name'),
     ])
     setProfileBase({ ...prof, email: user.email, uid: user.id })
-    if (prof?.avatar_url) setPreview(prof.avatar_url + '?t=' + Date.now())
+    if (prof?.avatar_url) {
+      setPreview(prof.avatar_url + '?t=' + Date.now())
+      // Zapisz avatar do IDB jako base64
+      try {
+        const res = await fetch(prof.avatar_url)
+        const blob = await res.blob()
+        const reader = new FileReader()
+        reader.onloadend = () => dbSetAvatar(reader.result)
+        reader.readAsDataURL(blob)
+      } catch {}
+    }
     setDropzones(dz || [])
     setDocs(docList || [])
     await dbSetDocuments(docList || [])

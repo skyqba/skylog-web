@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { dbGetAvatar } from './db'
 import { supabase } from './supabase'
 
 export function useProfile() {
@@ -8,6 +9,15 @@ export function useProfile() {
   useEffect(() => {
     let cancelled = false
     const load = async () => {
+      if (!navigator.onLine) {
+        const { dbGetProfile: getProf } = await import('./db')
+        const [prof, avatarData] = await Promise.all([getProf(), dbGetAvatar()])
+        if (!cancelled && prof) {
+          setProfile({ ...prof, avatar_url: avatarData || prof.avatar_url })
+          setLoading(false)
+        }
+        return
+      }
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { if (!cancelled) setLoading(false); return }
       const { data } = await supabase
