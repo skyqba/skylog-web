@@ -278,9 +278,11 @@ export default function Profile() {
                 ) : (
                   <span style={{ fontSize:'0.7rem', color:'var(--muted)', padding:'0.3rem 0.6rem' }}>📵 Offline</span>
                 )}
-                <button onClick={() => deleteDoc(doc.name)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem', padding:'0.2rem 0.4rem', borderRadius:5 }}
-                  onMouseEnter={e => e.target.style.color='var(--danger)'}
-                  onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>
+                {navigator.onLine && (
+                  <button onClick={() => deleteDoc(doc.name)} style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem', padding:'0.2rem 0.4rem', borderRadius:5 }}
+                    onMouseEnter={e => e.target.style.color='var(--danger)'}
+                    onMouseLeave={e => e.target.style.color='var(--muted)'}>✕</button>
+                )}
               </div>
             </div>
           ))}
