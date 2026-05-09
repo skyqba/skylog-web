@@ -20,7 +20,11 @@
   ],
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#0a0a0f",
-  "background_color": "#0a0a0f",
-  "orientation": "portrait"
+  "theme_color": "#0F172A",
+  "background_color": "#0F172A",
+  "orientation": "portrait",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ]
 }
