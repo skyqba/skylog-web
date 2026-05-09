@@ -110,6 +110,19 @@ function JumpModal({ jump, onClose, onDelete }) {
 export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeating, docs = [], urgentDocs = [], urgentRigs = [], profileAlerts = [], qualAlerts = [] }) {
   const [search, setSearch] = useState('')
   const [showDocs, setShowDocs] = useState(false)
+  const [dismissedRigs, setDismissedRigs] = useState(() => JSON.parse(sessionStorage.getItem('dismissedRigs') || '[]'))
+  const [dismissedQuals, setDismissedQuals] = useState(() => JSON.parse(sessionStorage.getItem('dismissedQuals') || '[]'))
+
+  const dismissRig = (id) => {
+    const updated = [...dismissedRigs, id]
+    setDismissedRigs(updated)
+    sessionStorage.setItem('dismissedRigs', JSON.stringify(updated))
+  }
+  const dismissQual = (key) => {
+    const updated = [...dismissedQuals, key]
+    setDismissedQuals(updated)
+    sessionStorage.setItem('dismissedQuals', JSON.stringify(updated))
+  }
   const [selectedJump, setSelectedJump] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
 
@@ -134,7 +147,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
       <div style={{ position:'relative', zIndex:1, maxWidth:780, margin:'0 auto' }}>
 
         {/* Alerty */}
-        {urgentRigs.map(rig => {
+        {urgentRigs.filter(r => !dismissedRigs.includes(r.id)).map(rig => {
           const expired = rig.days < 0
           const color = expired ? '#F87171' : '#FBBF24'
           return (
@@ -144,10 +157,11 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
                 <div style={{ fontSize:'0.88rem', fontWeight:700, color }}>{expired ? 'Wygasło ułożenie zapasowego' : 'Zbliża się koniec ważności ułożenia zapasowego'}</div>
                 <div style={{ fontSize:'0.78rem', color, opacity:0.85 }}>{rig.name} — {expired ? `Wygasło ${Math.abs(rig.days)} dni temu` : `Zostało ${rig.days} dni`}</div>
               </div>
+              <button onClick={() => dismissRig(rig.id)} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,0.4)', cursor:'pointer', fontSize:'1rem', padding:'0.2rem 0.4rem', flexShrink:0 }} onMouseEnter={e=>e.target.style.color='#F87171'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>✕</button>
             </div>
           )
         })}
-        {[...profileAlerts, ...qualAlerts].map(a => {
+        {[...profileAlerts, ...qualAlerts].filter(a => !dismissedQuals.includes(a.key)).map(a => {
           const expired = a.days < 0
           const color = expired ? '#F87171' : '#FBBF24'
           return (
@@ -157,6 +171,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
                 <div style={{ fontSize:'0.88rem', fontWeight:700, color }}>{expired ? `Wygasło — ${a.label}` : `Zbliża się koniec ważności — ${a.label}`}</div>
                 <div style={{ fontSize:'0.78rem', color, opacity:0.85 }}>{expired ? `Wygasło ${Math.abs(a.days)} dni temu` : `Zostało ${a.days} dni`}</div>
               </div>
+              <button onClick={() => dismissQual(a.key)} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,0.4)', cursor:'pointer', fontSize:'1rem', padding:'0.2rem 0.4rem', flexShrink:0 }} onMouseEnter={e=>e.target.style.color='#F87171'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>✕</button>
             </div>
           )
         })}
