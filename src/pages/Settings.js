@@ -246,7 +246,7 @@ export default function Settings() {
     setBackupLoading(false)
   }
 
-  const activeCount = Object.values(settings).filter(Boolean).length
+  const activeCount = ALERT_KEYS.filter(a => settings[a.key]).length
 
   const formatOptions = [
     { key: 'csv',   icon: '📊', label: 'Pobierz CSV',   desc: 'Plik .csv do Excela lub Numbers' },
