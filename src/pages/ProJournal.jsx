@@ -107,7 +107,7 @@ function JumpModal({ jump, onClose, onDelete }) {
   )
 }
 
-export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeating, docs = [], urgentDocs = [] }) {
+export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeating, docs = [], urgentDocs = [], urgentRigs = [], profileAlerts = [], qualAlerts = [] }) {
   const [search, setSearch] = useState('')
   const [showDocs, setShowDocs] = useState(false)
   const [selectedJump, setSelectedJump] = useState(null)
@@ -132,6 +132,34 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
   return (
     <div style={{ minHeight:'100vh', padding:'1.5rem 1rem 5rem', position:'relative' }}>
       <div style={{ position:'relative', zIndex:1, maxWidth:780, margin:'0 auto' }}>
+
+        {/* Alerty */}
+        {urgentRigs.map(rig => {
+          const expired = rig.days < 0
+          const color = expired ? '#F87171' : '#FBBF24'
+          return (
+            <div key={rig.id} style={{ display:'flex', alignItems:'center', gap:'1rem', padding:'0.85rem 1.1rem', borderRadius:16, marginBottom:'0.75rem', background: expired ? 'rgba(248,113,113,0.1)' : 'rgba(251,191,36,0.08)', border:`1px solid ${expired ? 'rgba(248,113,113,0.4)' : 'rgba(251,191,36,0.3)'}` }}>
+              <span style={{ fontSize:20 }}>{expired ? '🚨' : '⚠️'}</span>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:'0.88rem', fontWeight:700, color }}>{expired ? 'Wygasło ułożenie zapasowego' : 'Zbliża się koniec ważności ułożenia zapasowego'}</div>
+                <div style={{ fontSize:'0.78rem', color, opacity:0.85 }}>{rig.name} — {expired ? `Wygasło ${Math.abs(rig.days)} dni temu` : `Zostało ${rig.days} dni`}</div>
+              </div>
+            </div>
+          )
+        })}
+        {[...profileAlerts, ...qualAlerts].map(a => {
+          const expired = a.days < 0
+          const color = expired ? '#F87171' : '#FBBF24'
+          return (
+            <div key={a.key} style={{ display:'flex', alignItems:'center', gap:'1rem', padding:'0.85rem 1.1rem', borderRadius:16, marginBottom:'0.75rem', background: expired ? 'rgba(248,113,113,0.1)' : 'rgba(251,191,36,0.08)', border:`1px solid ${expired ? 'rgba(248,113,113,0.4)' : 'rgba(251,191,36,0.3)'}` }}>
+              <span style={{ fontSize:20 }}>{expired ? '🚨' : '⚠️'}</span>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:'0.88rem', fontWeight:700, color }}>{expired ? `Wygasło — ${a.label}` : `Zbliża się koniec ważności — ${a.label}`}</div>
+                <div style={{ fontSize:'0.78rem', color, opacity:0.85 }}>{expired ? `Wygasło ${Math.abs(a.days)} dni temu` : `Zostało ${a.days} dni`}</div>
+              </div>
+            </div>
+          )
+        })}
 
         {/* Dokumenty */}
         {docs.length > 0 && (

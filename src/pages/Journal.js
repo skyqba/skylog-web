@@ -235,6 +235,9 @@ export default function Journal() {
           repeating={repeating}
           docs={docs}
           urgentDocs={urgentDocs}
+          urgentRigs={urgentRigs}
+          profileAlerts={profileAlerts}
+          qualAlerts={qualAlerts}
         />
         {confirmDelete && (
           <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
