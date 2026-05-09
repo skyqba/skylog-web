@@ -229,6 +229,15 @@ body.theme-pro .tag-pro {
   font-family: var(--mono);
 }
 
+/* Safe area for PWA on iOS/macOS */
+body.theme-pro {
+  padding-top: env(safe-area-inset-top);
+}
+
+body.theme-pro nav {
+  top: calc(10px + env(safe-area-inset-top)) !important;
+}
+
 /* Remove focus outline from charts */
 .recharts-wrapper, .recharts-surface, .recharts-wrapper * {
   outline: none !important;

@@ -36,7 +36,7 @@ export default function Navbar() {
   if (pro) {
     return (
       <>
-        <div style={{ position:'sticky', top:0, zIndex:100, padding:'10px 16px 0', pointerEvents:'none' }}>
+        <div style={{ position:'sticky', top:0, zIndex:100, padding:'calc(10px + env(safe-area-inset-top)) 16px 0', pointerEvents:'none' }}>
           <nav style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.65rem 1.25rem', background:'rgba(15,23,42,0.75)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:24, boxShadow:'inset 0 1px 1px rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.4)', pointerEvents:'all', maxWidth:780, margin:'0 auto' }}>
             <Link to="/manual" style={{ textDecoration:'none', flexShrink:0 }}>
               <div>
