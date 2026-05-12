@@ -23,8 +23,10 @@ export default function Terms() {
           <P>Regulamin może być zmieniany w dowolnym czasie. O istotnych zmianach Użytkownicy będą informowani poprzez powiadomienie w Aplikacji.</P>
         </Section>
 
-        <Section title="§2. Konto użytkownika">
-          <P>Korzystanie z pełnej funkcjonalności Aplikacji wymaga założenia bezpłatnego konta przy użyciu adresu e-mail i hasła.</P>
+        <Section title="§2. Konto użytkownika i dane osobowe">
+          <P>Korzystanie z pełnej funkcjonalności Aplikacji wymaga założenia bezpłatnego konta przy użyciu adresu e-mail i hasła. Podanie imienia i nazwiska nie jest wymagane podczas rejestracji.</P>
+          <P>Imię i nazwisko można opcjonalnie uzupełnić w dowolnym momencie w sekcji Profil. Dane te są wykorzystywane wyłącznie do personalizacji raportów PDF generowanych przez Aplikację.</P>
+          <P urgent>📄 Jeśli chcesz, aby Twoje imię i nazwisko widniało na wygenerowanym raporcie PDF, uzupełnij je w Profilu. W przeciwnym razie raport zostanie wygenerowany z samym adresem e-mail.</P>
           <P>Użytkownik jest zobowiązany do podania prawdziwych danych podczas rejestracji oraz do nieudostępniania danych logowania osobom trzecim.</P>
           <P>Twórca zastrzega sobie prawo do usunięcia konta, które narusza niniejszy Regulamin lub jest wykorzystywane w sposób niezgodny z przeznaczeniem Aplikacji.</P>
         </Section>
