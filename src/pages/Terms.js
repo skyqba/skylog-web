@@ -40,7 +40,8 @@ export default function Terms() {
 
         <Section title="§4. Ograniczenie odpowiedzialności">
           <P>Aplikacja jest udostępniana w stanie „takim, jaki jest" (as-is), bez jakichkolwiek gwarancji — wyraźnych ani dorozumianych.</P>
-          <P>Twórca nie gwarantuje nieprzerwanego ani bezbłędnego działania Aplikacji, dostępności danych w każdym czasie, ani że dane wprowadzone przez Użytkownika nie zostaną utracone.</P>
+          <P>Twórca dołoży wszelkich starań, aby Aplikacja działała prawidłowo, była dostępna bez zakłóceń i zapewniała bezpieczne przechowywanie danych Użytkowników.</P>
+          <P>Twórca nie gwarantuje jednak nieprzerwanego ani bezbłędnego działania Aplikacji, dostępności danych w każdym czasie, ani że dane wprowadzone przez Użytkownika nie zostaną utracone.</P>
           <P urgent>⚠️ Twórca nie ponosi odpowiedzialności za jakiekolwiek szkody wynikłe z korzystania lub niemożności korzystania z Aplikacji, w tym utratę danych skoków, utratę dostępu do konta lub błędy w zapisanych danych.</P>
           <P>Użytkownik korzysta z Aplikacji na własne ryzyko i własną odpowiedzialność.</P>
         </Section>
