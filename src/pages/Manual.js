@@ -159,7 +159,7 @@ export default function Manual() {
 
         <div style={{ textAlign: 'center', marginBottom: '2.5rem', padding: '2rem', background: 'var(--bg2)', border: '1px solid var(--border2)', borderRadius: 'var(--r2)', borderTop: '3px solid var(--accent)' }}>
           <div style={{ fontFamily: 'var(--head)', fontSize: '2rem', fontWeight: 900, marginBottom: '0.25rem' }}>
-            <span style={{ color: 'var(--accent2)' }}>Jump</span>Log<span style={{ color: 'var(--accent2)' }}>X</span>
+            <span style={{ color: '#A78BFA' }}>Jump</span><span style={{ color: 'var(--text)' }}>Log</span><span style={{ color: '#A78BFA' }}>X</span>
           </div>
           <div style={{ fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '0.75rem' }}>by SkyQba ver 1.0</div>
           <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.25rem' }}>Instrukcja użytkownika</div>
@@ -428,7 +428,7 @@ export default function Manual() {
 
         <div style={{ textAlign: 'center', padding: '1.5rem', borderTop: '1px solid var(--border)', marginTop: '1rem' }}>
           <div style={{ fontFamily: 'var(--head)', fontSize: '1rem', fontWeight: 900, marginBottom: '0.25rem' }}>
-            <span style={{ color: 'var(--accent2)' }}>Jump</span>Log<span style={{ color: 'var(--accent2)' }}>X</span>
+            <span style={{ color: '#A78BFA' }}>Jump</span><span style={{ color: 'var(--text)' }}>Log</span><span style={{ color: '#A78BFA' }}>X</span>
             <span style={{ color: 'var(--muted)', fontWeight: 400, fontSize: '0.82rem' }}> by SkyQba</span>
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Elektroniczny Dziennik Skoków Spadochronowych · ver 1.0</div>
