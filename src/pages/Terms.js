@@ -51,7 +51,11 @@ export default function Terms() {
 
         <Section title="§5. Dane osobowe i prywatność">
           <P>Aplikacja przechowuje dane podane przez Użytkownika podczas rejestracji oraz dane wprowadzone do dziennika skoków. Dane są przechowywane na serwerach dostawcy Supabase.</P>
-          <P>Aplikacja wykorzystuje niezbędne pliki cookies oraz technologię lokalnego przechowywania danych (localStorage) w celu utrzymania sesji Użytkownika, zapamiętania preferencji i prawidłowego działania Aplikacji. Dane te nie są wykorzystywane w celach reklamowych ani śledzenia.</P>
+          <P urgent>🍪 Sesje i przechowywanie danych — informacja zgodna z RODO</P>
+          <P>Aplikacja JumpLogX korzysta z usługi Supabase Auth do zarządzania sesjami użytkowników. W celu utrzymania zalogowanej sesji, token dostępu (JWT) jest przechowywany w localStorage przeglądarki lub w plikach cookies. Dzięki temu nie musisz logować się przy każdym odświeżeniu strony.</P>
+          <P>Dane te zaliczają się do kategorii <strong style={{color:'var(--text)'}}>„strictly necessary"</strong> (niezbędnych technicznie) i są wymagane do prawidłowego działania Aplikacji. Bez nich korzystanie z Aplikacji nie byłoby możliwe.</P>
+          <P>JumpLogX <strong style={{color:'var(--text)'}}>nie używa</strong> plików cookies śledzących, reklamowych ani marketingowych. Nie przekazujemy żadnych danych do sieci reklamowych ani platform analitycznych. Dane przechowywane lokalnie służą wyłącznie do uwierzytelnienia i zapamiętania Twoich preferencji (np. wybranego motywu aplikacji).</P>
+          <P>Podstawa prawna przetwarzania: art. 6 ust. 1 lit. b RODO — przetwarzanie niezbędne do wykonania umowy (świadczenia usługi), której stroną jest Użytkownik.</P>
           <P>Dane Użytkownika nie są udostępniane osobom trzecim w celach komercyjnych.</P>
           <P>Użytkownik ma prawo do wglądu, edycji oraz usunięcia swoich danych w dowolnym momencie poprzez opcję „Usuń konto" w Ustawieniach aplikacji.</P>
         </Section>
