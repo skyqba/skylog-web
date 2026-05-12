@@ -3,7 +3,9 @@
     "journal": "Dziennik",
     "profile": "Profil",
     "settings": "Ustawienia",
-    "logout": "Wyloguj"
+    "logout": "Wyloguj",
+    "stats": "Statystyki",
+    "manual": "Pomoc"
   },
   "login": {
     "title": "Logowanie",

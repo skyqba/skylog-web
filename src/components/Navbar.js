@@ -52,6 +52,8 @@ export default function Navbar() {
               <ProNavLink to="/" label={t('nav.journal')} active={pathname==='/'} />
               <ProNavLink to="/profile" label={t('nav.profile')} active={pathname==='/profile'} />
               <ProNavLink to="/settings" label={t('nav.settings')} active={pathname==='/settings'} />
+              <ProNavLink to="/stats" label={t('nav.stats')} active={pathname==='/stats'} />
+              <ProNavLink to="/manual" label={t('nav.manual')} active={pathname==='/manual'} />
               {isAdmin && <ProNavLink to="/admin" label="Admin" active={pathname==='/admin'} isAdmin />}
             </div>
 
@@ -90,6 +92,8 @@ export default function Navbar() {
             <MobileNavLink to="/" label={t('nav.journal')} active={pathname==='/'} onClick={()=>setMenuOpen(false)} />
             <MobileNavLink to="/profile" label={t('nav.profile')} active={pathname==='/profile'} onClick={()=>setMenuOpen(false)} />
             <MobileNavLink to="/settings" label={t('nav.settings')} active={pathname==='/settings'} onClick={()=>setMenuOpen(false)} />
+            <MobileNavLink to="/stats" label={t('nav.stats')} active={pathname==='/stats'} onClick={()=>setMenuOpen(false)} />
+            <MobileNavLink to="/manual" label={t('nav.manual')} active={pathname==='/manual'} onClick={()=>setMenuOpen(false)} />
             {isAdmin && <MobileNavLink to="/admin" label="🛡 Admin" active={pathname==='/admin'} onClick={()=>setMenuOpen(false)} />}
             <div style={{ height:1, background:'rgba(255,255,255,0.07)', margin:'0.5rem 0' }} />
             <button onClick={()=>{setMenuOpen(false);logout()}} style={{ width:'100%', padding:'0.75rem 1rem', background:'transparent', border:'1px solid rgba(248,113,113,0.3)', borderRadius:12, color:'#F87171', fontFamily:'var(--font)', fontSize:'0.88rem', cursor:'pointer', textAlign:'left' }}>
@@ -119,6 +123,8 @@ export default function Navbar() {
           <NavLink to="/" label={t('nav.journal')} active={pathname==='/'} />
           <NavLink to="/profile" label={t('nav.profile')} active={pathname==='/profile'} />
           <NavLink to="/settings" label={t('nav.settings')} active={pathname==='/settings'} />
+          <NavLink to="/stats" label={t('nav.stats')} active={pathname==='/stats'} />
+          <NavLink to="/manual" label={t('nav.manual')} active={pathname==='/manual'} />
           {isAdmin && <NavLink to="/admin" label="🛡 Admin" active={pathname==='/admin'} />}
           <button onClick={logout} style={{ padding:'0.4rem 0.9rem', background:'transparent', border:'1px solid var(--border)', borderRadius:8, color:'var(--muted)', fontFamily:'var(--font)', fontSize:'0.82rem', cursor:'pointer', transition:'all 0.2s' }} onMouseEnter={e=>{e.target.style.borderColor='var(--danger)';e.target.style.color='var(--danger)'}} onMouseLeave={e=>{e.target.style.borderColor='var(--border)';e.target.style.color='var(--muted)'}}>
             {t('nav.logout')}
@@ -135,6 +141,8 @@ export default function Navbar() {
           <MobileNavLink to="/" label={t('nav.journal')} active={pathname==='/'} onClick={()=>setMenuOpen(false)} />
           <MobileNavLink to="/profile" label={t('nav.profile')} active={pathname==='/profile'} onClick={()=>setMenuOpen(false)} />
           <MobileNavLink to="/settings" label={t('nav.settings')} active={pathname==='/settings'} onClick={()=>setMenuOpen(false)} />
+          <MobileNavLink to="/stats" label={t('nav.stats')} active={pathname==='/stats'} onClick={()=>setMenuOpen(false)} />
+          <MobileNavLink to="/manual" label={t('nav.manual')} active={pathname==='/manual'} onClick={()=>setMenuOpen(false)} />
           {isAdmin && <MobileNavLink to="/admin" label="🛡 Admin" active={pathname==='/admin'} onClick={()=>setMenuOpen(false)} />}
           <button onClick={()=>{setMenuOpen(false);logout()}} style={{ padding:'0.75rem 1rem', background:'transparent', border:'1px solid var(--danger)', borderRadius:8, color:'var(--danger)', fontFamily:'var(--font)', fontSize:'0.9rem', cursor:'pointer', textAlign:'left' }}>
             {t('nav.logout')}

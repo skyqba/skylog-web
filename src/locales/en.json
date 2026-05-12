@@ -3,7 +3,9 @@
     "journal": "Journal",
     "profile": "Profile",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "stats": "Statistics",
+    "manual": "Help"
   },
   "login": {
     "title": "Login",
@@ -294,7 +296,6 @@
     "edit_jumps": "Edit jumps",
     "export": "Export jumps (PDF / Print)",
     "import": "Import jumps from CSV",
-    "settings": "Settings",
     "settings": "Settings",
     "logout": "Logout",
     "personal_title": "Personal data",
