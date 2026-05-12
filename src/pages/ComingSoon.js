@@ -26,7 +26,7 @@ export default function ComingSoon() {
       overflow: 'hidden',
     }}>
 
-      {/* mesh gradient - identyczny jak theme-pro */}
+      {/* mesh gradient */}
       <div style={{
         position: 'fixed',
         inset: 0,
@@ -39,7 +39,7 @@ export default function ComingSoon() {
         pointerEvents: 'none',
       }} />
 
-      {/* karta glass - identyczna jak theme-pro .card */}
+      {/* karta glass */}
       <div style={{
         position: 'relative',
         zIndex: 1,
@@ -59,38 +59,29 @@ export default function ComingSoon() {
         gap: '1.5rem',
       }}>
 
-        {/* ikona */}
-        <div style={{
-          width: 72,
-          height: 72,
-          borderRadius: 20,
-          background: 'rgba(139,92,246,0.15)',
-          border: '1px solid rgba(139,92,246,0.35)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '2rem',
-          boxShadow: '0 0 40px rgba(139,92,246,0.25)',
-        }}>
-          🪂
+        {/* logo - identyczne jak w Login.js */}
+        <div>
+          <span style={{
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: '2.8rem',
+            fontWeight: 900,
+            lineHeight: 1,
+          }}>
+            <span style={{ color: '#A78BFA' }}>Jump</span>
+            <span style={{ color: '#F1F5F9' }}>Log</span>
+            <span style={{ color: '#A78BFA' }}>X</span>
+          </span>
         </div>
 
-        {/* nazwa */}
-        <h1 style={{
-          fontFamily: "'Outfit', sans-serif",
-          fontSize: 'clamp(2.2rem, 8vw, 3.5rem)',
-          fontWeight: 900,
-          letterSpacing: '-0.02em',
-          margin: 0,
-          background: 'linear-gradient(135deg, #F1F5F9 0%, #A78BFA 60%, #60A5FA 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          lineHeight: 1.1,
-          textShadow: 'none',
+        {/* by SkyQba - jak w Login */}
+        <div style={{
+          fontFamily: "'Inter', sans-serif",
+          fontSize: '0.65rem',
+          color: 'rgba(148,163,184,0.6)',
+          marginTop: '-1rem',
         }}>
-          JumpLogX
-        </h1>
+          by SkyQba ver 1.0
+        </div>
 
         {/* linia */}
         <div style={{
@@ -112,23 +103,6 @@ export default function ComingSoon() {
           Coming Soon{dots}
         </p>
 
-        {/* przycisk - styl theme-pro */}
-        <div style={{
-          marginTop: '0.5rem',
-          padding: '0.6rem 1.8rem',
-          background: 'linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%)',
-          borderRadius: 12,
-          fontSize: '0.78rem',
-          fontWeight: 700,
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          color: '#fff',
-          boxShadow: '0 4px 20px rgba(139,92,246,0.4)',
-          fontFamily: "'Inter', sans-serif",
-        }}>
-          Wkrótce
-        </div>
-
       </div>
 
       {/* dolna etykieta */}
@@ -137,7 +111,7 @@ export default function ComingSoon() {
         bottom: '1.5rem',
         fontFamily: "'JetBrains Mono', monospace",
         fontSize: '0.65rem',
-        color: 'rgba(148,163,184,0.35)',
+        color: 'rgba(148,163,184,0.3)',
         letterSpacing: '0.15em',
         margin: 0,
         zIndex: 1,
