@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import emailjs from '@emailjs/browser'
 import Navbar from '../components/Navbar'
 
 const Section = ({ id, title, children }) => (
@@ -90,11 +91,12 @@ function ContactForm() {
     setLoading(true)
     setStatus(null)
     try {
-      const subject = encodeURIComponent(`JumpLogX — Wiadomość od ${form.name}`)
-      const body = encodeURIComponent(
-        `Imię: ${form.name}\nEmail: ${form.email}\n\nWiadomość:\n${form.message}`
+      await emailjs.send(
+        'service_laqfcvn',
+        'template_irybq0f',
+        { name: form.name, email: form.email, message: form.message },
+        'lWz6Bj-KMIMAxsY43'
       )
-      window.location.href = `mailto:jumplogx@gmail.com?subject=${subject}&body=${body}`
       setStatus('success')
       setForm({ name:'', email:'', message:'' })
     } catch {
