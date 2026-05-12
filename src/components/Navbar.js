@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 import { useProfile } from '../useProfile'
 
-const isPro = () => document.body.classList.contains('theme-pro') || document.body.classList.contains('theme-dark')
+const isPro = () => document.body.classList.contains('theme-pro') || document.body.classList.contains('theme-dark') || document.body.classList.contains('theme-dark')
 
 export default function Navbar() {
   const navigate = useNavigate()
