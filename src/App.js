@@ -19,15 +19,12 @@ import Settings       from './pages/Settings'
 import ResetPassword  from './pages/ResetPassword'
 import AdminPanel     from './pages/AdminPanel'
 
-// Inicjalizacja motywu przy starcie
 const savedTheme = localStorage.getItem('jumplogx_theme')
 if (savedTheme === 'pro') document.body.classList.add('theme-pro')
 
 function App() {
   const [session, setSession] = useState(undefined)
   const [online, setOnline]   = useState(navigator.onLine)
-
-  if (process.env.REACT_APP_COMING_SOON === 'true') return <ComingSoon />
 
   useEffect(() => {
     const hash = window.location.hash
@@ -55,6 +52,8 @@ function App() {
       window.removeEventListener('offline', handleOffline)
     }
   }, [])
+
+  if (process.env.REACT_APP_COMING_SOON === 'true') return <ComingSoon />
 
   if (session === undefined) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', color:'var(--muted)' }}>
