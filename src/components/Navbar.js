@@ -86,7 +86,7 @@ export default function Navbar() {
         </div>
 
         {menuOpen && (
-          <div style={{ position:'fixed', top:80, left:16, right:16, zIndex:99, background:'rgba(15,23,42,0.97)', backdropFilter:'blur(24px)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:20, padding:'1rem', boxShadow:'0 16px 40px rgba(0,0,0,0.5)' }}>
+          <div style={{ position:'sticky', top:'calc(10px + env(safe-area-inset-top) + 60px)', left:16, right:16, zIndex:99, background:'rgba(15,23,42,0.97)', backdropFilter:'blur(24px)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:20, padding:'1rem', boxShadow:'0 16px 40px rgba(0,0,0,0.5)', margin:'0.5rem 1rem 0' }}>
             <MobileNavLink to="/" label={t('nav.journal')} active={pathname==='/'} onClick={()=>setMenuOpen(false)} />
             <MobileNavLink to="/profile" label={t('nav.profile')} active={pathname==='/profile'} onClick={()=>setMenuOpen(false)} />
             <MobileNavLink to="/settings" label={t('nav.settings')} active={pathname==='/settings'} onClick={()=>setMenuOpen(false)} />
