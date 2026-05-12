@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar'
 
 const Section = ({ id, title, children }) => (
   <div id={id} style={{ marginBottom: '2rem', scrollMarginTop: '80px' }}>
-    <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.15rem', fontWeight: 800, color: 'var(--accent2)', marginBottom: '0.75rem', paddingBottom: '0.4rem', borderBottom: '1px solid var(--border)' }}>{title}</h2>
+    <h2 style={{ fontFamily: 'var(--head)', fontSize: '1.15rem', fontWeight: 800, color: '#A78BFA', marginBottom: '0.75rem', paddingBottom: '0.4rem', borderBottom: '1px solid var(--border)' }}>{title}</h2>
     {children}
   </div>
 )
@@ -48,7 +48,7 @@ const FieldTable = ({ rows }) => (
       <tbody>
         {rows.map(([label, desc], i) => (
           <tr key={i} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'var(--bg3)' : 'var(--bg2)' }}>
-            <td style={{ padding: '0.5rem 0.75rem', fontWeight: 600, color: 'var(--accent2)', verticalAlign: 'top' }}>{label}</td>
+            <td style={{ padding: '0.5rem 0.75rem', fontWeight: 600, color: '#A78BFA', verticalAlign: 'top' }}>{label}</td>
             <td style={{ padding: '0.5rem 0.75rem', color: 'var(--muted)', lineHeight: 1.6 }}>{desc}</td>
           </tr>
         ))}
@@ -68,10 +68,11 @@ const tocItems = [
   { label: '8. Import skoków z pliku',                            id: 's8'  },
   { label: '9. Statystyki',                                       id: 's9'  },
   { label: '10. Ustawienia i powiadomienia',                      id: 's10' },
-  { label: '11. Motyw Pro',                                       id: 's11' },
+  { label: '11. Motywy aplikacji (Dark Mode / Pro)',               id: 's11' },
   { label: '12. Tryb offline',                                    id: 's12' },
   { label: '13. Bezpieczeństwo i prywatność',                     id: 's13' },
   { label: '14. Przydatne wskazówki',                             id: 's14' },
+  { label: '15. Kontakt i pomoc',                                  id: 's15' },
 ]
 
 
@@ -142,7 +143,7 @@ function ContactForm() {
         />
       </div>
       <button className="btn" onClick={handleSubmit} disabled={loading} style={{ marginTop:'0.5rem' }}>
-        {loading ? 'Otwieranie...' : '✉️ Wyślij wiadomość'}
+        {loading ? 'Wysyłanie...' : '✉️ Wyślij wiadomość'}
       </button>
       <p style={{ fontSize:'0.72rem', color:'var(--muted)', marginTop:'0.75rem', textAlign:'center' }}>
         Wiadomość zostanie wysłana na jumplogx@gmail.com
@@ -169,7 +170,7 @@ export default function Manual() {
         <div className="card" style={{ marginBottom: '2rem' }}>
           <div style={{ fontFamily: 'var(--head)', fontWeight: 800, marginBottom: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.7rem' }}>Spis treści</div>
           {tocItems.map((item, i) => (
-            <a key={i} href={`#${item.id}`} style={{ display: 'block', fontSize: '0.85rem', color: 'var(--accent2)', padding: '0.25rem 0', borderBottom: i < tocItems.length - 1 ? '1px solid var(--border)' : 'none', textDecoration: 'none', transition: 'opacity 0.15s' }}
+            <a key={i} href={`#${item.id}`} style={{ display: 'block', fontSize: '0.85rem', color: '#A78BFA', padding: '0.25rem 0', borderBottom: i < tocItems.length - 1 ? '1px solid var(--border)' : 'none', textDecoration: 'none', transition: 'opacity 0.15s' }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
               {item.label}
@@ -329,7 +330,7 @@ export default function Manual() {
 
         <Section id="s10" title="10. Ustawienia i powiadomienia">
           <Sub title="10.1 Motyw aplikacji">
-            <P>Dostępny dla użytkowników Premium z uprawnieniem Motyw Pro. Wybierz między motywem Classic (domyślny) a Pro (nowoczesny wygląd glassmorphism z wykresami na stronie głównej).</P>
+            <P>Dostępny dla użytkowników Premium z uprawnieniem Motyw Pro. Wybierz między motywem Dark Mode (domyślny, ciemny z cyjanowymi akcentami) a Pro (fioletowy glassmorphism z wykresami na stronie głównej).</P>
           </Sub>
           <Sub title="10.2 Język">
             <P>Zmiana języka aplikacji (Polski / English) dostępna dla użytkowników Premium z uprawnieniem Język.</P>
@@ -357,20 +358,29 @@ export default function Manual() {
           </Sub>
         </Section>
 
-        <Section id="s11" title="11. Motyw Pro">
-          <P>Motyw Pro to zaawansowany wygląd aplikacji dostępny dla użytkowników Premium z uprawnieniem Motyw Pro.</P>
-          <Sub title="11.1 Funkcje motywu Pro">
+        <Section id="s11" title="11. Motywy aplikacji">
+          <Sub title="11.1 Dark Mode (domyślny)">
+            <P>Ciemny motyw z cyjanowymi akcentami. Ustawiony domyślnie dla wszystkich nowych użytkowników.</P>
             <Ul items={[
+              'Głęboko ciemne tło z subtelnymi gradientami',
+              'Cyjanowe akcenty i podświetlenia',
               'Glassmorphism — półprzezroczyste karty z efektem rozmycia tła',
+              'Pływająca nawigacja z menu hamburgera na telefonie',
+            ]} />
+          </Sub>
+          <Sub title="11.2 Pro Mode">
+            <P>Zaawansowany wygląd z fioletowymi akcentami dostępny dla użytkowników Premium.</P>
+            <Ul items={[
+              'Fioletowo-niebieski gradient z efektem glassmorphism',
               'Pływająca nawigacja (Floating Island Navbar) z menu avatara',
               'Strona główna z wykresem aktywności (Sparkline) i liczbą skoków',
               'Karty skoków z pogodą widoczną bezpośrednio na liście',
               'Animowane wejście kart przy przewijaniu',
-              'Przycisk FAB (+ Dodaj skok) w prawym dolnym rogu',
+              'Przycisk FAB (+ Dodaj skok) z animacją pulsowania',
             ]} />
           </Sub>
-          <Sub title="11.2 Włączanie motywu">
-            <P>Wejdź w Ustawienia → sekcja "Motyw aplikacji" → wybierz "💎 Pro". Motyw jest zapamiętywany między sesjami.</P>
+          <Sub title="11.3 Włączanie motywu">
+            <P>Wejdź w Ustawienia → sekcja "Motyw aplikacji" → wybierz "🌙 Dark Mode" lub "💎 Pro Mode". Motyw jest zapamiętywany między sesjami.</P>
           </Sub>
         </Section>
 
