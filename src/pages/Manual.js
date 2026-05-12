@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Navbar from '../components/Navbar'
 
 const Section = ({ id, title, children }) => (
@@ -71,6 +72,82 @@ const tocItems = [
   { label: '13. Bezpieczeństwo i prywatność',                     id: 's13' },
   { label: '14. Przydatne wskazówki',                             id: 's14' },
 ]
+
+
+function ContactForm() {
+  const [form, setForm] = useState({ name:'', email:'', message:'' })
+  const [status, setStatus] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!form.name || !form.email || !form.message) {
+      setStatus('error_empty')
+      return
+    }
+    setLoading(true)
+    setStatus(null)
+    try {
+      const subject = encodeURIComponent(`JumpLogX — Wiadomość od ${form.name}`)
+      const body = encodeURIComponent(
+        `Imię: ${form.name}\nEmail: ${form.email}\n\nWiadomość:\n${form.message}`
+      )
+      window.location.href = `mailto:jumplogx@gmail.com?subject=${subject}&body=${body}`
+      setStatus('success')
+      setForm({ name:'', email:'', message:'' })
+    } catch {
+      setStatus('error')
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="card" style={{ marginTop:'0.5rem' }}>
+      <p style={{ fontSize:'0.88rem', color:'var(--muted)', marginBottom:'1.25rem', lineHeight:1.6 }}>
+        Masz pytanie lub problem? Napisz do nas — odpowiemy najszybciej jak to możliwe.
+      </p>
+
+      {status === 'success' && (
+        <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.85rem 1rem', marginBottom:'1rem', fontSize:'0.88rem', color:'var(--success)' }}>
+          ✓ Otwarto klienta email — wyślij wiadomość aby się z nami skontaktować.
+        </div>
+      )}
+      {status === 'error_empty' && (
+        <div style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'var(--r)', padding:'0.85rem 1rem', marginBottom:'1rem', fontSize:'0.88rem', color:'var(--danger)' }}>
+          Wypełnij wszystkie pola formularza.
+        </div>
+      )}
+
+      <div className="form-group">
+        <label className="label">Imię i nazwisko</label>
+        <input className="input" placeholder="Jan Kowalski" value={form.name} onChange={set('name')} />
+      </div>
+      <div className="form-group">
+        <label className="label">Adres e-mail</label>
+        <input className="input" type="email" placeholder="twoj@email.com" value={form.email} onChange={set('email')} />
+      </div>
+      <div className="form-group">
+        <label className="label">Wiadomość</label>
+        <textarea
+          className="input"
+          placeholder="Opisz swój problem lub pytanie..."
+          value={form.message}
+          onChange={set('message')}
+          rows={5}
+          style={{ resize:'vertical', minHeight:120, fontFamily:'var(--font)', lineHeight:1.6 }}
+        />
+      </div>
+      <button className="btn" onClick={handleSubmit} disabled={loading} style={{ marginTop:'0.5rem' }}>
+        {loading ? 'Otwieranie...' : '✉️ Wyślij wiadomość'}
+      </button>
+      <p style={{ fontSize:'0.72rem', color:'var(--muted)', marginTop:'0.75rem', textAlign:'center' }}>
+        Wiadomość zostanie wysłana na jumplogx@gmail.com
+      </p>
+    </div>
+  )
+}
 
 export default function Manual() {
   return (
@@ -340,6 +417,11 @@ export default function Manual() {
             'Eksportuj PDF co sezon jako kopię zapasową dziennika',
             'W motyw Pro — kliknij avatar w prawym górnym rogu aby otworzyć menu z opcjami profilu i wylogowania',
           ]} />
+        </Section>
+
+        {/* FORMULARZ KONTAKTOWY */}
+        <Section id="s15" title="15. Kontakt i pomoc">
+          <ContactForm />
         </Section>
 
         <div style={{ textAlign: 'center', padding: '1.5rem', borderTop: '1px solid var(--border)', marginTop: '1rem' }}>
