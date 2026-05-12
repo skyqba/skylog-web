@@ -1,3 +1,4 @@
+import ComingSoon from './pages/ComingSoon'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabase'
@@ -25,6 +26,8 @@ if (savedTheme === 'pro') document.body.classList.add('theme-pro')
 function App() {
   const [session, setSession] = useState(undefined)
   const [online, setOnline]   = useState(navigator.onLine)
+
+  if (process.env.REACT_APP_COMING_SOON === 'true') return <ComingSoon />
 
   useEffect(() => {
     const hash = window.location.hash
