@@ -356,7 +356,7 @@ export default function Settings() {
           <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Wybierz wygląd aplikacji</p>
           <div style={{ display:'flex', gap:'0.75rem' }}>
             {[
-              { code:'dark', label:'🌙 Dark Mode', desc:'Glassmorphism cyan' },
+              { code:'dark', label:'🌙 Dark Mode', desc:'Ciemny motyw' },
               { code:'pro',     label:'💎 Pro Mode', desc:'Fioletowy motyw' },
             ].map(m => (
               <button key={m.code} onClick={() => changeTheme(m.code)}
