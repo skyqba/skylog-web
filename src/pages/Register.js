@@ -13,6 +13,7 @@ export default function Register() {
   const [avatarFile, setAvatarFile] = useState(null)
   const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
+  const [acceptTerms, setAcceptTerms] = useState(false)
   const fileRef = useRef()
   const navigate = useNavigate()
 
@@ -36,6 +37,10 @@ export default function Register() {
     }
     if (form.password.length < 6) {
       setError(t('register.error_password_length')); return
+    }
+    if (!acceptTerms) {
+      setError('Musisz zaakceptować Regulamin aby się zarejestrować.')
+      return
     }
     setLoading(true)
 
@@ -113,7 +118,22 @@ export default function Register() {
                 {error}
               </div>
             )}
-            <button className="btn" type="submit" disabled={loading} style={{ marginTop:'0.5rem' }}>
+            {/* Regulamin */}
+            <div onClick={() => setAcceptTerms(a => !a)}
+              style={{ display:'flex', alignItems:'flex-start', gap:'0.75rem', padding:'0.85rem 1rem', background: acceptTerms ? 'rgba(139,92,246,0.06)' : 'var(--bg3)', border:`1px solid ${acceptTerms ? 'rgba(139,92,246,0.35)' : 'var(--border)'}`, borderRadius:'var(--r)', cursor:'pointer', marginBottom:'0.75rem', marginTop:'0.5rem', transition:'all 0.2s' }}>
+              <div style={{ width:18, height:18, borderRadius:4, border:`2px solid ${acceptTerms ? '#8B5CF6' : 'var(--border2)'}`, background: acceptTerms ? '#8B5CF6' : 'transparent', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1, transition:'all 0.2s' }}>
+                {acceptTerms && <span style={{ color:'#fff', fontSize:11, fontWeight:700, lineHeight:1 }}>✓</span>}
+              </div>
+              <p style={{ fontSize:'0.82rem', color:'var(--muted)', margin:0, lineHeight:1.5 }}>
+                Przeczytałem i akceptuję{' '}
+                <Link to="/terms" onClick={e => e.stopPropagation()} style={{ color:'#A78BFA', textDecoration:'none', fontWeight:600 }}>
+                  Regulamin aplikacji JumpLogX
+                </Link>
+                . Rozumiem, że powinienem regularnie tworzyć kopie zapasowe swoich skoków oraz prowadzić papierową książeczkę skoków.
+              </p>
+            </div>
+
+            <button className="btn" type="submit" disabled={loading || !acceptTerms} style={{ marginTop:'0.25rem', opacity: acceptTerms ? 1 : 0.5 }}>
               {loading ? t('register.loading') : t('register.submit')}
             </button>
           </form>
