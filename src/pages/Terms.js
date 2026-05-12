@@ -21,6 +21,7 @@ export default function Terms() {
           <P>Aplikacja JumpLogX (dalej: „Aplikacja") jest elektronicznym dziennikiem skoków spadochronowych, stworzonym przez SkyQba (dalej: „Twórca") i dostępnym pod adresem jumplogx.com.</P>
           <P>Korzystanie z Aplikacji oznacza akceptację niniejszego Regulaminu w całości. Jeśli nie zgadzasz się z jego treścią, prosimy o zaprzestanie korzystania z Aplikacji.</P>
           <P>Regulamin może być zmieniany w dowolnym czasie. O istotnych zmianach Użytkownicy będą informowani poprzez powiadomienie w Aplikacji.</P>
+          <P urgent>© Wszelkie prawa do Aplikacji, w tym do jej nazwy, logotypu oraz kodu źródłowego, przysługują Twórcy. Nieautoryzowane kopiowanie, modyfikowanie lub rozpowszechnianie jakichkolwiek elementów Aplikacji jest zabronione.</P>
         </Section>
 
         <Section title="§2. Konto użytkownika i dane osobowe">
@@ -34,7 +35,7 @@ export default function Terms() {
         <Section title="§3. Dane i kopie zapasowe">
           <P urgent>⚠️ Użytkownik jest zobowiązany do regularnego tworzenia kopii zapasowych swoich danych, w szczególności listy skoków.</P>
           <P>Aplikacja udostępnia funkcję eksportu danych do formatu CSV oraz PDF. Zalecamy korzystanie z tej funkcji regularnie — co najmniej raz na sezon skokowy.</P>
-          <P urgent>⚠️ Twórca nie ponosi żadnej odpowiedzialności za utratę danych, w tym utratę zapisanych skoków, niezależnie od przyczyny — w tym awarii serwera, błędów technicznych, problemów z dostawcą usług lub innych nieprzewidzianych okoliczności.</P>
+          <P urgent>⚠️ W maksymalnym zakresie dopuszczalnym przez obowiązujące prawo, Twórca nie ponosi odpowiedzialności za utratę danych, w tym utratę zapisanych skoków, niezależnie od przyczyny — w tym awarii serwera, błędów technicznych, problemów z dostawcą usług lub innych nieprzewidzianych okoliczności.</P>
           <P>Elektroniczny dziennik skoków w Aplikacji nie zastępuje oficjalnej, papierowej książeczki skoków.</P>
           <P urgent>📖 Każdy skoczek jest zobowiązany do prowadzenia papierowej książeczki skoków zgodnie z obowiązującymi przepisami lotniczymi. JumpLogX jest narzędziem pomocniczym i nie ma charakteru dokumentu urzędowego.</P>
           <P>W przypadku rozbieżności między danymi w Aplikacji a papierową książeczką skoków, za wiążące uznaje się dane zawarte w papierowej książeczce.</P>
@@ -44,12 +45,13 @@ export default function Terms() {
           <P>Aplikacja jest udostępniana w stanie „takim, jaki jest" (as-is), bez jakichkolwiek gwarancji — wyraźnych ani dorozumianych.</P>
           <P>Twórca dołoży wszelkich starań, aby Aplikacja działała prawidłowo, była dostępna bez zakłóceń i zapewniała bezpieczne przechowywanie danych Użytkowników.</P>
           <P>Twórca nie gwarantuje jednak nieprzerwanego ani bezbłędnego działania Aplikacji, dostępności danych w każdym czasie, ani że dane wprowadzone przez Użytkownika nie zostaną utracone.</P>
-          <P urgent>⚠️ Twórca nie ponosi odpowiedzialności za jakiekolwiek szkody wynikłe z korzystania lub niemożności korzystania z Aplikacji, w tym utratę danych skoków, utratę dostępu do konta lub błędy w zapisanych danych.</P>
+          <P urgent>⚠️ W maksymalnym zakresie dopuszczalnym przez obowiązujące prawo, Twórca nie ponosi odpowiedzialności za jakiekolwiek szkody wynikłe z korzystania lub niemożności korzystania z Aplikacji, w tym utratę danych skoków, utratę dostępu do konta lub błędy w zapisanych danych.</P>
           <P>Użytkownik korzysta z Aplikacji na własne ryzyko i własną odpowiedzialność.</P>
         </Section>
 
         <Section title="§5. Dane osobowe i prywatność">
           <P>Aplikacja przechowuje dane podane przez Użytkownika podczas rejestracji oraz dane wprowadzone do dziennika skoków. Dane są przechowywane na serwerach dostawcy Supabase.</P>
+          <P>Aplikacja wykorzystuje niezbędne pliki cookies oraz technologię lokalnego przechowywania danych (localStorage) w celu utrzymania sesji Użytkownika, zapamiętania preferencji i prawidłowego działania Aplikacji. Dane te nie są wykorzystywane w celach reklamowych ani śledzenia.</P>
           <P>Dane Użytkownika nie są udostępniane osobom trzecim w celach komercyjnych.</P>
           <P>Użytkownik ma prawo do wglądu, edycji oraz usunięcia swoich danych w dowolnym momencie poprzez opcję „Usuń konto" w Ustawieniach aplikacji.</P>
         </Section>
