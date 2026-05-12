@@ -1,12 +1,9 @@
 import { useLocation } from 'react-router-dom'
-import Navbar from '../components/Navbar'
 
 export default function Terms() {
   const { state } = useLocation()
-  const fromRegister = document.referrer.includes('/register') || window.location.search.includes('from=register')
   return (
     <div>
-      {!fromRegister && <Navbar />}
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '1.5rem 1rem 4rem' }}>
 
         {/* Nagłówek */}
