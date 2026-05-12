@@ -265,14 +265,26 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
 
       {/* FAB */}
       <Link to="/add" style={{ textDecoration:'none', position:'fixed', bottom:'2rem', right:'2rem', zIndex:50 }}>
-        <motion.button
-          whileHover={{ scale:1.08 }}
-          whileTap={{ scale:0.95 }}
-          animate={{ scale:[1, 1.06, 1], opacity:[1, 0.82, 1], boxShadow:['0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)','0 4px 32px rgba(59,130,246,0.7), 0 0 0 1px rgba(59,130,246,0.4)','0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)'] }}
-          transition={{ duration:2.8, repeat:Infinity, ease:'easeInOut' }}
-          style={{ width:56, height:56, borderRadius:'50%', background:'linear-gradient(135deg,#8B5CF6,#3B82F6)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)', color:'#fff' }}>
-          <Plus size={22} strokeWidth={2}/>
-        </motion.button>
+        <motion.div
+          initial="rest"
+          whileHover="hover"
+          style={{ display:'flex', alignItems:'center', justifyContent:'flex-end', gap:'0.75rem' }}
+        >
+          <motion.span
+            variants={{ rest:{ opacity:0, x:10, pointerEvents:'none' }, hover:{ opacity:1, x:0, pointerEvents:'auto' } }}
+            transition={{ duration:0.2, ease:'easeOut' }}
+            style={{ fontFamily:'var(--mono)', fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color:'rgba(255,255,255,0.75)', background:'rgba(15,23,42,0.7)', backdropFilter:'blur(8px)', WebkitBackdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:20, padding:'0.35rem 0.85rem', whiteSpace:'nowrap' }}
+          >
+            Dodaj skok
+          </motion.span>
+          <motion.button
+            whileTap={{ scale:0.95 }}
+            animate={{ scale:[1, 1.06, 1], opacity:[1, 0.82, 1], boxShadow:['0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)','0 4px 32px rgba(59,130,246,0.7), 0 0 0 1px rgba(59,130,246,0.4)','0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)'] }}
+            transition={{ duration:2.8, repeat:Infinity, ease:'easeInOut' }}
+            style={{ width:56, height:56, borderRadius:'50%', background:'linear-gradient(135deg,#8B5CF6,#3B82F6)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)', color:'#fff', flexShrink:0 }}>
+            <Plus size={22} strokeWidth={2}/>
+          </motion.button>
+        </motion.div>
       </Link>
 
       <AnimatePresence>
