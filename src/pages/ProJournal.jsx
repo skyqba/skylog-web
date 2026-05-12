@@ -265,7 +265,12 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
 
       {/* FAB */}
       <Link to="/add" style={{ textDecoration:'none', position:'fixed', bottom:'2rem', right:'2rem', zIndex:50 }}>
-        <motion.button whileHover={{ scale:1.08 }} whileTap={{ scale:0.95 }} style={{ width:56, height:56, borderRadius:'50%', background:'linear-gradient(135deg,#8B5CF6,#3B82F6)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)', color:'#fff' }}>
+        <motion.button
+          whileHover={{ scale:1.08 }}
+          whileTap={{ scale:0.95 }}
+          animate={{ scale:[1, 1.06, 1], opacity:[1, 0.82, 1] }}
+          transition={{ duration:2.8, repeat:Infinity, ease:'easeInOut' }}
+          style={{ width:56, height:56, borderRadius:'50%', background:'linear-gradient(135deg,#8B5CF6,#3B82F6)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)', color:'#fff' }}>
           <Plus size={22} strokeWidth={2}/>
         </motion.button>
       </Link>
