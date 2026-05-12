@@ -91,7 +91,7 @@ export default function AdminPanel() {
       <div style={{ display:'flex', gap:'0.5rem', marginBottom:'1.5rem' }}>
         {[{ key:'users', label:'👥 Użytkownicy' }, { key:'announcements', label:'📢 Powiadomienia' }].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            style={{ padding:'0.5rem 1.1rem', background: tab === t.key ? 'var(--accent)' : 'transparent', border:`1px solid ${tab === t.key ? 'var(--accent)' : 'var(--border)'}`, borderRadius:8, color: tab === t.key ? '#fff' : 'var(--muted)', fontFamily:'var(--font)', fontSize:'0.85rem', fontWeight: tab === t.key ? 600 : 400, cursor:'pointer', transition:'all 0.2s' }}>
+            style={{ padding:'0.5rem 1.1rem', background: tab === t.key ? '#8B5CF6' : 'transparent', border:`1px solid ${tab === t.key ? '#8B5CF6' : 'var(--border)'}`, borderRadius:8, color: tab === t.key ? '#fff' : 'var(--muted)', fontFamily:'var(--font)', fontSize:'0.85rem', fontWeight: tab === t.key ? 600 : 400, cursor:'pointer', transition:'all 0.2s' }}>
             {t.label}
           </button>
         ))}
@@ -103,16 +103,16 @@ export default function AdminPanel() {
             return (
               <div key={u.id} style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'var(--r2)', overflow:'hidden' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.85rem 1rem' }}>
-                  <div style={{ width:36, height:36, borderRadius:'50%', background: u.is_premium ? 'rgba(108,99,255,0.15)' : 'var(--bg3)', border:`1px solid ${u.is_premium ? 'var(--accent)' : 'var(--border)'}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1rem', flexShrink:0 }}>
+                  <div style={{ width:36, height:36, borderRadius:'50%', background: u.is_premium ? 'rgba(139,92,246,0.15)' : 'var(--bg3)', border:`1px solid ${u.is_premium ? '#8B5CF6' : 'var(--border)'}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1rem', flexShrink:0 }}>
                     {u.is_admin ? '🛡' : u.is_premium ? '⭐' : '👤'}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:'0.88rem', fontWeight:600, color:'var(--text)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                       {u.email || 'Brak emaila'}
-                      {u.is_admin && <span style={{ marginLeft:'0.5rem', fontSize:'0.65rem', fontFamily:'var(--mono)', color:'var(--accent2)', fontWeight:700, letterSpacing:1 }}>ADMIN</span>}
+                      {u.is_admin && <span style={{ marginLeft:'0.5rem', fontSize:'0.65rem', fontFamily:'var(--mono)', color:'#A78BFA', fontWeight:700, letterSpacing:1 }}>ADMIN</span>}
                     </div>
                     <div style={{ display:'flex', flexWrap:'wrap', gap:'0.3rem', marginTop:'0.35rem' }}>
-                      {u.is_premium && <span style={{ display:'inline-flex', alignItems:'center', gap:'0.25rem', background:'rgba(108,99,255,0.15)', border:'1px solid rgba(108,99,255,0.4)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.68rem', color:'var(--accent2)', fontWeight:600 }}>⭐ Premium</span>}
+                      {u.is_premium && <span style={{ display:'inline-flex', alignItems:'center', gap:'0.25rem', background:'rgba(139,92,246,0.15)', border:'1px solid rgba(139,92,246,0.4)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.68rem', color:'#A78BFA', fontWeight:600 }}>⭐ Premium</span>}
                       {!u.is_premium && activePerm.length === 0 && !u.is_admin && <span style={{ display:'inline-flex', alignItems:'center', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.68rem', color:'var(--muted)' }}>brak uprawnień</span>}
                       {!u.is_premium && activePerm.map(p => (
                         <span key={p.key} style={{ display:'inline-flex', alignItems:'center', gap:'0.25rem', background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:20, padding:'0.1rem 0.55rem', fontSize:'0.68rem', color:'var(--success)', fontWeight:600 }}>
@@ -123,7 +123,7 @@ export default function AdminPanel() {
                   </div>
                   <div style={{ display:'flex', gap:'0.4rem', alignItems:'center', flexShrink:0 }}>
                       <button onClick={() => togglePremium(u)}
-                        style={{ background: u.is_premium ? 'rgba(108,99,255,0.15)' : 'transparent', border:`1px solid ${u.is_premium ? 'var(--accent)' : 'var(--border)'}`, borderRadius:8, padding:'0.35rem 0.75rem', cursor:'pointer', color: u.is_premium ? 'var(--accent2)' : 'var(--muted)', fontFamily:'var(--font)', fontSize:'0.78rem', fontWeight:600, whiteSpace:'nowrap' }}>
+                        style={{ background: u.is_premium ? 'rgba(139,92,246,0.15)' : 'transparent', border:`1px solid ${u.is_premium ? '#8B5CF6' : 'var(--border)'}`, borderRadius:8, padding:'0.35rem 0.75rem', cursor:'pointer', color: u.is_premium ? '#A78BFA' : 'var(--muted)', fontFamily:'var(--font)', fontSize:'0.78rem', fontWeight:600, whiteSpace:'nowrap' }}>
                         {u.is_premium ? '⭐ Premium' : '+ Premium'}
                       </button>
                     <button onClick={() => setExpanded(expanded === u.id ? null : u.id)}
@@ -138,7 +138,7 @@ export default function AdminPanel() {
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem' }}>
                       {PERMISSIONS.map(perm => (
                         <div key={perm.key} onClick={() => togglePerm(u, perm.key)}
-                          style={{ display:'flex', alignItems:'center', gap:'0.6rem', padding:'0.65rem 0.85rem', background: u[perm.key] ? 'rgba(108,99,255,0.08)' : 'var(--bg2)', border:`1px solid ${u[perm.key] ? 'rgba(108,99,255,0.35)' : 'var(--border)'}`, borderRadius:'var(--r)', cursor:'pointer', transition:'all 0.15s' }}>
+                          style={{ display:'flex', alignItems:'center', gap:'0.6rem', padding:'0.65rem 0.85rem', background: u[perm.key] ? 'rgba(139,92,246,0.08)' : 'var(--bg2)', border:`1px solid ${u[perm.key] ? 'rgba(139,92,246,0.35)' : 'var(--border)'}`, borderRadius:'var(--r)', cursor:'pointer', transition:'all 0.15s' }}>
                           <span style={{ fontSize:16 }}>{perm.icon}</span>
                           <span style={{ fontSize:'0.82rem', fontWeight:600, color: u[perm.key] ? 'var(--accent2)' : 'var(--muted)', flex:1 }}>{perm.label}</span>
                           <div style={{ width:32, height:18, borderRadius:9, background: u[perm.key] ? 'var(--accent)' : 'var(--bg3)', border:`2px solid ${u[perm.key] ? 'var(--accent)' : 'var(--border2)'}`, position:'relative', transition:'all 0.2s', flexShrink:0 }}>
