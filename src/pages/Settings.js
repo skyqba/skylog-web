@@ -451,7 +451,7 @@ export default function Settings() {
         </button>
 
         {/* STREFA NIEBEZPIECZNA */}
-        <div style={{ background:'rgba(248,113,113,0.05)', border:'1px solid rgba(248,113,113,0.25)', borderRadius:'var(--r2)', padding:'1.25rem' }}>
+        <div style={{ background:'rgba(248,113,113,0.05)', border:'1px solid rgba(248,113,113,0.25)', borderRadius:'var(--r2)', padding:'1.25rem', textAlign:'center' }}>
           <h3 style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, color:'var(--danger)', marginBottom:'0.5rem' }}>{t('settings.danger_zone')}</h3>
           <p style={{ fontSize:'0.82rem', color:'var(--muted)', marginBottom:'1rem', lineHeight:1.6 }}>{t('settings.danger_desc')}</p>
           <button onClick={() => setDeleteStep('confirm')}
