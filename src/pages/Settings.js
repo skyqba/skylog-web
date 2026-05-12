@@ -73,7 +73,6 @@ export default function Settings() {
       return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS
     } catch { return DEFAULT_SETTINGS }
   })
-  const [saved, setSaved] = useState(false)
   const [deleteStep, setDeleteStep] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteError, setDeleteError] = useState('')
@@ -88,20 +87,20 @@ export default function Settings() {
   }
 
   const toggle = (key) => {
-    setSettings(s => ({ ...s, [key]: !s[key] }))
-    setSaved(false)
+    setSettings(s => {
+      const next = { ...s, [key]: !s[key] }
+      localStorage.setItem('alertSettings', JSON.stringify(next))
+      return next
+    })
   }
 
-  const save = () => {
-    localStorage.setItem('alertSettings', JSON.stringify(settings))
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
-  }
+
 
   const resetAll = (value) => {
     const reset = Object.fromEntries(ALERT_KEYS.map(a => [a.key, value]))
-    setSettings(s => ({ ...reset, show_weather: s.show_weather ?? true }))
-    setSaved(false)
+    const next = { ...reset, show_weather: settings.show_weather ?? true }
+    setSettings(next)
+    localStorage.setItem('alertSettings', JSON.stringify(next))
   }
 
   const handleDeleteAccount = async () => {
@@ -445,10 +444,6 @@ export default function Settings() {
             {t('settings.threshold_future')}
           </div>
         </div>
-
-        <button onClick={save} className="btn" style={{ width:'100%', fontSize:'0.95rem', padding:'0.75rem', marginBottom:'1rem' }}>
-          {saved ? t('settings.saved') : t('settings.save')}
-        </button>
 
         {/* STREFA NIEBEZPIECZNA */}
         <div style={{ background:'rgba(248,113,113,0.05)', border:'1px solid rgba(248,113,113,0.25)', borderRadius:'var(--r2)', padding:'1.25rem', textAlign:'center' }}>
