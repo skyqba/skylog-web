@@ -268,7 +268,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
         <motion.button
           whileHover={{ scale:1.08 }}
           whileTap={{ scale:0.95 }}
-          animate={{ scale:[1, 1.06, 1], opacity:[1, 0.82, 1] }}
+          animate={{ scale:[1, 1.06, 1], opacity:[1, 0.82, 1], boxShadow:['0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)','0 4px 32px rgba(59,130,246,0.7), 0 0 0 1px rgba(59,130,246,0.4)','0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)'] }}
           transition={{ duration:2.8, repeat:Infinity, ease:'easeInOut' }}
           style={{ width:56, height:56, borderRadius:'50%', background:'linear-gradient(135deg,#8B5CF6,#3B82F6)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 24px rgba(139,92,246,0.6), 0 0 0 1px rgba(139,92,246,0.3)', color:'#fff' }}>
           <Plus size={22} strokeWidth={2}/>
