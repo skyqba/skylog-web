@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import emailjs from '@emailjs/browser'
+import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 
 const Section = ({ id, title, children }) => (
@@ -73,6 +74,7 @@ const tocItems = [
   { label: '13. Bezpieczeństwo i prywatność',                     id: 's13' },
   { label: '14. Przydatne wskazówki',                             id: 's14' },
   { label: '15. Kontakt i pomoc',                                  id: 's15' },
+  { label: '16. Regulamin',                                           id: 's16' },
 ]
 
 
@@ -429,6 +431,19 @@ export default function Manual() {
             'Eksportuj PDF co sezon jako kopię zapasową dziennika',
             'W motyw Pro — kliknij avatar w prawym górnym rogu aby otworzyć menu z opcjami profilu i wylogowania',
           ]} />
+        </Section>
+
+        {/* REGULAMIN */}
+        <Section id="s16" title="16. Regulamin">
+          <P>Korzystając z aplikacji JumpLogX akceptujesz nasz Regulamin.</P>
+          <P>Regulamin określa zasady korzystania z aplikacji, zakres odpowiedzialności Twórcy oraz obowiązki Użytkownika — w tym obowiązek tworzenia kopii zapasowych i prowadzenia papierowej książeczki skoków.</P>
+          <div style={{ marginTop:'1rem' }}>
+            <Link to="/terms" style={{ display:'inline-flex', alignItems:'center', gap:'0.5rem', background:'rgba(139,92,246,0.1)', border:'1px solid rgba(139,92,246,0.3)', borderRadius:'var(--r)', padding:'0.65rem 1.25rem', color:'#A78BFA', textDecoration:'none', fontWeight:600, fontSize:'0.88rem', transition:'all 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.background='rgba(139,92,246,0.2)'}
+              onMouseLeave={e => e.currentTarget.style.background='rgba(139,92,246,0.1)'}>
+              📄 Przeczytaj Regulamin aplikacji JumpLogX
+            </Link>
+          </div>
         </Section>
 
         {/* FORMULARZ KONTAKTOWY */}
