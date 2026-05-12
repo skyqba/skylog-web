@@ -22,9 +22,23 @@ import AdminPanel     from './pages/AdminPanel'
 const savedTheme = localStorage.getItem('jumplogx_theme')
 if (savedTheme === 'pro') document.body.classList.add('theme-pro')
 
+const DEV_SECRET = process.env.REACT_APP_DEV_SECRET || ''
+
+function checkDevAccess() {
+  const params = new URLSearchParams(window.location.search)
+  const secret = params.get('dev')
+  if (DEV_SECRET && secret === DEV_SECRET) {
+    localStorage.setItem('jumplogx_dev_access', DEV_SECRET)
+    window.history.replaceState({}, '', window.location.pathname)
+    return true
+  }
+  return localStorage.getItem('jumplogx_dev_access') === DEV_SECRET && DEV_SECRET !== ''
+}
+
 function App() {
   const [session, setSession] = useState(undefined)
   const [online, setOnline]   = useState(navigator.onLine)
+  const [devAccess]           = useState(() => checkDevAccess())
 
   useEffect(() => {
     const hash = window.location.hash
@@ -53,7 +67,7 @@ function App() {
     }
   }, [])
 
-  if (process.env.REACT_APP_COMING_SOON === 'true') return <ComingSoon />
+  if (process.env.REACT_APP_COMING_SOON === 'true' && !devAccess) return <ComingSoon />
 
   if (session === undefined) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', color:'var(--muted)' }}>
