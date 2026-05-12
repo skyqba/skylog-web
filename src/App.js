@@ -20,7 +20,8 @@ import ResetPassword  from './pages/ResetPassword'
 import AdminPanel     from './pages/AdminPanel'
 
 const savedTheme = localStorage.getItem('jumplogx_theme')
-if (savedTheme === 'pro') document.body.classList.add('theme-pro')
+if (savedTheme === 'pro')  document.body.classList.add('theme-pro')
+if (savedTheme === 'dark') document.body.classList.add('theme-dark')
 
 const DEV_SECRET = process.env.REACT_APP_DEV_SECRET || ''
 

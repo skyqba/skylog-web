@@ -242,3 +242,118 @@ body.theme-pro nav {
 .recharts-wrapper, .recharts-surface, .recharts-wrapper * {
   outline: none !important;
 }
+
+/* ─── MOTYW DARK MIDNIGHT ───────────────────────────────────────────────────── */
+body.theme-dark {
+  --bg:      #070B14;
+  --bg2:     rgba(13, 22, 40, 0.8);
+  --bg3:     rgba(255, 255, 255, 0.03);
+  --border:  rgba(255, 255, 255, 0.07);
+  --border2: rgba(255, 255, 255, 0.12);
+  --text:    #E2E8F0;
+  --muted:   #64748B;
+  --accent:  #06B6D4;
+  --accent2: #67E8F9;
+  --success: #10B981;
+  --danger:  #F87171;
+  background: #070B14;
+}
+
+body.theme-dark::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(6,182,212,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(99,102,241,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 50% 90%, rgba(16,185,129,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(6,182,212,0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.theme-dark::after { display: none; }
+
+body.theme-dark .card {
+  background: rgba(13, 22, 40, 0.7);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+body.theme-dark .card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(6, 182, 212, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+body.theme-dark .btn {
+  background: linear-gradient(135deg, #06B6D4 0%, #6366F1 100%);
+  border: none;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+  transition: all 0.25s ease;
+}
+
+body.theme-dark .btn:hover {
+  background: linear-gradient(135deg, #0891B2 0%, #4F46E5 100%);
+  box-shadow: 0 6px 28px rgba(6, 182, 212, 0.55);
+  transform: translateY(-2px);
+}
+
+body.theme-dark .btn.ghost {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: var(--muted);
+  box-shadow: none;
+}
+
+body.theme-dark .btn.ghost:hover {
+  background: rgba(6,182,212,0.08);
+  border-color: rgba(6,182,212,0.35);
+  color: var(--accent2);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+body.theme-dark .input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: var(--text);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s;
+}
+
+body.theme-dark .input:focus {
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.10);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body.theme-dark nav {
+  background: rgba(7, 11, 20, 0.85) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+  box-shadow: 0 1px 40px rgba(0,0,0,0.5) !important;
+}
+
+body.theme-dark .pro-glow {
+  text-shadow:
+    0 0 20px rgba(6, 182, 212, 0.5),
+    0 0 40px rgba(6, 182, 212, 0.25),
+    0 0 80px rgba(6, 182, 212, 0.12);
+  color: #fff;
+}

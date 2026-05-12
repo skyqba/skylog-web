@@ -54,6 +54,11 @@ export default function Settings() {
   const changeTheme = (t) => {
     setTheme(t)
     localStorage.setItem('jumplogx_theme', t)
+    if (t === 'dark') {
+      document.body.classList.add('theme-dark')
+    } else {
+      document.body.classList.remove('theme-dark')
+    }
     if (t === 'pro') {
       document.body.classList.add('theme-pro')
     } else {
@@ -350,7 +355,7 @@ export default function Settings() {
           <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Wybierz wygląd aplikacji</p>
           <div style={{ display:'flex', gap:'0.75rem' }}>
             {[
-              { code:'classic', label:'⚡ Classic', desc:'Obecny wygląd' },
+              { code:'dark', label:'🌙 Dark Mode', desc:'Glassmorphism cyan' },
               { code:'pro',     label:'💎 Pro',     desc:'Glassmorphism' },
             ].map(m => (
               <button key={m.code} onClick={() => changeTheme(m.code)}
