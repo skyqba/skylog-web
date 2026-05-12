@@ -357,7 +357,7 @@ export default function Settings() {
           <div style={{ display:'flex', gap:'0.75rem' }}>
             {[
               { code:'dark', label:'🌙 Dark Mode', desc:'Glassmorphism cyan' },
-              { code:'pro',     label:'💎 Pro',     desc:'Glassmorphism' },
+              { code:'pro',     label:'💎 Pro Mode', desc:'Fioletowy motyw' },
             ].map(m => (
               <button key={m.code} onClick={() => changeTheme(m.code)}
                 style={{ flex:1, padding:'0.85rem', background: theme === m.code ? 'rgba(108,99,255,0.15)' : 'var(--bg3)', border:`1px solid ${theme === m.code ? 'var(--accent)' : 'var(--border)'}`, borderRadius:12, color: theme === m.code ? 'var(--accent2)' : 'var(--muted)', fontFamily:'var(--font)', fontSize:'0.88rem', fontWeight: theme === m.code ? 700 : 400, cursor:'pointer', transition:'all 0.2s', textAlign:'center' }}>
