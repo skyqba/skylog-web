@@ -68,7 +68,7 @@ export default function Login() {
         <div style={{ textAlign:'center', marginBottom:'2rem' }}>
           <div style={{ marginBottom:'0.25rem' }}>
             <span style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:900, color:'var(--text)' }}>
-              <span style={{ color:'var(--accent2)' }}>Jump</span>Log<span style={{ color:'var(--accent2)' }}>X</span>
+              <span style={{ color:'#A78BFA' }}>Jump</span><span style={{ color:'#F1F5F9' }}>Log</span><span style={{ color:'#A78BFA' }}>X</span>
             </span>
           </div>
           <div style={{ fontFamily:'var(--font)', fontSize:'0.65rem', color:'var(--muted)', marginBottom:'0.4rem' }}>
