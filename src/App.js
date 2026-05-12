@@ -69,7 +69,8 @@ function App() {
     }
   }, [])
 
-  if (process.env.REACT_APP_COMING_SOON === 'true' && !devAccess) return <ComingSoon />
+  const isPublicPage = ['/terms', '/register', '/login', '/reset-password'].includes(window.location.pathname)
+  if (process.env.REACT_APP_COMING_SOON === 'true' && !devAccess && !isPublicPage) return <ComingSoon />
 
   if (session === undefined) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', color:'var(--muted)' }}>
