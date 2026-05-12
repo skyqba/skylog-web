@@ -59,6 +59,7 @@ export default function Settings() {
     } else {
       document.body.classList.remove('theme-dark')
     }
+    if (t === 'dark') { document.body.classList.add('theme-dark') } else { document.body.classList.remove('theme-dark') }
     if (t === 'pro') {
       document.body.classList.add('theme-pro')
     } else {
