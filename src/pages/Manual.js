@@ -113,7 +113,7 @@ function ContactForm() {
 
       {status === 'success' && (
         <div style={{ background:'rgba(52,211,153,0.1)', border:'1px solid rgba(52,211,153,0.3)', borderRadius:'var(--r)', padding:'0.85rem 1rem', marginBottom:'1rem', fontSize:'0.88rem', color:'var(--success)' }}>
-          ✓ Otwarto klienta email — wyślij wiadomość aby się z nami skontaktować.
+          ✓ Wiadomość wysłana! Odpowiemy najszybciej jak to możliwe.
         </div>
       )}
       {status === 'error_empty' && (
