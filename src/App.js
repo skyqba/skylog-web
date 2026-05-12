@@ -18,6 +18,7 @@ import Qualifications from './pages/Qualifications'
 import Settings       from './pages/Settings'
 import ResetPassword  from './pages/ResetPassword'
 import AdminPanel     from './pages/AdminPanel'
+import Terms         from './pages/Terms'
 
 const savedTheme = localStorage.getItem('jumplogx_theme') || 'dark'
 if (savedTheme === 'pro')  document.body.classList.add('theme-pro')
@@ -99,6 +100,7 @@ function App() {
         <Route path="/qualifications" element={ session  ? <Qualifications /> : <Navigate to="/login" />} />
         <Route path="/settings"       element={ session  ? <Settings />       : <Navigate to="/login" />} />
         <Route path="/admin"          element={ session  ? <AdminPanel />     : <Navigate to="/login" />} />
+        <Route path="/terms"          element={<Terms />} />
       </Routes>
     </BrowserRouter>
   )

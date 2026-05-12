@@ -131,11 +131,15 @@ export default function Login() {
               style={{ background:'none', border:'none', color:'var(--muted)', fontSize:'0.82rem', cursor:'pointer', fontFamily:'var(--font)' }}>
               {resetMode ? t('login.back_to_login') : t('login.forgot')}
             </button>
-            <Link to="/register" style={{ color:'var(--accent2)', fontSize:'0.82rem', textDecoration:'none' }}>
+            <Link to="/register" style={{ color:'#A78BFA', fontSize:'0.82rem', textDecoration:'none' }}>
               {t('login.no_account')}
             </Link>
           </div>
         </div>
+        <p style={{ textAlign:'center', marginTop:'1.5rem', fontSize:'0.72rem', color:'var(--muted)' }}>
+          Korzystając z aplikacji akceptujesz{' '}
+          <Link to="/terms" style={{ color:'#A78BFA', textDecoration:'none' }}>Regulamin</Link>
+        </p>
       </div>
     </div>
   )
