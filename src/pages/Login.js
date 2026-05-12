@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 
 export default function Login() {
+  if (!localStorage.getItem('jumplogx_theme')) {
+    document.body.classList.add('theme-dark')
+  }
   const { t } = useTranslation()
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')

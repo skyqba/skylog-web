@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
 
 export default function Register() {
+  if (!localStorage.getItem('jumplogx_theme')) {
+    document.body.classList.add('theme-dark')
+  }
   const { t } = useTranslation()
   const [form, setForm] = useState({ name:'', surname:'', email:'', password:'', password2:'' })
   const [preview, setPreview] = useState(null)

@@ -19,7 +19,7 @@ import Settings       from './pages/Settings'
 import ResetPassword  from './pages/ResetPassword'
 import AdminPanel     from './pages/AdminPanel'
 
-const savedTheme = localStorage.getItem('jumplogx_theme')
+const savedTheme = localStorage.getItem('jumplogx_theme') || 'dark'
 if (savedTheme === 'pro')  document.body.classList.add('theme-pro')
 if (savedTheme === 'dark') document.body.classList.add('theme-dark')
 
