@@ -53,7 +53,6 @@ export default function Terms() {
         </Section>
 
         <Section title="§6. Zasady korzystania">
-          <P>Aplikacja jest przeznaczona wyłącznie do użytku przez skoczków spadochronowych do prowadzenia osobistego dziennika skoków.</P>
           <P>Zabrania się wykorzystywania Aplikacji do celów niezgodnych z prawem, wprowadzania fałszywych danych skoków lub podszywania się pod inne osoby.</P>
           <P>Zabrania się podejmowania prób nieautoryzowanego dostępu do danych innych Użytkowników lub infrastruktury technicznej Aplikacji.</P>
         </Section>
