@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import html2canvas from 'html2canvas'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
@@ -331,59 +332,44 @@ export default function Stats() {
 
   const downloadPDF = async () => {
     try {
-    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' })
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(18)
-    doc.text('JumpLog - Statystyki skoków', 14, 18)
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(10)
-    doc.text(`Data wydruku: ${new Date().toLocaleDateString('pl-PL')}`, 14, 26)
-    let y = 34
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(12)
-    doc.text('Podsumowanie ogólne', 14, y); y += 6
-    autoTable(doc, {
-      startY: y,
-      head: [['Parametr', 'Wartość']],
-      body: [
-        ['Łączna liczba skoków', String(totalJumps)],
-        ['Lata aktywności', years.length > 0 ? `${years[0]} – ${years[years.length-1]}` : '—'],
-        ['Pierwszy skok', fmt(firstJump?.jump_date) + (firstJump?.city ? ` · ${firstJump.city}` : '')],
-        ['Ostatni skok', fmt(lastJump?.jump_date) + (lastJump?.city ? ` · ${lastJump.city}` : '')],
-        ['Rekord dzienny', bestDayJumps ? `${bestDayJumps[1]} skoków (${fmt(bestDayJumps[0])})` : '—'],
-        ['Średnia wysokość', avgAlt ? `${avgAlt} m (max ${maxAlt} m)` : '—'],
-        ['Średnie opóźnienie', avgDelay ? `${avgDelay} s (max ${maxDelay} s)` : '—'],
-        ['Liczba stref zrzutu', String(Object.keys(perCity).length)],
-      ],
-      styles: { fontSize:9, font:'helvetica' },
-      headStyles: { fillColor:[108,99,255] },
-      alternateRowStyles: { fillColor:[245,245,250] },
-    })
-    y = doc.lastAutoTable.finalY + 8
-    if (dayAvgs.length > 0) {
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(12)
-      doc.text('Wyniki — celność lądowania', 14, y); y += 6
-      autoTable(doc, {
-        startY: y,
-        head: [['Parametr', 'Wartość']],
-        body: [
-          ['Ogólna średnia', overallAvg ? `${overallAvg} cm` : '—'],
-          ['Najlepszy dzień', bestDay ? `${bestDay.avg.toFixed(3)} cm · ${fmt(bestDay.day)} (${bestDay.count} skoków)` : '—'],
-          ['Najsłabszy dzień', worstDay ? `${worstDay.avg.toFixed(3)} cm · ${fmt(worstDay.day)} (${worstDay.count} skoków)` : '—'],
-        ],
-        styles: { fontSize:9, font:'helvetica' },
-        headStyles: { fillColor:[108,99,255] },
-        alternateRowStyles: { fillColor:[245,245,250] },
+      const element = document.getElementById('stats-content')
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#0F172A',
+        logging: false,
       })
-    }
-    doc.save(`JumpLog_statystyki_${new Date().toISOString().split('T')[0]}.pdf`)
+      const imgData = canvas.toDataURL('image/png')
+      const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' })
+      const pageW = doc.internal.pageSize.getWidth()
+      const pageH = doc.internal.pageSize.getHeight()
+      const imgW = pageW - 20
+      const imgH = (canvas.height * imgW) / canvas.width
+      let y = 10
+      let remaining = imgH
+      while (remaining > 0) {
+        const sliceH = Math.min(remaining, pageH - 20)
+        const sourceY = (imgH - remaining) * (canvas.height / imgH)
+        const sliceCanvas = document.createElement('canvas')
+        sliceCanvas.width = canvas.width
+        sliceCanvas.height = sliceH * (canvas.height / imgH)
+        const ctx = sliceCanvas.getContext('2d')
+        ctx.drawImage(canvas, 0, sourceY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height)
+        if (y > 10) { doc.addPage(); y = 10 }
+        doc.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', 10, y, imgW, sliceH)
+        remaining -= sliceH
+      }
+      doc.save(`JumpLogX_statystyki_${new Date().toISOString().split('T')[0]}.pdf`)
     } catch (err) {
       console.error('PDF error:', err)
-      alert('Błąd generowania PDF: ' + err.message)
+      alert('Blad generowania PDF: ' + err.message)
     }
   }
 
   return (
     <div>
       <Navbar />
-      <div style={{ maxWidth:780, margin:'0 auto', padding:'1.5rem 1rem 4rem' }}>
+      <div id='stats-content' style={{ maxWidth:780, margin:'0 auto', padding:'1.5rem 1rem 4rem' }}>
 
         {/* Nagłówek */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'0.75rem', marginBottom:'1.5rem' }}>
