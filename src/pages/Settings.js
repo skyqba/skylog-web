@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
@@ -165,8 +167,6 @@ export default function Settings() {
   }
 
   const downloadPDF = async (jumps, profile) => {
-    const { default: jsPDF } = await import('jspdf')
-    const { default: autoTable } = await import('jspdf-autotable')
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
     const name = profile ? plChar(`${profile.name || ''} ${profile.surname || ''}`.trim()) : ''
     const today = new Date().toLocaleDateString('pl-PL')
