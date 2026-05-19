@@ -34,6 +34,7 @@ export default function Journal() {
   const [dismissedQuals, setDismissedQuals] = useState(() => JSON.parse(sessionStorage.getItem('dismissedQuals') || '[]'))
   const [confirmDismiss, setConfirmDismiss] = useState(null)
   const [confirmDelete, setConfirmDelete]   = useState(null)
+  const [visibleCount, setVisibleCount]       = useState(20)
 
   const alertSettings = (() => {
     try { return JSON.parse(localStorage.getItem('alertSettings') || '{}') } catch { return {} }
@@ -423,7 +424,7 @@ export default function Journal() {
               className="input"
               placeholder={t('journal.search_placeholder')}
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={e => { setSearch(e.target.value); setVisibleCount(20) }}
               style={{ paddingLeft:'1rem' }}
             />
             {search && (
@@ -456,7 +457,21 @@ export default function Journal() {
           ) : jumps
           return filtered.length === 0
             ? <p style={{ textAlign:'center', color:'var(--muted)', padding:'2rem' }}>{t('journal.no_results', { search })}</p>
-            : filtered.map(j => <JumpCard key={j.id} jump={j} onDelete={(id) => setConfirmDelete({ id, number: j.number })} />)
+            : <>
+                {filtered.slice(0, visibleCount).map(j => <JumpCard key={j.id} jump={j} onDelete={(id) => setConfirmDelete({ id, number: j.number })} />)}
+                {filtered.length > visibleCount && (
+                  <div style={{ textAlign:'center', padding:'1rem 0' }}>
+                    <button
+                      onClick={() => setVisibleCount(v => v + 20)}
+                      style={{ background:'rgba(139,92,246,0.1)', border:'1px solid rgba(139,92,246,0.3)', borderRadius:12, color:'#A78BFA', padding:'0.65rem 2rem', fontFamily:'var(--font)', fontSize:'0.88rem', fontWeight:600, cursor:'pointer', transition:'all 0.2s' }}
+                      onMouseEnter={e => e.currentTarget.style.background='rgba(139,92,246,0.2)'}
+                      onMouseLeave={e => e.currentTarget.style.background='rgba(139,92,246,0.1)'}
+                    >
+                      Pokaż więcej ({filtered.length - visibleCount} pozostałych)
+                    </button>
+                  </div>
+                )}
+              </>
         })()}
       </div>
     </div>
