@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabase'
@@ -16,6 +16,81 @@ import {
   dbAddJump, dbDeleteJump
 } from '../db'
 import { saveToQueue } from '../offlineQueue'
+
+
+function LoadingScreen() {
+  const [progress, setProgress] = React.useState(0)
+  const [phase, setPhase] = React.useState(0)
+  const phases = ['Łączenie z bazą...', 'Pobieranie skoków...', 'Ładowanie profilu...', 'Prawie gotowe...']
+
+  React.useEffect(() => {
+    const start = Date.now()
+    const duration = 1800
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - start
+      const pct = Math.min((elapsed / duration) * 100, 95)
+      setProgress(pct)
+      setPhase(Math.floor((pct / 100) * phases.length))
+      if (pct >= 95) clearInterval(timer)
+    }, 16)
+    return () => clearInterval(timer)
+  }, [])
+
+  return (
+    <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:'2rem', padding:'2rem' }}>
+
+      {/* Logo */}
+      <div style={{ textAlign:'center' }}>
+        <div style={{ fontFamily:'var(--head)', fontSize:'2rem', fontWeight:900, marginBottom:'0.25rem' }}>
+          <span style={{ color:'#A78BFA' }}>Jump</span>
+          <span style={{ color:'var(--text)' }}>Log</span>
+          <span style={{ color:'#A78BFA' }}>X</span>
+        </div>
+        <div style={{ fontFamily:'var(--mono)', fontSize:'0.6rem', color:'var(--muted)', letterSpacing:'0.15em', textTransform:'uppercase' }}>
+          {phases[Math.min(phase, phases.length - 1)]}
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div style={{ width:'100%', maxWidth:280 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'0.5rem' }}>
+          <span style={{ fontFamily:'var(--mono)', fontSize:'0.65rem', color:'var(--muted)' }}>Ładowanie</span>
+          <span style={{ fontFamily:'var(--mono)', fontSize:'0.65rem', color:'#A78BFA', fontWeight:700 }}>{Math.round(progress)}%</span>
+        </div>
+        <div style={{ height:3, background:'rgba(255,255,255,0.06)', borderRadius:99, overflow:'hidden' }}>
+          <div style={{
+            height:'100%',
+            width:`${progress}%`,
+            background:'linear-gradient(90deg, #8B5CF6, #06B6D4)',
+            borderRadius:99,
+            transition:'width 0.1s linear',
+            boxShadow:'0 0 12px rgba(139,92,246,0.6)',
+          }} />
+        </div>
+      </div>
+
+      {/* Animowane kropki */}
+      <div style={{ display:'flex', gap:'0.5rem' }}>
+        {[0,1,2].map(i => (
+          <div key={i} style={{
+            width:6, height:6, borderRadius:'50%',
+            background: i === Math.floor(Date.now() / 400) % 3 ? '#A78BFA' : 'rgba(255,255,255,0.15)',
+            animation: `pulse${i} 1.2s ease-in-out infinite`,
+            animationDelay: `${i * 0.2}s`,
+          }} />
+        ))}
+      </div>
+
+      <style>{`
+        @keyframes dotPulse {
+          0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+          40% { opacity: 1; transform: scale(1.2); }
+        }
+        div[style*="border-radius: 50%"] { animation: dotPulse 1.2s ease-in-out infinite; }
+      `}</style>
+    </div>
+  )
+}
 
 export default function Journal() {
   const { t } = useTranslation()
