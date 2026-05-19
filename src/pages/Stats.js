@@ -328,6 +328,7 @@ export default function Stats() {
   }
 
   const downloadPDF = async () => {
+    try {
     const { default: jsPDF }     = await import('jspdf')
     const { default: autoTable } = await import('jspdf-autotable')
     const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' })
@@ -373,6 +374,10 @@ export default function Stats() {
       })
     }
     doc.save(`JumpLog_statystyki_${new Date().toISOString().split('T')[0]}.pdf`)
+    } catch (err) {
+      console.error('PDF error:', err)
+      alert('Błąd generowania PDF: ' + err.message)
+    }
   }
 
   return (
