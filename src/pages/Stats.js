@@ -331,8 +331,6 @@ export default function Stats() {
 
   const downloadPDF = async () => {
     try {
-    const { default: jsPDF }     = await import('jspdf')
-    const { default: autoTable } = await import('jspdf-autotable')
     const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' })
     doc.setFont('helvetica', 'bold'); doc.setFontSize(18)
     doc.text('JumpLog - Statystyki skoków', 14, 18)
