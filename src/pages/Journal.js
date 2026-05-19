@@ -53,15 +53,25 @@ export default function Journal() {
   useEffect(() => { fetchAll() }, [])
 
   const fetchAll = async () => {
+    // Najpierw pokaz dane z cache - natychmiastowe ladowanie
+    const [cachedJumps, cachedProfile, cachedRigs, cachedQuals, cachedDz] = await Promise.all([
+      dbGetJumps(), dbGetProfile(), dbGetRigs(), dbGetQuals(), dbGetDropzones()
+    ])
+    if (cachedJumps?.length > 0) {
+      setJumps(cachedJumps)
+      setProfile(cachedProfile)
+      setRigs(cachedRigs || [])
+      setQuals(cachedQuals)
+      setDropzones(cachedDz || [])
+      setLoading(false)
+    }
+
     if (!navigator.onLine) {
-      setJumps(await dbGetJumps())
-      setProfile(await dbGetProfile())
-      setRigs(await dbGetRigs())
-      setQuals(await dbGetQuals())
-      setDropzones(await dbGetDropzones())
       setLoading(false)
       return
     }
+
+    // Odswież dane z Supabase w tle
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const [{ data: j }, { data: prof }, { data: rigList }, { data: q }, { data: dzList }, { data: acList }] = await Promise.all([
