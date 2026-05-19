@@ -306,6 +306,8 @@ export default function Journal() {
     </div>
   )
 
+  if (loading && jumps.length === 0) return <LoadingScreen />
+
   const isPro = document.body.classList.contains('theme-pro') || document.body.classList.contains('theme-dark') || document.body.classList.contains('theme-dark')
 
   if (isPro) {
