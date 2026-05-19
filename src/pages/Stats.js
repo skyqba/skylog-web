@@ -332,33 +332,199 @@ export default function Stats() {
 
   const downloadPDF = async () => {
     try {
-      const element = document.getElementById('stats-content')
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#0F172A',
-        logging: false,
-      })
-      const imgData = canvas.toDataURL('image/png')
       const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' })
-      const pageW = doc.internal.pageSize.getWidth()
-      const pageH = doc.internal.pageSize.getHeight()
-      const imgW = pageW - 20
-      const imgH = (canvas.height * imgW) / canvas.width
-      let y = 10
-      let remaining = imgH
-      while (remaining > 0) {
-        const sliceH = Math.min(remaining, pageH - 20)
-        const sourceY = (imgH - remaining) * (canvas.height / imgH)
-        const sliceCanvas = document.createElement('canvas')
-        sliceCanvas.width = canvas.width
-        sliceCanvas.height = sliceH * (canvas.height / imgH)
-        const ctx = sliceCanvas.getContext('2d')
-        ctx.drawImage(canvas, 0, sourceY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height)
-        if (y > 10) { doc.addPage(); y = 10 }
-        doc.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', 10, y, imgW, sliceH)
-        remaining -= sliceH
+      const purple = [108, 99, 255]
+      const W = doc.internal.pageSize.getWidth()
+      const H = doc.internal.pageSize.getHeight()
+      let y = 0
+
+      const addPage = () => { doc.addPage(); y = 20 }
+      const checkY = (needed = 30) => { if (y + needed > H - 15) addPage() }
+      const section = (title) => {
+        checkY(20)
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(11)
+        doc.setTextColor(...purple)
+        doc.text(title, 14, y)
+        doc.setTextColor(0)
+        y += 2
       }
+      const table = (head, body) => {
+        autoTable(doc, {
+          startY: y,
+          head: [head],
+          body,
+          styles: { fontSize:8, font:'helvetica', cellPadding:2 },
+          headStyles: { fillColor:purple, textColor:255, fontStyle:'bold' },
+          alternateRowStyles: { fillColor:[245,245,250] },
+          margin: { left:14, right:14 },
+          didDrawPage: (d) => { y = d.cursor.y + 6 },
+        })
+        y = doc.lastAutoTable.finalY + 8
+      }
+
+      // ── Strona 1: naglowek + podsumowanie ──
+      doc.setFillColor(...purple)
+      doc.rect(0, 0, W, 28, 'F')
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(20)
+      doc.setTextColor(255, 255, 255)
+      doc.text('JumpLogX', 14, 12)
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.text('Statystyki skokow spadochronowych', 14, 20)
+      doc.setFontSize(9)
+      doc.text(`Wygenerowano: ${new Date().toLocaleDateString('pl-PL')}`, W - 14, 20, { align:'right' })
+      doc.setTextColor(0)
+      y = 36
+
+      section('Podsumowanie ogolne')
+      table(
+        ['Parametr', 'Wartosc'],
+        [
+          ['Laczna liczba skokow', String(totalJumps)],
+          ['Lata aktywnosci', years.length > 0 ? `${years[0]} - ${years[years.length-1]}` : '-'],
+          ['Liczba lat', String(years.length)],
+          ['Pierwszy skok', fmt(firstJump?.jump_date) + (firstJump?.city ? ` - ${firstJump.city}` : '')],
+          ['Ostatni skok', fmt(lastJump?.jump_date) + (lastJump?.city ? ` - ${lastJump.city}` : '')],
+          ['Rekord dzienny', bestDayJumps ? `${bestDayJumps[1]} skokow (${fmt(bestDayJumps[0])})` : '-'],
+          ['Srednia wysokosc', avgAlt ? `${avgAlt} m (max ${maxAlt} m)` : '-'],
+          ['Srednie opoznienie', avgDelay ? `${avgDelay} s (max ${maxDelay} s)` : '-'],
+          ['Rozne strefy zrzutu', String(allCities.length)],
+          ['Rozne samoloty', String(allAircraft.length)],
+          ['Rozne spadochrony', String(Object.keys(perChute).length)],
+        ]
+      )
+
+      // Czas swobodnego spadania
+      const withDelayPDF = jumps.filter(j => j.delay > 0)
+      if (withDelayPDF.length > 0) {
+        const totalSec = withDelayPDF.reduce((s,j) => s + j.delay, 0)
+        const h2 = Math.floor(totalSec/3600)
+        const m2 = Math.floor((totalSec%3600)/60)
+        const s2 = totalSec % 60
+        section('Czas swobodnego spadania')
+        table(
+          ['Parametr', 'Wartosc'],
+          [
+            ['Laczny czas', h2 > 0 ? `${h2}h ${m2}m ${s2}s` : `${m2}m ${s2}s`],
+            ['Laczna liczba sekund', `${totalSec.toLocaleString('pl-PL')} s`],
+            ['Skoki z opoznieniem', String(withDelayPDF.length)],
+          ]
+        )
+      }
+
+      // Skoki per rok
+      if (Object.keys(perYear).length > 0) {
+        section('Skoki per rok')
+        table(
+          ['Rok', 'Liczba skokow'],
+          Object.entries(perYear).sort().map(([yr, cnt]) => [yr, String(cnt)])
+        )
+      }
+
+      // Rodzaje skokow
+      if (topTypes.length > 0) {
+        section('Rodzaje skokow')
+        table(
+          ['Typ skoku', 'Liczba', '% wszystkich'],
+          Object.entries(perType).sort((a,b) => b[1]-a[1]).map(([type, cnt]) => [
+            type, String(cnt), `${((cnt/jumps.length)*100).toFixed(1)}%`
+          ])
+        )
+      }
+
+      // ── Strona 2: strefy, samoloty, sprzet ──
+      addPage()
+
+      section('Strefy zrzutu')
+      table(
+        ['Strefa zrzutu', 'Liczba skokow', '% wszystkich'],
+        allCities.map(([city, cnt]) => [city, String(cnt), `${((cnt/jumps.length)*100).toFixed(1)}%`])
+      )
+
+      section('Samoloty')
+      table(
+        ['Samolot', 'Liczba skokow', '% wszystkich'],
+        allAircraft.map(([ac, cnt]) => [ac, String(cnt), `${((cnt/jumps.length)*100).toFixed(1)}%`])
+      )
+
+      if (Object.keys(perChute).length > 0) {
+        section('Uzywany sprzet (spadochrony)')
+        table(
+          ['Spadochron', 'Liczba skokow', '% wszystkich'],
+          Object.entries(perChute).sort((a,b) => b[1]-a[1]).map(([ch, cnt]) => [
+            ch, String(cnt), `${((cnt/jumps.length)*100).toFixed(1)}%`
+          ])
+        )
+      }
+
+      // ── Strona 3: aktywnosc miesięczna ──
+      addPage()
+
+      section('Aktywnosc miesięczna - wszystkie lata')
+      const monthHeaders = ['Rok', 'Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paz','Lis','Gru','Suma']
+      const monthRows = yearsSorted.map(yr => {
+        const row = perYearMonth[yr]
+        const sum = row.reduce((s,v) => s+v, 0)
+        return [yr, ...row.map(v => v > 0 ? String(v) : '-'), String(sum)]
+      })
+      const totalRow = ['SUMA', ...months.map((_, mi) => {
+        const t = yearsSorted.reduce((s, yr) => s + (perYearMonth[yr][mi] || 0), 0)
+        return t > 0 ? String(t) : '-'
+      }), String(yearsSorted.reduce((s, yr) => s + perYearMonth[yr].reduce((a,b) => a+b, 0), 0))]
+      monthRows.push(totalRow)
+      autoTable(doc, {
+        startY: y,
+        head: [monthHeaders],
+        body: monthRows,
+        styles: { fontSize:7, font:'helvetica', cellPadding:1.5, halign:'center' },
+        headStyles: { fillColor:purple, textColor:255, fontStyle:'bold', fontSize:7 },
+        columnStyles: { 0: { halign:'left', fontStyle:'bold' } },
+        alternateRowStyles: { fillColor:[245,245,250] },
+        margin: { left:14, right:14 },
+      })
+      y = doc.lastAutoTable.finalY + 8
+
+      // ── Celnosc ladowania ──
+      if (dayAvgs.length > 0) {
+        addPage()
+        section('Celnosc ladowania (ACC) - podsumowanie')
+        table(
+          ['Parametr', 'Wartosc'],
+          [
+            ['Ogolna srednia', overallAvg ? `${overallAvg} cm` : '-'],
+            ['Najlepszy dzien', bestDay ? `${bestDay.avg.toFixed(3)} cm - ${fmt(bestDay.day)} (${bestDay.count} skokow)` : '-'],
+            ['Najslabszy dzien', worstDay ? `${worstDay.avg.toFixed(3)} cm - ${fmt(worstDay.day)} (${worstDay.count} skokow)` : '-'],
+            ['Liczba dni treningowych', String(dayAvgs.length)],
+            ['Laczna liczba skokow ACC', String(withResult.length)],
+          ]
+        )
+
+        section('Celnosc ladowania - szczegoly per dzien')
+        table(
+          ['Data', 'Liczba skokow', 'Srednia dnia (cm)', 'vs srednia'],
+          dayAvgsWithRolling.map(d => [
+            fmt(d.day),
+            String(d.count),
+            d.oneDayAvg.toFixed(3),
+            d.oneDayAvg <= parseFloat(overallAvg) ? 'lepsza' : 'gorsza'
+          ])
+        )
+      }
+
+      // ── Stopka na kazdej stronie ──
+      const pageCount = doc.internal.getNumberOfPages()
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i)
+        doc.setFontSize(7)
+        doc.setTextColor(150)
+        doc.text(
+          `JumpLogX - Statystyki skokow | Strona ${i}/${pageCount} | ${new Date().toLocaleDateString('pl-PL')}`,
+          W/2, H - 6, { align:'center' }
+        )
+      }
+
       doc.save(`JumpLogX_statystyki_${new Date().toISOString().split('T')[0]}.pdf`)
     } catch (err) {
       console.error('PDF error:', err)
