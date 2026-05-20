@@ -124,6 +124,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
     sessionStorage.setItem('dismissedQuals', JSON.stringify(updated))
   }
   const [selectedJump, setSelectedJump] = useState(null)
+  const [visibleCount, setVisibleCount] = useState(20)
   const [confirmDelete, setConfirmDelete] = useState(null)
 
   const totalJumps = jumps.length > 0 ? Math.max(...jumps.map(j => j.number || 0)) : 0
@@ -241,7 +242,7 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
           <div style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
             <div style={{ position:'relative' }}>
               <Search size={13} style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#64748B' }} strokeWidth={1.5}/>
-              <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Szukaj..." style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:50, padding:'0.45rem 0.85rem 0.45rem 2rem', color:'#fff', fontFamily:'var(--font)', fontSize:'0.82rem', outline:'none', width:160 }}/>
+              <input value={search} onChange={e=>{ setSearch(e.target.value); setVisibleCount(20) }} placeholder="Szukaj..." style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:50, padding:'0.45rem 0.85rem 0.45rem 2rem', color:'#fff', fontFamily:'var(--font)', fontSize:'0.82rem', outline:'none', width:160 }}/>
               {search && <button onClick={()=>setSearch('')} style={{ position:'absolute', right:8, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', color:'#64748B', cursor:'pointer', padding:0, lineHeight:1 }}><X size={12}/></button>}
             </div>
             {jumps.length > 0 && <button onClick={onRepeat} disabled={repeating} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:50, color:'#94A3B8', padding:'0.45rem 1rem', cursor:'pointer', fontFamily:'var(--font)', fontSize:'0.78rem', fontWeight:500 }}>{repeating ? '...' : '↩ Powtórz'}</button>}
@@ -258,9 +259,21 @@ export default function ProJournal({ jumps, loading, onDelete, onRepeat, repeati
         )}
 
         <AnimatePresence>
-          {!loading && filtered.map(j => <JumpCardPro key={j.id} jump={j} onClick={()=>setSelectedJump(j)} onDelete={(id)=>setConfirmDelete({ id, number:j.number })}/>)}
+          {!loading && filtered.slice(0, visibleCount).map(j => <JumpCardPro key={j.id} jump={j} onClick={()=>setSelectedJump(j)} onDelete={(id)=>setConfirmDelete({ id, number:j.number })}/>)}
         </AnimatePresence>
         {!loading && search && filtered.length === 0 && <div style={{ textAlign:'center', padding:'2rem', color:'#64748B' }}>Brak wyników dla "{search}"</div>}
+        {!loading && filtered.length > visibleCount && (
+          <div style={{ textAlign:'center', padding:'1rem 0' }}>
+            <button
+              onClick={() => setVisibleCount(v => v + 20)}
+              style={{ background:'rgba(139,92,246,0.1)', border:'1px solid rgba(139,92,246,0.3)', borderRadius:12, color:'#A78BFA', padding:'0.65rem 2rem', fontFamily:'var(--font)', fontSize:'0.88rem', fontWeight:600, cursor:'pointer', transition:'all 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.background='rgba(139,92,246,0.2)'}
+              onMouseLeave={e => e.currentTarget.style.background='rgba(139,92,246,0.1)'}
+            >
+              Pokaż więcej ({filtered.length - visibleCount} pozostałych)
+            </button>
+          </div>
+        )}
       </div>
 
       {/* FAB */}
