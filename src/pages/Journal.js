@@ -5,6 +5,8 @@ import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 import JumpCard from '../components/JumpCard'
 import ProJournal from './ProJournal'
+import UltraJournal from './UltraJournal'
+import UltraJournal from './UltraJournal'
 import JumpsMap from '../components/JumpsMap'
 import {
   dbGetJumps, dbSetJumps,
@@ -233,7 +235,72 @@ export default function Journal() {
     </div>
   )
 
-  const isPro = document.body.classList.contains('theme-pro') || document.body.classList.contains('theme-dark') || document.body.classList.contains('theme-ultra') || document.body.classList.contains('theme-dark')
+  const isUltra = document.body.classList.contains('theme-ultra')
+  const isPro = document.body.classList.contains('theme-pro') || document.body.classList.contains('theme-dark') || document.body.classList.contains('theme-dark')
+
+  if (isUltra) {
+    return (
+      <>
+        <Navbar />
+        <UltraJournal
+          jumps={jumps}
+          loading={loading}
+          onDelete={(id) => setConfirmDelete({ id, number: jumps.find(j=>j.id===id)?.number })}
+          onRepeat={repeatLastJump}
+          repeating={repeating}
+          docs={docs}
+          urgentDocs={urgentDocs}
+          urgentRigs={urgentRigs}
+          profileAlerts={profileAlerts}
+          qualAlerts={qualAlerts}
+        />
+        {confirmDelete && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
+            <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.5rem', maxWidth:360, width:'100%' }}>
+              <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.75rem' }}>{t('journal.delete_jump_title', { number: confirmDelete.number })}</div>
+              <p style={{ fontSize:'0.88rem', color:'var(--muted)', marginBottom:'1.25rem' }}>{t('journal.delete_jump_desc')}</p>
+              <div style={{ display:'flex', gap:'0.75rem' }}>
+                <button className="btn ghost" style={{ flex:1 }} onClick={() => setConfirmDelete(null)}>{t('common.cancel')}</button>
+                <button className="btn danger" style={{ flex:1 }} onClick={() => { deleteJump(confirmDelete.id); setConfirmDelete(null) }}>{t('journal.delete_jump_confirm')}</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    )
+  }
+
+  if (isUltra) {
+    return (
+      <>
+        <Navbar />
+        <UltraJournal
+          jumps={jumps}
+          loading={loading}
+          onDelete={(id) => setConfirmDelete({ id, number: jumps.find(j=>j.id===id)?.number })}
+          onRepeat={repeatLastJump}
+          repeating={repeating}
+          docs={docs}
+          urgentDocs={urgentDocs}
+          urgentRigs={urgentRigs}
+          profileAlerts={profileAlerts}
+          qualAlerts={qualAlerts}
+        />
+        {confirmDelete && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
+            <div style={{ background:'var(--bg2)', border:'1px solid var(--border2)', borderRadius:'var(--r2)', padding:'1.5rem', maxWidth:360, width:'100%' }}>
+              <div style={{ fontFamily:'var(--head)', fontSize:'1rem', fontWeight:800, marginBottom:'0.75rem' }}>{t('journal.delete_jump_title', { number: confirmDelete.number })}</div>
+              <p style={{ fontSize:'0.88rem', color:'var(--muted)', marginBottom:'1.25rem' }}>{t('journal.delete_jump_desc')}</p>
+              <div style={{ display:'flex', gap:'0.75rem' }}>
+                <button className="btn ghost" style={{ flex:1 }} onClick={() => setConfirmDelete(null)}>{t('common.cancel')}</button>
+                <button className="btn danger" style={{ flex:1 }} onClick={() => { deleteJump(confirmDelete.id); setConfirmDelete(null) }}>{t('journal.delete_jump_confirm')}</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    )
+  }
 
   if (isPro) {
     return (
