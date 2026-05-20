@@ -21,8 +21,9 @@ import AdminPanel     from './pages/AdminPanel'
 import Terms         from './pages/Terms'
 
 const savedTheme = localStorage.getItem('jumplogx_theme') || 'dark'
-if (savedTheme === 'pro')  document.body.classList.add('theme-pro')
-if (savedTheme === 'dark') document.body.classList.add('theme-dark')
+if (savedTheme === 'pro')   document.body.classList.add('theme-pro')
+if (savedTheme === 'dark')  document.body.classList.add('theme-dark')
+if (savedTheme === 'ultra') document.body.classList.add('theme-ultra')
 
 const DEV_SECRET = process.env.REACT_APP_DEV_SECRET || ''
 

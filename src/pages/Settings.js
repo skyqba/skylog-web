@@ -61,7 +61,11 @@ export default function Settings() {
     } else {
       document.body.classList.remove('theme-dark')
     }
-    if (t === 'dark') { document.body.classList.add('theme-dark') } else { document.body.classList.remove('theme-dark') }
+    if (t === 'ultra') {
+      document.body.classList.add('theme-ultra')
+    } else {
+      document.body.classList.remove('theme-ultra')
+    }
     if (t === 'pro') {
       document.body.classList.add('theme-pro')
     } else {
@@ -355,8 +359,9 @@ export default function Settings() {
           <p style={{ color:'var(--muted)', fontSize:'0.82rem', marginBottom:'1rem' }}>Wybierz wygląd aplikacji</p>
           <div style={{ display:'flex', gap:'0.75rem' }}>
             {[
-              { code:'dark', label:'🌙 Dark Mode', desc:'Ciemny motyw' },
-              { code:'pro',     label:'💎 Pro Mode', desc:'Fioletowy motyw' },
+              { code:'dark',  label:'🌙 Dark Mode',  desc:'Ciemny motyw' },
+              { code:'pro',   label:'💎 Pro Mode',   desc:'Fioletowy motyw' },
+              { code:'ultra', label:'⚡ Ultra',       desc:'Modern Classic' },
             ].map(m => (
               <button key={m.code} onClick={() => changeTheme(m.code)}
                 style={{ flex:1, padding:'0.85rem', background: theme === m.code ? 'rgba(108,99,255,0.15)' : 'var(--bg3)', border:`1px solid ${theme === m.code ? 'var(--accent)' : 'var(--border)'}`, borderRadius:12, color: theme === m.code ? 'var(--accent2)' : 'var(--muted)', fontFamily:'var(--font)', fontSize:'0.88rem', fontWeight: theme === m.code ? 700 : 400, cursor:'pointer', transition:'all 0.2s', textAlign:'center' }}>

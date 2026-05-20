@@ -233,7 +233,7 @@ export default function Journal() {
     </div>
   )
 
-  const isPro = document.body.classList.contains('theme-pro') || document.body.classList.contains('theme-dark') || document.body.classList.contains('theme-dark')
+  const isPro = document.body.classList.contains('theme-pro') || document.body.classList.contains('theme-dark') || document.body.classList.contains('theme-ultra') || document.body.classList.contains('theme-dark')
 
   if (isPro) {
     return (
