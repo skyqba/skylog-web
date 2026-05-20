@@ -6,7 +6,6 @@ import Navbar from '../components/Navbar'
 import JumpCard from '../components/JumpCard'
 import ProJournal from './ProJournal'
 import UltraJournal from './UltraJournal'
-import UltraJournal from './UltraJournal'
 import JumpsMap from '../components/JumpsMap'
 import {
   dbGetJumps, dbSetJumps,
